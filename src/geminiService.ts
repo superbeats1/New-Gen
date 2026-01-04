@@ -11,8 +11,6 @@ const genAI = new GoogleGenAI({ apiKey });
 
 export const analyzeQuery = async (query: string): Promise<AnalysisResult> => {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
     const prompt = `
 Analyze the following user query for a platform called "Signal". 
 Determine if the user is looking for "Business Opportunities" (Opportunity Mode) or "Active Client Leads" (Lead Mode).
@@ -66,11 +64,16 @@ Return ONLY valid JSON in this exact format:
 Return either "opportunities" array (for Opportunity Mode) OR "leads" array (for Lead Mode), not both.
 `;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const response = await genAI.models.generateContent({
+      model: "gemini-1.5-flash",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json"
+      }
+    });
     
     // Clean and parse JSON
+    const text = response.text;
     const cleanText = text.replace(/```json\n?|\n?```/g, '').trim();
     const parsedResult = JSON.parse(cleanText);
     
@@ -86,8 +89,6 @@ Return either "opportunities" array (for Opportunity Mode) OR "leads" array (for
 
 export const generateOutreach = async (lead: any, myProfile: string = ""): Promise<string> => {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    
     const prompt = `
 Generate a personalized, high-converting outreach message for the following lead.
 
@@ -110,9 +111,12 @@ Requirements:
 Return only the message text, no extra formatting.
 `;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    return response.text();
+    const response = await genAI.models.generateContent({
+      model: "gemini-1.5-flash",
+      contents: prompt
+    });
+    
+    return response.text;
   } catch (error) {
     console.error('Gemini API Error:', error);
     throw new Error('Failed to generate outreach message.');
@@ -121,8 +125,6 @@ Return only the message text, no extra formatting.
 
 export const enrichContact = async (lead: any): Promise<any> => {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    
     const prompt = `
 Based on the following lead information, generate realistic contact enrichment data:
 
@@ -148,11 +150,16 @@ Return ONLY valid JSON in this format:
 }
 `;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const response = await genAI.models.generateContent({
+      model: "gemini-1.5-flash",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json"
+      }
+    });
     
     // Clean and parse JSON
+    const text = response.text;
     const cleanText = text.replace(/```json\n?|\n?```/g, '').trim();
     return JSON.parse(cleanText);
   } catch (error) {
