@@ -2,7 +2,13 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { WorkflowMode, AnalysisResult } from "./types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+if (!apiKey) {
+  throw new Error('VITE_GEMINI_API_KEY environment variable is not set. Please add it to your .env.local file or Vercel environment variables.');
+}
+
+const ai = new GoogleGenAI({ apiKey });
 
 export const analyzeQuery = async (query: string): Promise<AnalysisResult> => {
   const model = 'gemini-3-flash-preview';
