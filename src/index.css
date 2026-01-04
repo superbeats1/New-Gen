@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 body {
   font-family: 'Inter', sans-serif;
   background-color: #0a0b0e;
@@ -22,4 +24,22 @@ body {
 .gradient-border > div {
   background: #0a0b0e;
   border-radius: 0.7rem;
+}
+
+@keyframes scanning {
+  0% { transform: translateY(-100px); }
+  100% { transform: translateY(calc(100vh + 100px)); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-scanning-line {
+  animation: scanning 2s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
 }
