@@ -1,0 +1,7 @@
+{
+  "name": "Signal - Opportunity & Lead Discovery Platform",
+  "description": "A powerful dual-purpose platform that analyzes market signals to discover validated business opportunities or active client leads using AI-driven orchestration.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
