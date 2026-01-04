@@ -1,5 +1,4 @@
-
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { WorkflowMode, AnalysisResult } from "./types";
 
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -8,144 +7,156 @@ if (!apiKey) {
   throw new Error('VITE_GEMINI_API_KEY environment variable is not set. Please add it to your .env.local file or Vercel environment variables.');
 }
 
-const ai = new GoogleGenAI({ apiKey });
+const genAI = new GoogleGenAI({ apiKey });
 
 export const analyzeQuery = async (query: string): Promise<AnalysisResult> => {
-  const model = 'gemini-3-flash-preview';
-  
-  const prompt = `
-    Analyze the following user query for a platform called "Signal". 
-    Determine if the user is looking for "Business Opportunities" (Opportunity Mode) or "Active Client Leads" (Lead Mode).
-    
-    Query: "${query}"
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    If it's Opportunity Mode: Generate 5 realistic business opportunities found by "scanning" Reddit/forums (simulate this research). 
-    Provide scores for Demand (1-10), Market Readiness (1-10), Competition (Saturated/Moderate/Underserved), and Entry Difficulty (Low/Medium/High).
-    
-    If it's Lead Mode: Generate 5-8 active leads that might exist on Reddit, Upwork, or Twitter for the requested service.
-    Provide Fit Score (1-10), Budget (High/Medium/Low/Unknown), and Urgency (High/Medium/Low).
+    const prompt = `
+Analyze the following user query for a platform called "Signal". 
+Determine if the user is looking for "Business Opportunities" (Opportunity Mode) or "Active Client Leads" (Lead Mode).
 
-    Return the results in the specified JSON format.
-  `;
+Query: "${query}"
 
-  const response = await ai.models.generateContent({
-    model,
-    contents: prompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          mode: { type: Type.STRING, enum: [WorkflowMode.OPPORTUNITY, WorkflowMode.LEAD] },
-          query: { type: Type.STRING },
-          summary: { type: Type.STRING },
-          opportunities: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                id: { type: Type.STRING },
-                problemStatement: { type: Type.STRING },
-                overallScore: { type: Type.NUMBER },
-                demandSignal: { type: Type.NUMBER },
-                marketReadiness: { type: Type.NUMBER },
-                competition: { type: Type.STRING },
-                entryDifficulty: { type: Type.STRING },
-                evidence: { type: Type.ARRAY, items: { type: Type.STRING } },
-                whyItMatters: { type: Type.STRING },
-                redFlags: { type: Type.STRING },
-                nextSteps: { type: Type.ARRAY, items: { type: Type.STRING } }
-              },
-              required: ["id", "problemStatement", "overallScore"]
-            }
-          },
-          leads: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                id: { type: Type.STRING },
-                prospectName: { type: Type.STRING },
-                username: { type: Type.STRING },
-                requestSummary: { type: Type.STRING },
-                postedAt: { type: Type.STRING },
-                source: { type: Type.STRING },
-                location: { type: Type.STRING },
-                fitScore: { type: Type.NUMBER },
-                budget: { type: Type.STRING },
-                urgency: { type: Type.STRING },
-                contactInfo: { type: Type.STRING },
-                sourceUrl: { type: Type.STRING }
-              }
-            }
-          }
-        },
-        required: ["mode", "query", "summary"]
-      }
+If it's Opportunity Mode: Generate 3-5 realistic business opportunities found by "scanning" Reddit/forums (simulate this research). 
+Provide scores for Demand (1-10), Market Readiness (1-10), Competition (Saturated/Moderate/Underserved), and Entry Difficulty (Low/Medium/High).
+
+If it's Lead Mode: Generate 5-8 active leads that might exist on Reddit, Upwork, or Twitter for the requested service.
+Provide Fit Score (1-10), Budget (High/Medium/Low/Unknown), and Urgency (High/Medium/Low).
+
+Return ONLY valid JSON in this exact format:
+{
+  "mode": "OPPORTUNITY" or "LEAD",
+  "query": "${query}",
+  "summary": "Brief summary of findings",
+  "opportunities": [
+    {
+      "id": "opp-1",
+      "problemStatement": "Clear problem description",
+      "overallScore": 8,
+      "demandSignal": 9,
+      "marketReadiness": 7,
+      "competition": "Underserved",
+      "entryDifficulty": "Medium",
+      "evidence": ["Evidence 1", "Evidence 2"],
+      "whyItMatters": "Why this opportunity matters",
+      "redFlags": "Potential concerns",
+      "nextSteps": ["Step 1", "Step 2"]
     }
-  });
+  ],
+  "leads": [
+    {
+      "id": "lead-1",
+      "prospectName": "John Doe",
+      "username": "@johndoe",
+      "requestSummary": "Looking for help with...",
+      "postedAt": "2 hours ago",
+      "source": "Reddit",
+      "location": "Austin, TX",
+      "fitScore": 8,
+      "budget": "Medium",
+      "urgency": "High",
+      "contactInfo": "Contact through platform",
+      "sourceUrl": "https://example.com/post"
+    }
+  ]
+}
 
-  const result = JSON.parse(response.text);
-  return {
-    ...result,
-    timestamp: new Date().toISOString()
-  };
+Return either "opportunities" array (for Opportunity Mode) OR "leads" array (for Lead Mode), not both.
+`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    
+    // Clean and parse JSON
+    const cleanText = text.replace(/```json\n?|\n?```/g, '').trim();
+    const parsedResult = JSON.parse(cleanText);
+    
+    return {
+      ...parsedResult,
+      timestamp: new Date().toISOString()
+    };
+  } catch (error) {
+    console.error('Gemini API Error:', error);
+    throw new Error('Failed to analyze query. Please check your API key and try again.');
+  }
 };
 
 export const generateOutreach = async (lead: any, myProfile: string = ""): Promise<string> => {
-  const model = 'gemini-3-flash-preview';
-  const prompt = `
-    Generate a personalized, high-converting outreach message for the following lead.
-    Lead Name: ${lead.prospectName}
-    Request: ${lead.requestSummary}
-    Platform: ${lead.source}
-    Budget: ${lead.budget}
-    Urgency: ${lead.urgency}
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
-    My Info: ${myProfile}
+    const prompt = `
+Generate a personalized, high-converting outreach message for the following lead.
 
-    Requirements:
-    - Subject line (if applicable)
-    - Tone: Matches the lead's posting style (casual or professional)
-    - Opening: Strong hook referencing their specific need
-    - Value Prop: Briefly explain how I can solve their pain point
-    - CTA: Clear next step
-    - Length: Keep it concise.
-  `;
+Lead Name: ${lead.prospectName}
+Request: ${lead.requestSummary}
+Platform: ${lead.source}
+Budget: ${lead.budget}
+Urgency: ${lead.urgency}
 
-  const response = await ai.models.generateContent({
-    model,
-    contents: prompt
-  });
+My Info: ${myProfile}
 
-  return response.text || "Failed to generate message.";
+Requirements:
+- Subject line (if applicable)
+- Tone: Matches the lead's posting style (casual or professional)
+- Opening: Strong hook referencing their specific need
+- Value Prop: Briefly explain how I can solve their pain point
+- CTA: Clear next step
+- Length: Keep it concise (2-3 paragraphs max)
+
+Return only the message text, no extra formatting.
+`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  } catch (error) {
+    console.error('Gemini API Error:', error);
+    throw new Error('Failed to generate outreach message.');
+  }
 };
 
 export const enrichContact = async (lead: any): Promise<any> => {
-  // Mocking enrichment logic for the prototype
-  const model = 'gemini-3-flash-preview';
-  const prompt = `
-    Based on the prospect name "${lead.prospectName}" and platform "${lead.source}", 
-    simulate realistic contact enrichment data. Find a likely LinkedIn URL, professional email format, 
-    and recent activity summary.
-  `;
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    
+    const prompt = `
+Based on the following lead information, generate realistic contact enrichment data:
 
-  const response = await ai.models.generateContent({
-    model,
-    contents: prompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          email: { type: Type.STRING },
-          linkedIn: { type: Type.STRING },
-          company: { type: Type.STRING },
-          recentActivity: { type: Type.STRING }
-        }
-      }
-    }
-  });
+Lead Name: ${lead.prospectName}
+Company/Context: ${lead.requestSummary}
+Location: ${lead.location}
+Platform: ${lead.source}
 
-  return JSON.parse(response.text);
+Generate realistic professional contact information that might be found through LinkedIn/social research:
+- Email (format: firstname.lastname@company.com or similar)
+- LinkedIn URL
+- Company name
+- Job title
+- Phone number (format: +1-XXX-XXX-XXXX)
+
+Return ONLY valid JSON in this format:
+{
+  "email": "john.doe@company.com",
+  "linkedin": "https://linkedin.com/in/johndoe",
+  "company": "Company Name",
+  "jobTitle": "Job Title",
+  "phone": "+1-555-123-4567"
+}
+`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    
+    // Clean and parse JSON
+    const cleanText = text.replace(/```json\n?|\n?```/g, '').trim();
+    return JSON.parse(cleanText);
+  } catch (error) {
+    console.error('Gemini API Error:', error);
+    throw new Error('Failed to enrich contact information.');
+  }
 };
