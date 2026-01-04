@@ -1,10 +1,31 @@
 import { GoogleGenAI } from "@google/genai";
 import { WorkflowMode, AnalysisResult } from "./types";
 
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+// Check multiple possible environment variable names
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY || 
+               import.meta.env.VITE_GOOGLE_API_KEY ||
+               import.meta.env.GEMINI_API_KEY;
+
+// Debug logging for environment variables
+console.log('Environment check:', {
+  VITE_GEMINI_API_KEY: !!import.meta.env.VITE_GEMINI_API_KEY,
+  VITE_GOOGLE_API_KEY: !!import.meta.env.VITE_GOOGLE_API_KEY,
+  GEMINI_API_KEY: !!import.meta.env.GEMINI_API_KEY,
+  hasApiKey: !!apiKey,
+  apiKeyLength: apiKey?.length,
+  allEnvKeys: Object.keys(import.meta.env).filter(key => key.includes('API') || key.includes('GEMINI'))
+});
 
 if (!apiKey) {
-  throw new Error('VITE_GEMINI_API_KEY environment variable is not set. Please add it to your .env.local file or Vercel environment variables.');
+  console.error('All environment variables:', import.meta.env);
+  throw new Error(`VITE_GEMINI_API_KEY environment variable is not set. Please add it to your Vercel environment variables. 
+  
+Available env vars: ${Object.keys(import.meta.env).join(', ')}
+  
+Steps:
+1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables
+2. Add: Name="VITE_GEMINI_API_KEY", Value=Your API Key
+3. Redeploy`);
 }
 
 const genAI = new GoogleGenAI({ apiKey });
