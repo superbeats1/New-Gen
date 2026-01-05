@@ -35,6 +35,7 @@ serve(async (req) => {
       const customerEmail = session.customer_email || session.customer_details?.email;
       
       console.log('Processing payment for email:', customerEmail);
+      console.log('Product purchased:', session.line_items || 'N/A');
 
       if (customerEmail) {
         // Find user by email
