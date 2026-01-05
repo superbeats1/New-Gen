@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { WorkflowMode, AnalysisResult } from "./types";
 
 // Check multiple possible environment variable names
@@ -7,7 +7,7 @@ const apiKey = import.meta.env.VITE_GEMINI_API_KEY ||
                import.meta.env.GEMINI_API_KEY;
 
 // Debug logging for environment variables
-console.log('Environment check (v2):', {
+console.log('Environment check (v3):', {
   VITE_GEMINI_API_KEY: !!import.meta.env.VITE_GEMINI_API_KEY,
   VITE_GOOGLE_API_KEY: !!import.meta.env.VITE_GOOGLE_API_KEY,
   GEMINI_API_KEY: !!import.meta.env.GEMINI_API_KEY,
@@ -29,7 +29,7 @@ Steps:
 3. Redeploy`);
 }
 
-const genAI = new GoogleGenAI({ apiKey });
+const genAI = new GoogleGenerativeAI(apiKey);
 
 export const analyzeQuery = async (query: string): Promise<AnalysisResult> => {
   try {
@@ -86,16 +86,17 @@ Return ONLY valid JSON in this exact format:
 Return either "opportunities" array (for Opportunity Mode) OR "leads" array (for Lead Mode), not both.
 `;
 
-    const response = await genAI.models.generateContent({
+    const model = genAI.getGenerativeModel({ 
       model: "gemini-1.5-flash",
-      contents: prompt,
-      config: {
+      generationConfig: {
         responseMimeType: "application/json"
       }
     });
     
+    const response = await model.generateContent(prompt);
+    
     // Clean and parse JSON
-    const text = response.text;
+    const text = response.response.text();
     const cleanText = text.replace(/```json\n?|\n?```/g, '').trim();
     const parsedResult = JSON.parse(cleanText);
     
@@ -133,12 +134,10 @@ Requirements:
 Return only the message text, no extra formatting.
 `;
 
-    const response = await genAI.models.generateContent({
-      model: "gemini-1.5-flash",
-      contents: prompt
-    });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const response = await model.generateContent(prompt);
     
-    return response.text;
+    return response.response.text();
   } catch (error) {
     console.error('Gemini API Error:', error);
     throw new Error('Failed to generate outreach message.');
@@ -172,16 +171,17 @@ Return ONLY valid JSON in this format:
 }
 `;
 
-    const response = await genAI.models.generateContent({
+    const model = genAI.getGenerativeModel({ 
       model: "gemini-1.5-flash",
-      contents: prompt,
-      config: {
+      generationConfig: {
         responseMimeType: "application/json"
       }
     });
     
+    const response = await model.generateContent(prompt);
+    
     // Clean and parse JSON
-    const text = response.text;
+    const text = response.response.text();
     const cleanText = text.replace(/```json\n?|\n?```/g, '').trim();
     return JSON.parse(cleanText);
   } catch (error) {
