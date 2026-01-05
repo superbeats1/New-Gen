@@ -9,7 +9,7 @@ export const createCheckoutSession = async () => {
     
     // SIGNAL Pro Plan - Product ID: prod_TjNbchpI0jBZG5
     // Create checkout session with custom success URL that includes session info
-    const paymentLinkUrl = `https://buy.stripe.com/test_7sYeVc1CX3UwcbFeQp2kw03?success_url=${encodeURIComponent(currentUrl + '/success?session_id={CHECKOUT_SESSION_ID}')}&cancel_url=${encodeURIComponent(currentUrl)}`;
+    const paymentLinkUrl = `https://buy.stripe.com/test_5kQ5kC6Xhdv66Rl7nX2kw04?success_url=${encodeURIComponent(currentUrl + '/success?session_id={CHECKOUT_SESSION_ID}')}&cancel_url=${encodeURIComponent(currentUrl)}`;
     
     // Redirect to Stripe Payment Link with custom URLs
     window.location.href = paymentLinkUrl;
