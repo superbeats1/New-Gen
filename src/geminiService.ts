@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/genai";
 import { WorkflowMode, AnalysisResult } from "./types";
 
 // Check multiple possible environment variable names
