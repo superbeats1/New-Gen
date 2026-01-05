@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Zap, Target, Users, Search, ChevronRight, Briefcase, BarChart3, Globe, LogIn, User, Crown, CreditCard, ChevronDown, Settings, LogOut, Star } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Zap, Target, Users, Search, ChevronRight, Briefcase, BarChart3, Globe, LogIn, User, Crown, CreditCard, ChevronDown, Settings, LogOut, Star, CheckCircle, X } from 'lucide-react';
 
 interface Props {
   onStart: () => void;
@@ -9,10 +9,22 @@ interface Props {
   profile?: any;
   onSignOut?: () => void;
   onUpgrade?: () => void;
+  showPaymentSuccess?: boolean;
 }
 
-const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, onSignOut, onUpgrade }) => {
+const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, onSignOut, onUpgrade, showPaymentSuccess }) => {
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showSuccessBanner, setShowSuccessBanner] = useState(false);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('payment') === 'success') {
+      setShowSuccessBanner(true);
+      // Auto-hide banner after 10 seconds
+      const timer = setTimeout(() => setShowSuccessBanner(false), 10000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
   return (
     <div className="min-h-screen bg-[#0a0b0e] overflow-x-hidden selection:bg-blue-500/30">
       {/* Background Grid & Ambient Glow */}
@@ -145,6 +157,29 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
           )}
         </div>
       </nav>
+
+      {/* Payment Success Banner */}
+      {showSuccessBanner && (
+        <div className="relative z-50 bg-gradient-to-r from-green-600 to-emerald-600 border-b border-green-500">
+          <div className="max-w-7xl mx-auto px-8 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <CheckCircle className="w-6 h-6 text-white" />
+                <div>
+                  <h3 className="text-white font-bold">Payment Successful!</h3>
+                  <p className="text-green-100 text-sm">Welcome to SIGNAL Pro! You now have unlimited searches and advanced features.</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowSuccessBanner(false)}
+                className="text-white hover:text-green-200 transition-colors p-1"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Hero Section */}
       <section className="relative z-10 max-w-7xl mx-auto px-8 pt-20 pb-32 flex flex-col lg:flex-row items-center gap-16">

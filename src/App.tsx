@@ -113,11 +113,14 @@ const App: React.FC = () => {
   useEffect(() => {
     // Check for success redirect from Stripe
     const urlParams = new URLSearchParams(window.location.search);
-    const sessionId = urlParams.get('session_id');
-    if (sessionId) {
-      setShowSuccessPage(true);
+    const paymentSuccess = urlParams.get('payment');
+    if (paymentSuccess === 'success') {
       // Clear the URL parameters but keep the current path
       window.history.replaceState({}, document.title, window.location.pathname);
+      // Force refresh of profile data after payment
+      if (session) {
+        fetchProfile(session.user.id);
+      }
     }
 
     supabase.auth.getSession().then(({ data: { session } }) => {
