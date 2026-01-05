@@ -15,6 +15,43 @@ interface Props {
 const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, onSignOut, onUpgrade, showPaymentSuccess }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showSuccessBanner, setShowSuccessBanner] = useState(false);
+  
+  // Pre-calculate random values to avoid hydration issues
+  const [targetPositions] = useState(() => 
+    Array.from({ length: 8 }, (_, i) => {
+      const angle = (i * 45) + (Math.random() * 30);
+      const distance = 30 + (Math.random() * 40);
+      return {
+        x: 50 + distance * Math.cos(angle * Math.PI / 180),
+        y: 50 + distance * Math.sin(angle * Math.PI / 180),
+        delay: Math.random() * 3
+      };
+    })
+  );
+
+  const [particlePositions] = useState(() =>
+    Array.from({ length: 20 }, () => ({
+      top: Math.random() * 100,
+      left: Math.random() * 100,
+      delay: Math.random() * 5
+    }))
+  );
+
+  const [moneyIndicators] = useState(() =>
+    Array.from({ length: 4 }, (_, i) => ({
+      top: 20 + (i * 15),
+      left: 15 + (i * 20),
+      amount: ['5K', '12K', '8K', '15K'][i],
+      delay: i * 0.8
+    }))
+  );
+
+  const [platformIcons] = useState(() => [
+    {name: 'LinkedIn', color: '#0077b5', position: {top: '20%', right: '20%'}, delay: 0},
+    {name: 'Reddit', color: '#ff4500', position: {bottom: '20%', left: '20%'}, delay: 0.5},
+    {name: 'GitHub', color: '#333', position: {top: '60%', right: '15%'}, delay: 1.0},
+    {name: 'Twitter', color: '#1da1f2', position: {bottom: '40%', right: '25%'}, delay: 1.5}
+  ]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -44,14 +81,14 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
         </div>
         
         {/* Particle Effect */}
-        {[...Array(20)].map((_, i) => (
+        {particlePositions.map((particle, i) => (
           <div 
             key={i}
             className="absolute w-1 h-1 bg-cyan-400 rounded-full animate-twinkle"
             style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`
+              top: `${particle.top}%`,
+              left: `${particle.left}%`,
+              animationDelay: `${particle.delay}s`
             }}
           />
         ))}
@@ -324,41 +361,34 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
               <div className="absolute top-1/2 left-1/2 w-full h-[3px] bg-gradient-to-r from-emerald-400 via-cyan-400 to-transparent origin-left animate-radar-sweep"></div>
               
               {/* Target Leads (Animated Points) */}
-              {[...Array(8)].map((_, i) => {
-                const angle = (i * 45) + (Math.random() * 30);
-                const distance = 30 + (Math.random() * 40);
-                const x = 50 + distance * Math.cos(angle * Math.PI / 180);
-                const y = 50 + distance * Math.sin(angle * Math.PI / 180);
-                
-                return (
-                  <div 
-                    key={i}
-                    className="absolute w-3 h-3 rounded-full animate-target-blink"
-                    style={{
-                      top: `${y}%`,
-                      left: `${x}%`,
-                      backgroundColor: i % 3 === 0 ? '#10b981' : i % 3 === 1 ? '#06b6d4' : '#8b5cf6',
-                      animationDelay: `${Math.random() * 3}s`,
-                      transform: 'translate(-50%, -50%)'
-                    }}
-                  >
-                    <div className="absolute inset-0 rounded-full animate-ping" style={{backgroundColor: 'inherit', opacity: 0.4}}></div>
-                  </div>
-                );
-              })}
+              {targetPositions.map((position, i) => (
+                <div 
+                  key={i}
+                  className="absolute w-3 h-3 rounded-full animate-target-blink"
+                  style={{
+                    top: `${position.y}%`,
+                    left: `${position.x}%`,
+                    backgroundColor: i % 3 === 0 ? '#10b981' : i % 3 === 1 ? '#06b6d4' : '#8b5cf6',
+                    animationDelay: `${position.delay}s`,
+                    transform: 'translate(-50%, -50%)'
+                  }}
+                >
+                  <div className="absolute inset-0 rounded-full animate-ping" style={{backgroundColor: 'inherit', opacity: 0.4}}></div>
+                </div>
+              ))}
 
               {/* Money Indicators */}
-              {[...Array(4)].map((_, i) => (
+              {moneyIndicators.map((indicator, i) => (
                 <div 
                   key={i}
                   className="absolute text-emerald-400 font-bold text-xs animate-float-money"
                   style={{
-                    top: `${20 + (i * 15)}%`,
-                    left: `${15 + (i * 20)}%`,
-                    animationDelay: `${i * 0.8}s`
+                    top: `${indicator.top}%`,
+                    left: `${indicator.left}%`,
+                    animationDelay: `${indicator.delay}s`
                   }}
                 >
-                  ${['5K', '12K', '8K', '15K'][i]}
+                  ${indicator.amount}
                 </div>
               ))}
 
@@ -386,12 +416,7 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
               </div>
               
               {/* Platform Icons Floating Around */}
-              {[
-                {name: 'LinkedIn', color: '#0077b5', position: {top: '20%', right: '20%'}},
-                {name: 'Reddit', color: '#ff4500', position: {bottom: '20%', left: '20%'}},
-                {name: 'GitHub', color: '#333', position: {top: '60%', right: '15%'}},
-                {name: 'Twitter', color: '#1da1f2', position: {bottom: '40%', right: '25%'}}
-              ].map((platform, i) => (
+              {platformIcons.map((platform, i) => (
                 <div 
                   key={platform.name}
                   className="absolute w-8 h-8 rounded-lg border border-white/20 flex items-center justify-center text-xs font-bold text-white animate-float-platforms"
@@ -399,7 +424,7 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
                     ...platform.position,
                     backgroundColor: platform.color + '40',
                     borderColor: platform.color + '60',
-                    animationDelay: `${i * 0.5}s`
+                    animationDelay: `${platform.delay}s`
                   }}
                 >
                   {platform.name[0]}
