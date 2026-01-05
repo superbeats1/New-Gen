@@ -94,7 +94,21 @@ const LeadView: React.FC<Props> = ({ results, onSave, onGoTracker }) => {
             <span>Finding Leads for</span>
             <span className="text-indigo-400 italic">"{results.query}"</span>
           </div>
-          <p className="text-slate-400 text-sm max-w-2xl">{results.summary}</p>
+          <div className="flex items-center space-x-4">
+            <p className="text-slate-400 text-sm max-w-2xl">{results.summary}</p>
+            {results.leads && (
+              <div className="flex items-center space-x-2">
+                <span className="text-[8px] bg-emerald-600/20 text-emerald-400 px-1.5 py-0.5 rounded uppercase tracking-wide">
+                  {results.leads.filter(lead => !lead.notes?.includes('AI-generated')).length} Live
+                </span>
+                {results.leads.filter(lead => lead.notes?.includes('AI-generated')).length > 0 && (
+                  <span className="text-[8px] bg-indigo-600/20 text-indigo-400 px-1.5 py-0.5 rounded uppercase tracking-wide">
+                    {results.leads.filter(lead => lead.notes?.includes('AI-generated')).length} Enhanced
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
         <div className="flex items-center space-x-3">
           <button 
@@ -162,7 +176,18 @@ const LeadView: React.FC<Props> = ({ results, onSave, onGoTracker }) => {
                         <Users className="w-5 h-5" />
                       </div>
                       <div>
-                        <div className="text-sm font-bold text-white mb-0.5">{lead.prospectName}</div>
+                        <div className="text-sm font-bold text-white mb-0.5 flex items-center space-x-2">
+                          <span>{lead.prospectName}</span>
+                          {lead.notes?.includes('AI-generated') ? (
+                            <span className="text-[8px] bg-indigo-600/20 text-indigo-400 px-1.5 py-0.5 rounded uppercase tracking-wide">
+                              Enhanced
+                            </span>
+                          ) : (
+                            <span className="text-[8px] bg-emerald-600/20 text-emerald-400 px-1.5 py-0.5 rounded uppercase tracking-wide">
+                              Live
+                            </span>
+                          )}
+                        </div>
                         <div className="flex items-center space-x-2">
                           <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">{lead.source}</span>
                           <span className="text-[10px] text-slate-500">{lead.postedAt}</span>

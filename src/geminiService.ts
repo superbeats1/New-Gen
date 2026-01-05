@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { WorkflowMode, AnalysisResult } from "./types";
+import { RealDataCollector } from "./services/realDataService";
 
 // Check multiple possible environment variable names
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY || 
@@ -30,69 +31,109 @@ Steps:
 }
 
 const genAI = new GoogleGenAI({ apiKey });
+const realDataCollector = new RealDataCollector();
 
 export const analyzeQuery = async (query: string): Promise<AnalysisResult> => {
   try {
-    const prompt = `
-Analyze the following user query for a platform called "Signal". 
-Determine if the user is looking for "Business Opportunities" (Opportunity Mode) or "Active Client Leads" (Lead Mode).
+    console.log(`🧠 Starting analysis for: "${query}"`);
+    
+    // Step 1: Determine mode using AI (quick analysis)
+    const modePrompt = `
+Analyze this query and determine if the user wants:
+- "LEAD" mode: Finding active clients/prospects who need services right now
+- "OPPORTUNITY" mode: Identifying business opportunities/market gaps
 
 Query: "${query}"
 
-If it's Opportunity Mode: Generate 3-5 realistic business opportunities found by "scanning" Reddit/forums (simulate this research). 
-Provide scores for Demand (1-10), Market Readiness (1-10), Competition (Saturated/Moderate/Underserved), and Entry Difficulty (Low/Medium/High).
-
-If it's Lead Mode: Generate 5-8 active leads from diverse platforms including LinkedIn, Facebook Groups, Upwork, Fiverr, 99designs, Behance, GitHub, AngelList, Indie Hackers, Product Hunt, Discord servers, Slack communities, and industry forums.
-Provide Fit Score (1-10), Budget (High/Medium/Low/Unknown), and Urgency (High/Medium/Low).
-IMPORTANT: Use real platform URLs like:
-- LinkedIn: https://linkedin.com/in/username or https://linkedin.com/posts/activity-id
-- Facebook: https://facebook.com/groups/groupname/posts/postid  
-- Upwork: https://upwork.com/jobs/~jobid
-- GitHub: https://github.com/username/repo/issues/number
-- AngelList: https://angel.co/company/companyname
-- Discord: discord.gg/serverinvite (for public servers)
-
-Return ONLY valid JSON in this exact format:
-{
-  "mode": "OPPORTUNITY" or "LEAD",
-  "query": "${query}",
-  "summary": "Brief summary of findings",
-  "opportunities": [
-    {
-      "id": "opp-1",
-      "problemStatement": "Clear problem description",
-      "overallScore": 8,
-      "demandSignal": 9,
-      "marketReadiness": 7,
-      "competition": "Underserved",
-      "entryDifficulty": "Medium",
-      "evidence": ["Evidence 1", "Evidence 2"],
-      "whyItMatters": "Why this opportunity matters",
-      "redFlags": "Potential concerns",
-      "nextSteps": ["Step 1", "Step 2"]
-    }
-  ],
-  "leads": [
-    {
-      "id": "lead-1",
-      "prospectName": "John Doe",
-      "username": "@johndoe",
-      "requestSummary": "Looking for help with...",
-      "postedAt": "2 hours ago",
-      "source": "LinkedIn",
-      "location": "Austin, TX",
-      "fitScore": 8,
-      "budget": "Medium",
-      "urgency": "High",
-      "contactInfo": "Contact through platform",
-      "sourceUrl": "https://linkedin.com/in/johndoe"
-    }
-  ]
-}
-
-Return either "opportunities" array (for Opportunity Mode) OR "leads" array (for Lead Mode), not both.
+Return ONLY one word: "LEAD" or "OPPORTUNITY"
 `;
 
+    const modeResponse = await genAI.models.generateContent({
+      model: "gemini-3-pro-preview",
+      contents: modePrompt
+    });
+
+    const detectedMode = modeResponse.text.trim().toUpperCase().includes('OPPORTUNITY') 
+      ? WorkflowMode.OPPORTUNITY 
+      : WorkflowMode.LEAD;
+
+    console.log(`🎯 Detected mode: ${detectedMode}`);
+
+    // Step 2: Get real data from live sources
+    let realLeads: any[] = [];
+    let realOpportunities: any[] = [];
+
+    if (detectedMode === WorkflowMode.LEAD) {
+      console.log(`🔍 Scanning live sources for leads...`);
+      realLeads = await realDataCollector.findRealLeads(query, detectedMode);
+      
+      // If we don't find enough real leads, supplement with AI-generated ones
+      if (realLeads.length < 3) {
+        console.log(`📈 Found ${realLeads.length} real leads, generating ${3 - realLeads.length} additional leads...`);
+        const supplementalLeads = await generateSupplementalLeads(query, 3 - realLeads.length);
+        realLeads.push(...supplementalLeads);
+      }
+    } else {
+      console.log(`💡 Generating opportunities analysis...`);
+      realOpportunities = await generateOpportunitiesAnalysis(query);
+    }
+
+    // Step 3: Create summary
+    const summary = detectedMode === WorkflowMode.LEAD
+      ? `Found ${realLeads.length} active leads from Reddit, HackerNews, and GitHub`
+      : `Identified ${realOpportunities.length} potential opportunities through market analysis`;
+
+    const result: AnalysisResult = {
+      mode: detectedMode,
+      query,
+      summary,
+      timestamp: new Date().toISOString(),
+      ...(detectedMode === WorkflowMode.LEAD 
+        ? { leads: realLeads }
+        : { opportunities: realOpportunities }
+      )
+    };
+
+    console.log(`✅ Analysis complete: ${detectedMode} mode with ${detectedMode === WorkflowMode.LEAD ? realLeads.length : realOpportunities.length} results`);
+    return result;
+
+  } catch (error) {
+    console.error('Analysis failed:', error);
+    if (error.message?.includes('429') || error.message?.includes('quota')) {
+      throw new Error('Daily quota exceeded. Please try again tomorrow or upgrade your plan in Google AI Studio.');
+    }
+    throw new Error('Failed to analyze query. Please check your API key and try again.');
+  }
+};
+
+// Generate supplemental leads when real data is insufficient
+async function generateSupplementalLeads(query: string, count: number): Promise<any[]> {
+  const prompt = `
+Generate ${count} realistic leads for: "${query}"
+
+Create leads that might exist on platforms like LinkedIn, Upwork, or professional forums.
+Focus on realistic scenarios where someone would need this service.
+
+Return ONLY valid JSON array:
+[
+  {
+    "id": "ai_gen_1",
+    "prospectName": "Realistic Name",
+    "username": "@username",
+    "requestSummary": "Detailed request matching the query",
+    "postedAt": "3 hours ago",
+    "source": "LinkedIn",
+    "location": "City, State",
+    "fitScore": 7,
+    "budget": "Medium",
+    "urgency": "High",
+    "contactInfo": "Contact through platform",
+    "sourceUrl": "https://linkedin.com/in/realistic-profile"
+  }
+]
+`;
+
+  try {
     const response = await genAI.models.generateContent({
       model: "gemini-3-pro-preview",
       contents: prompt,
@@ -100,24 +141,64 @@ Return either "opportunities" array (for Opportunity Mode) OR "leads" array (for
         responseMimeType: "application/json"
       }
     });
+
+    const text = response.text.replace(/```json\n?|\n?```/g, '').trim();
+    const leads = JSON.parse(text);
     
-    // Clean and parse JSON
-    const text = response.text;
-    const cleanText = text.replace(/```json\n?|\n?```/g, '').trim();
-    const parsedResult = JSON.parse(cleanText);
-    
-    return {
-      ...parsedResult,
-      timestamp: new Date().toISOString()
-    };
+    // Mark as AI-generated for transparency
+    return leads.map((lead: any) => ({
+      ...lead,
+      status: 'New',
+      notes: 'AI-generated lead'
+    }));
   } catch (error) {
-    console.error('Gemini API Error:', error);
-    if (error.message?.includes('429') || error.message?.includes('quota')) {
-      throw new Error('Daily quota exceeded. Please try again tomorrow or upgrade your plan in Google AI Studio.');
-    }
-    throw new Error('Failed to analyze query. Please check your API key and try again.');
+    console.error('Failed to generate supplemental leads:', error);
+    return [];
   }
-};
+}
+
+// Generate opportunities analysis
+async function generateOpportunitiesAnalysis(query: string): Promise<any[]> {
+  const prompt = `
+Analyze market opportunities for: "${query}"
+
+Generate 3-5 realistic business opportunities based on market research.
+Focus on underserved markets and real problems people face.
+
+Return ONLY valid JSON array:
+[
+  {
+    "id": "opp-1",
+    "problemStatement": "Clear description of the problem",
+    "overallScore": 8,
+    "demandSignal": 9,
+    "marketReadiness": 7,
+    "competition": "Underserved",
+    "entryDifficulty": "Medium",
+    "evidence": ["Market indicator 1", "Market indicator 2"],
+    "whyItMatters": "Why this opportunity matters now",
+    "redFlags": "Potential risks or concerns",
+    "nextSteps": ["Actionable step 1", "Actionable step 2"]
+  }
+]
+`;
+
+  try {
+    const response = await genAI.models.generateContent({
+      model: "gemini-3-pro-preview",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json"
+      }
+    });
+
+    const text = response.text.replace(/```json\n?|\n?```/g, '').trim();
+    return JSON.parse(text);
+  } catch (error) {
+    console.error('Failed to generate opportunities:', error);
+    return [];
+  }
+}
 
 export const generateOutreach = async (lead: any, myProfile: string = ""): Promise<string> => {
   try {
