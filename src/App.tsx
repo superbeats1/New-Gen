@@ -34,6 +34,7 @@ import LeadView from './components/LeadView';
 import TrackerView from './components/TrackerView';
 import LandingPage from './components/LandingPage';
 import SuccessPage from './components/SuccessPage';
+import UpgradeModal from './components/UpgradeModal';
 import { supabase } from './lib/supabase';
 import { Auth } from './components/Auth';
 import { createCheckoutSession } from './lib/stripe';
@@ -105,6 +106,7 @@ const App: React.FC = () => {
   const [savedLeads, setSavedLeads] = useState<SavedLead[]>([]);
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [showSuccessPage, setShowSuccessPage] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -279,11 +281,16 @@ const App: React.FC = () => {
     localStorage.setItem('signal_saved_leads', JSON.stringify(updated));
   };
 
+  const handleUpgradeClick = () => {
+    setShowUpgradeModal(true);
+  };
+
   const handleUpgrade = async () => {
     if (isUpgrading) return;
     
     setIsUpgrading(true);
     try {
+      setShowUpgradeModal(false);
       await createCheckoutSession();
     } catch (error) {
       console.error('Upgrade error:', error);
@@ -361,9 +368,15 @@ const App: React.FC = () => {
           onOpenAuth={() => setShowAuthModal(true)} 
           profile={profile}
           onSignOut={handleSignOut}
-          onUpgrade={handleUpgrade}
+          onUpgrade={handleUpgradeClick}
         />
         <AuthModal />
+        <UpgradeModal 
+          isOpen={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+          onUpgrade={handleUpgrade}
+          isUpgrading={isUpgrading}
+        />
       </>
     );
   }
@@ -497,16 +510,11 @@ const App: React.FC = () => {
             </div>
             {!profile?.is_pro && (
               <button 
-                onClick={handleUpgrade}
-                disabled={isUpgrading}
-                className="bg-amber-600 hover:bg-amber-500 disabled:bg-amber-600/50 text-white text-xs font-bold px-4 py-1.5 rounded-xl transition-all flex items-center space-x-2"
+                onClick={handleUpgradeClick}
+                className="bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold px-4 py-1.5 rounded-xl transition-all flex items-center space-x-2"
               >
-                {isUpgrading ? (
-                  <Loader2 className="w-3 h-3 animate-spin" />
-                ) : (
-                  <Crown className="w-3 h-3" />
-                )}
-                <span>{isUpgrading ? 'Processing...' : 'Upgrade'}</span>
+                <Crown className="w-3 h-3" />
+                <span>Upgrade</span>
               </button>
             )}
           </div>
@@ -627,6 +635,12 @@ const App: React.FC = () => {
         </div>
       </main>
       <AuthModal />
+      <UpgradeModal 
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        onUpgrade={handleUpgrade}
+        isUpgrading={isUpgrading}
+      />
     </div>
   );
 };
