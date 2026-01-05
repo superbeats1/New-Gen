@@ -282,6 +282,33 @@ const App: React.FC = () => {
     }
   };
 
+  // TEMPORARY: Manual Pro upgrade for testing (remove in production)
+  const handleManualUpgrade = async () => {
+    if (!profile) return;
+    
+    const confirmed = confirm('ADMIN: Manually upgrade this user to Pro status?');
+    if (!confirmed) return;
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          is_pro: true,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', profile.id);
+
+      if (error) throw error;
+
+      // Refresh profile
+      await fetchProfile(profile.id);
+      alert('✅ Successfully upgraded to Pro status!');
+    } catch (error) {
+      console.error('Manual upgrade error:', error);
+      alert('Failed to upgrade user manually.');
+    }
+  };
+
   // Auth Modal Component
   const AuthModal = () => {
     if (!showAuthModal) return null;
@@ -380,11 +407,32 @@ const App: React.FC = () => {
              <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700">
                <UserIcon className="w-4 h-4 text-slate-400" />
              </div>
-             <div className="truncate">
-               <div className="text-xs font-bold text-white truncate">{profile?.first_name} {profile?.last_name}</div>
+             <div className="flex-1 truncate">
+               <div className="flex items-center space-x-2">
+                 <div className="text-xs font-bold text-white truncate">{profile?.first_name} {profile?.last_name}</div>
+                 {profile?.is_pro && (
+                   <span className="flex items-center text-[9px] font-bold text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded uppercase">
+                     <Crown className="w-2.5 h-2.5 mr-0.5" /> Pro
+                   </span>
+                 )}
+               </div>
                <div className="text-[10px] text-slate-500 truncate">{session?.user?.email}</div>
+               <div className="text-[9px] text-slate-600 truncate">
+                 {profile?.is_pro ? 'SIGNAL Pro Plan' : 'Free Plan (10 credits)'}
+               </div>
              </div>
           </div>
+          {/* TEMPORARY ADMIN BUTTON - Remove in production */}
+          {!profile?.is_pro && (
+            <button 
+              onClick={handleManualUpgrade}
+              className="w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-amber-400 hover:bg-amber-500/10 transition-all text-xs"
+            >
+              <Crown className="w-4 h-4" />
+              <span>Admin: Upgrade to Pro</span>
+            </button>
+          )}
+          
           <button 
             onClick={handleSignOut}
             className="w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-rose-400 hover:bg-rose-500/10 transition-all"
