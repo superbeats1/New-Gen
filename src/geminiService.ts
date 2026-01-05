@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import { WorkflowMode, AnalysisResult } from "./types";
 
 // Check multiple possible environment variable names
@@ -29,7 +29,7 @@ Steps:
 3. Redeploy`);
 }
 
-const genAI = new GoogleGenerativeAI(apiKey);
+const genAI = new GoogleGenAI({ apiKey });
 
 export const analyzeQuery = async (query: string): Promise<AnalysisResult> => {
   try {
@@ -86,17 +86,16 @@ Return ONLY valid JSON in this exact format:
 Return either "opportunities" array (for Opportunity Mode) OR "leads" array (for Lead Mode), not both.
 `;
 
-    const model = genAI.getGenerativeModel({ 
+    const response = await genAI.models.generateContent({
       model: "gemini-1.5-flash",
-      generationConfig: {
+      contents: prompt,
+      config: {
         responseMimeType: "application/json"
       }
     });
     
-    const response = await model.generateContent(prompt);
-    
     // Clean and parse JSON
-    const text = response.response.text();
+    const text = response.text;
     const cleanText = text.replace(/```json\n?|\n?```/g, '').trim();
     const parsedResult = JSON.parse(cleanText);
     
@@ -134,10 +133,12 @@ Requirements:
 Return only the message text, no extra formatting.
 `;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const response = await model.generateContent(prompt);
+    const response = await genAI.models.generateContent({
+      model: "gemini-1.5-flash",
+      contents: prompt
+    });
     
-    return response.response.text();
+    return response.text;
   } catch (error) {
     console.error('Gemini API Error:', error);
     throw new Error('Failed to generate outreach message.');
@@ -171,17 +172,16 @@ Return ONLY valid JSON in this format:
 }
 `;
 
-    const model = genAI.getGenerativeModel({ 
+    const response = await genAI.models.generateContent({
       model: "gemini-1.5-flash",
-      generationConfig: {
+      contents: prompt,
+      config: {
         responseMimeType: "application/json"
       }
     });
     
-    const response = await model.generateContent(prompt);
-    
     // Clean and parse JSON
-    const text = response.response.text();
+    const text = response.text;
     const cleanText = text.replace(/```json\n?|\n?```/g, '').trim();
     return JSON.parse(cleanText);
   } catch (error) {
