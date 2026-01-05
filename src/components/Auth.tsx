@@ -34,7 +34,7 @@ export const Auth: React.FC = () => {
           },
         });
         if (error) throw error;
-        alert('Check your email for the confirmation link!');
+        // Account created successfully - user will be automatically logged in if email confirmation is disabled
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
