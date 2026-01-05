@@ -13,7 +13,7 @@ console.log('Environment check (v2):', {
   GEMINI_API_KEY: !!import.meta.env.GEMINI_API_KEY,
   hasApiKey: !!apiKey,
   apiKeyLength: apiKey?.length,
-  modelUsing: "gemini-1.5-pro",
+  modelUsing: "gemini-1.5-flash",
   allEnvKeys: Object.keys(import.meta.env).filter(key => key.includes('API') || key.includes('GEMINI'))
 });
 
@@ -87,7 +87,7 @@ Return either "opportunities" array (for Opportunity Mode) OR "leads" array (for
 `;
 
     const response = await genAI.models.generateContent({
-      model: "gemini-1.5-pro",
+      model: "gemini-1.5-flash",
       contents: prompt,
       config: {
         responseMimeType: "application/json"
@@ -134,7 +134,7 @@ Return only the message text, no extra formatting.
 `;
 
     const response = await genAI.models.generateContent({
-      model: "gemini-1.5-pro",
+      model: "gemini-1.5-flash",
       contents: prompt
     });
     
@@ -173,7 +173,7 @@ Return ONLY valid JSON in this format:
 `;
 
     const response = await genAI.models.generateContent({
-      model: "gemini-1.5-pro",
+      model: "gemini-1.5-flash",
       contents: prompt,
       config: {
         responseMimeType: "application/json"
