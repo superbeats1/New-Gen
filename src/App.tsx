@@ -35,6 +35,7 @@ import TrackerView from './components/TrackerView';
 import LandingPage from './components/LandingPage';
 import { supabase } from './lib/supabase';
 import { Auth } from './components/Auth';
+import { createCheckoutSession } from './lib/stripe';
 
 const SEARCH_STEPS = [
   "Initializing neural discovery agents...",
@@ -101,6 +102,7 @@ const App: React.FC = () => {
   const [results, setResults] = useState<AnalysisResult | null>(null);
   const [view, setView] = useState<'home' | 'results' | 'tracker'>('home');
   const [savedLeads, setSavedLeads] = useState<SavedLead[]>([]);
+  const [isUpgrading, setIsUpgrading] = useState(false);
   
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -266,6 +268,20 @@ const App: React.FC = () => {
     localStorage.setItem('signal_saved_leads', JSON.stringify(updated));
   };
 
+  const handleUpgrade = async () => {
+    if (isUpgrading) return;
+    
+    setIsUpgrading(true);
+    try {
+      await createCheckoutSession();
+    } catch (error) {
+      console.error('Upgrade error:', error);
+      alert('Failed to start upgrade process. Please try again.');
+    } finally {
+      setIsUpgrading(false);
+    }
+  };
+
   // Auth Modal Component
   const AuthModal = () => {
     if (!showAuthModal) return null;
@@ -404,9 +420,17 @@ const App: React.FC = () => {
               <span className="text-xs font-bold text-slate-300">{profile?.is_pro ? 'Unlimited' : `${profile?.credits} Credits`}</span>
             </div>
             {!profile?.is_pro && (
-              <button className="bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold px-4 py-1.5 rounded-xl transition-all flex items-center space-x-2">
-                <Crown className="w-3 h-3" />
-                <span>Upgrade</span>
+              <button 
+                onClick={handleUpgrade}
+                disabled={isUpgrading}
+                className="bg-amber-600 hover:bg-amber-500 disabled:bg-amber-600/50 text-white text-xs font-bold px-4 py-1.5 rounded-xl transition-all flex items-center space-x-2"
+              >
+                {isUpgrading ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <Crown className="w-3 h-3" />
+                )}
+                <span>{isUpgrading ? 'Processing...' : 'Upgrade'}</span>
               </button>
             )}
           </div>
