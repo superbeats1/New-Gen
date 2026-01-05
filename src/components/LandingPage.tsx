@@ -1,14 +1,15 @@
 
 import React from 'react';
-import { Zap, Target, Users, Search, ChevronRight, Briefcase, BarChart3, Globe, LogIn } from 'lucide-react';
+import { Zap, Target, Users, Search, ChevronRight, Briefcase, BarChart3, Globe, LogIn, User, Crown, CreditCard } from 'lucide-react';
 
 interface Props {
   onStart: () => void;
   session: any;
   onOpenAuth: () => void;
+  profile?: any;
 }
 
-const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth }) => {
+const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile }) => {
   return (
     <div className="min-h-screen bg-[#0a0b0e] overflow-x-hidden selection:bg-blue-500/30">
       {/* Background Grid & Ambient Glow */}
@@ -27,7 +28,7 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth }) => {
           <span className="text-2xl font-bold tracking-tight text-white uppercase italic">Signal</span>
         </div>
         
-        <div className="hidden md:flex items-center space-x-8 text-sm font-medium">
+        <div className="hidden md:flex items-center space-x-6 text-sm font-medium">
           <a href="#workflow" className="text-slate-400 hover:text-blue-400 transition-colors">Workflow</a>
           {!session ? (
             <>
@@ -46,12 +47,44 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth }) => {
               </button>
             </>
           ) : (
-            <button 
-              onClick={onStart}
-              className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-6 py-2 rounded-full transition-all backdrop-blur-md font-bold"
-            >
-              Go to Dashboard
-            </button>
+            <>
+              {/* User Profile Section */}
+              <div className="flex items-center space-x-4 px-4 py-2 rounded-xl bg-slate-800/30 border border-slate-700/50 backdrop-blur-md">
+                <div className="flex items-center space-x-2">
+                  <CreditCard className="w-4 h-4 text-slate-400" />
+                  <span className="text-xs font-bold text-slate-300">
+                    {profile?.is_pro ? 'Unlimited' : `${profile?.credits || 0} Credits`}
+                  </span>
+                </div>
+                {profile?.is_pro && (
+                  <span className="flex items-center text-[10px] font-bold text-amber-400 bg-amber-400/10 px-2 py-1 rounded uppercase">
+                    <Crown className="w-3 h-3 mr-1" /> Pro
+                  </span>
+                )}
+              </div>
+              
+              {/* User Avatar & Info */}
+              <div className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-slate-800/30 border border-slate-700/50 backdrop-blur-md">
+                <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center border border-slate-600">
+                  <User className="w-4 h-4 text-slate-300" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-white truncate max-w-32">
+                    {profile?.first_name ? `${profile.first_name} ${profile?.last_name}` : 'User'}
+                  </div>
+                  <div className="text-[10px] text-slate-400 truncate max-w-32">
+                    {profile?.is_pro ? 'SIGNAL Pro' : 'Free Plan'}
+                  </div>
+                </div>
+              </div>
+              
+              <button 
+                onClick={onStart}
+                className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-full transition-all shadow-lg shadow-blue-900/20 font-bold"
+              >
+                Go to Dashboard
+              </button>
+            </>
           )}
         </div>
       </nav>

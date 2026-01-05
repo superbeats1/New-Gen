@@ -359,6 +359,7 @@ const App: React.FC = () => {
           onStart={handleStartApp} 
           session={session} 
           onOpenAuth={() => setShowAuthModal(true)} 
+          profile={profile}
         />
         <AuthModal />
       </>
