@@ -621,6 +621,7 @@ const App: React.FC = () => {
                   results={results} 
                   onSave={handleSaveLead}
                   onGoTracker={() => setView('tracker')}
+                  onRefresh={() => handleSearch()}
                 />
               )}
             </div>

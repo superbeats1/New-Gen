@@ -24,9 +24,10 @@ interface Props {
   results: AnalysisResult;
   onSave: (lead: Lead) => void;
   onGoTracker: () => void;
+  onRefresh?: () => void;
 }
 
-const LeadView: React.FC<Props> = ({ results, onSave, onGoTracker }) => {
+const LeadView: React.FC<Props> = ({ results, onSave, onGoTracker, onRefresh }) => {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [enrichLead, setEnrichLead] = useState<Lead | null>(null);
   const [outreachLead, setOutreachLead] = useState<Lead | null>(null);
@@ -58,13 +59,18 @@ const LeadView: React.FC<Props> = ({ results, onSave, onGoTracker }) => {
     return getBudgetIcon(lead.budget);
   };
 
-  const handleSourceClick = (sourceUrl: string, source: string, prospectName: string) => {
-    console.log('Attempting to open URL:', { sourceUrl, source, prospectName });
+  const handleSourceClick = (sourceUrl: any, source: any, prospectName: any) => {
+    console.log('Attempting to open URL:', { sourceUrl, source, prospectName, types: { sourceUrl: typeof sourceUrl, source: typeof source, prospectName: typeof prospectName } });
+    
+    // Convert to strings and provide defaults
+    const safeSourceUrl = sourceUrl ? String(sourceUrl) : '';
+    const safeSource = source ? String(source) : 'Unknown';
+    const safeName = prospectName ? String(prospectName) : 'Anonymous';
     
     // Check if URL is valid and not a demo URL
-    if (!sourceUrl || typeof sourceUrl !== 'string') {
-      console.warn('No valid sourceUrl provided:', sourceUrl);
-      alert(`This is a demo lead from ${source}. In a real implementation, this would link to the original ${source} profile/post by ${prospectName}.`);
+    if (!safeSourceUrl || safeSourceUrl.length === 0) {
+      console.warn('No valid sourceUrl provided:', { original: sourceUrl, converted: safeSourceUrl });
+      alert(`This is a demo lead from ${safeSource}. In a real implementation, this would link to the original ${safeSource} profile/post by ${safeName}.`);
       return;
     }
 
@@ -72,22 +78,25 @@ const LeadView: React.FC<Props> = ({ results, onSave, onGoTracker }) => {
     const demoUrls = [
       'https://example.com/post',
       'https://linkedin.com/in/johndoe',
-      'https://linkedin.com/in/realistic-profile'
+      'https://linkedin.com/in/realistic-profile',
+      'undefined',
+      'null',
+      ''
     ];
 
-    const isDemoPattern = demoUrls.includes(sourceUrl) || 
-                         sourceUrl.includes('activity-demo-') ||
-                         sourceUrl.includes('realistic-profile') ||
-                         !sourceUrl.startsWith('http');
+    const isDemoPattern = demoUrls.includes(safeSourceUrl) || 
+                         safeSourceUrl.includes('activity-demo-') ||
+                         safeSourceUrl.includes('realistic-profile') ||
+                         !safeSourceUrl.startsWith('http');
 
     if (isDemoPattern) {
-      alert(`This is an enhanced lead from ${source}. The AI generated this realistic example to supplement live data. Real leads will have working links to actual platform posts.`);
+      alert(`This is an enhanced lead from ${safeSource}. The AI generated this realistic example to supplement live data. Real leads will have working links to actual platform posts.`);
       return;
     }
 
     try {
       // Validate URL before opening
-      const url = new URL(sourceUrl);
+      const url = new URL(safeSourceUrl);
       
       // Handle platform-specific URLs (including Reddit and HackerNews)
       const platformDomains = [
@@ -97,21 +106,27 @@ const LeadView: React.FC<Props> = ({ results, onSave, onGoTracker }) => {
         'indiehackers.com', 'producthunt.com', 'discord.gg'
       ];
       
-      const isPlatform = platformDomains.some(domain => url.hostname.includes(domain));
+      const isPlatform = platformDomains.some(domain => {
+        try {
+          return url.hostname && url.hostname.includes(domain);
+        } catch {
+          return false;
+        }
+      });
       
       if (isPlatform) {
-        console.log('Opening trusted platform URL:', sourceUrl);
-        window.open(sourceUrl, '_blank', 'noopener,noreferrer');
+        console.log('Opening trusted platform URL:', safeSourceUrl);
+        window.open(safeSourceUrl, '_blank', 'noopener,noreferrer');
       } else {
         // For unknown domains, show a warning
         const proceed = confirm(`This link will take you to ${url.hostname}. Continue?`);
         if (proceed) {
-          window.open(sourceUrl, '_blank', 'noopener,noreferrer');
+          window.open(safeSourceUrl, '_blank', 'noopener,noreferrer');
         }
       }
     } catch (error) {
-      console.error('URL validation failed:', error, 'URL was:', sourceUrl);
-      alert(`Invalid link for ${prospectName}. This appears to be a demo lead with a mock URL.`);
+      console.error('URL validation failed:', error, 'URL was:', safeSourceUrl);
+      alert(`Invalid link for ${safeName}. This appears to be a demo lead with a mock URL.`);
     }
   };
 
@@ -147,7 +162,11 @@ const LeadView: React.FC<Props> = ({ results, onSave, onGoTracker }) => {
             <Bookmark className="w-4 h-4" />
             <span>My Tracker</span>
           </button>
-          <button className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-lg text-white transition-all text-sm font-semibold shadow-lg shadow-indigo-900/20">
+          <button 
+            onClick={onRefresh}
+            disabled={!onRefresh}
+            className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-lg text-white transition-all text-sm font-semibold shadow-lg shadow-indigo-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             <RefreshCw className="w-4 h-4" />
             <span>Refresh All</span>
           </button>
