@@ -48,3 +48,30 @@ export interface AnalysisResult {
 export interface SavedLead extends Lead {
   savedDate: string;
 }
+
+// Enrichment data interfaces
+export interface CompanyInfo {
+  name?: string;
+  domain?: string;
+  industry?: string;
+  size?: string;
+  location?: string;
+  description?: string;
+  founded?: string;
+  website?: string;
+}
+
+export interface SocialProfile {
+  platform: string;
+  url: string;
+  verified?: boolean;
+}
+
+export interface EnrichedLead extends Lead {
+  verifiedEmail?: string;
+  companyData?: CompanyInfo;
+  socialProfiles?: SocialProfile[];
+  phoneNumber?: string;
+  emailConfidence?: number;
+  lastEnriched?: string;
+}

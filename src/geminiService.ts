@@ -42,8 +42,15 @@ Query: "${query}"
 If it's Opportunity Mode: Generate 3-5 realistic business opportunities found by "scanning" Reddit/forums (simulate this research). 
 Provide scores for Demand (1-10), Market Readiness (1-10), Competition (Saturated/Moderate/Underserved), and Entry Difficulty (Low/Medium/High).
 
-If it's Lead Mode: Generate 5-8 active leads that might exist on Reddit, Upwork, or Twitter for the requested service.
+If it's Lead Mode: Generate 5-8 active leads from diverse platforms including LinkedIn, Facebook Groups, Upwork, Fiverr, 99designs, Behance, GitHub, AngelList, Indie Hackers, Product Hunt, Discord servers, Slack communities, and industry forums.
 Provide Fit Score (1-10), Budget (High/Medium/Low/Unknown), and Urgency (High/Medium/Low).
+IMPORTANT: Use real platform URLs like:
+- LinkedIn: https://linkedin.com/in/username or https://linkedin.com/posts/activity-id
+- Facebook: https://facebook.com/groups/groupname/posts/postid  
+- Upwork: https://upwork.com/jobs/~jobid
+- GitHub: https://github.com/username/repo/issues/number
+- AngelList: https://angel.co/company/companyname
+- Discord: discord.gg/serverinvite (for public servers)
 
 Return ONLY valid JSON in this exact format:
 {
@@ -72,13 +79,13 @@ Return ONLY valid JSON in this exact format:
       "username": "@johndoe",
       "requestSummary": "Looking for help with...",
       "postedAt": "2 hours ago",
-      "source": "Reddit",
+      "source": "LinkedIn",
       "location": "Austin, TX",
       "fitScore": 8,
       "budget": "Medium",
       "urgency": "High",
       "contactInfo": "Contact through platform",
-      "sourceUrl": "https://example.com/post"
+      "sourceUrl": "https://linkedin.com/in/johndoe"
     }
   ]
 }

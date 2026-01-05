@@ -49,6 +49,43 @@ const LeadView: React.FC<Props> = ({ results, onSave, onGoTracker }) => {
     }
   };
 
+  const handleSourceClick = (sourceUrl: string, source: string, prospectName: string) => {
+    // Check if URL is valid and not a demo URL
+    if (!sourceUrl || sourceUrl === 'https://example.com/post' || sourceUrl === 'https://linkedin.com/in/johndoe' || !sourceUrl.startsWith('http')) {
+      // Show a helpful message for demo/mock URLs
+      alert(`This is a demo lead from ${source}. In a real implementation, this would link to the original ${source} profile/post by ${prospectName}.`);
+      return;
+    }
+
+    try {
+      // Validate URL before opening
+      new URL(sourceUrl);
+      
+      // Handle platform-specific URLs
+      const platformDomains = [
+        'linkedin.com', 'facebook.com', 'upwork.com', 'fiverr.com', 
+        '99designs.com', 'behance.net', 'github.com', 'angel.co',
+        'indiehackers.com', 'producthunt.com', 'discord.gg'
+      ];
+      
+      const url = new URL(sourceUrl);
+      const isPlatform = platformDomains.some(domain => url.hostname.includes(domain));
+      
+      if (isPlatform) {
+        window.open(sourceUrl, '_blank', 'noopener,noreferrer');
+      } else {
+        // For unknown domains, show a warning
+        const proceed = confirm(`This link will take you to ${url.hostname}. Continue?`);
+        if (proceed) {
+          window.open(sourceUrl, '_blank', 'noopener,noreferrer');
+        }
+      }
+    } catch (error) {
+      console.error('Invalid URL:', sourceUrl);
+      alert(`Invalid link for ${prospectName}. This appears to be a demo lead with a mock URL.`);
+    }
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -181,14 +218,13 @@ const LeadView: React.FC<Props> = ({ results, onSave, onGoTracker }) => {
                       >
                         <Bookmark className="w-4 h-4" />
                       </button>
-                      <a 
-                        href={lead.sourceUrl} 
-                        target="_blank" 
-                        rel="noreferrer"
+                      <button 
+                        onClick={() => handleSourceClick(lead.sourceUrl, lead.source, lead.prospectName)}
                         className="p-2 hover:bg-slate-700 rounded-lg text-slate-400 hover:text-white transition-all border border-transparent hover:border-slate-600"
+                        title="View Original Post"
                       >
                         <ExternalLink className="w-4 h-4" />
-                      </a>
+                      </button>
                     </div>
                   </td>
                 </tr>
