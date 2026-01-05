@@ -128,9 +128,15 @@ Return ONLY valid JSON array:
     "budget": "Medium",
     "urgency": "High",
     "contactInfo": "Contact through platform",
-    "sourceUrl": "https://linkedin.com/in/realistic-profile"
+    "sourceUrl": "https://linkedin.com/posts/activity-demo-12345"
   }
 ]
+
+IMPORTANT: Use varied, realistic sourceUrl patterns like:
+- LinkedIn: "https://linkedin.com/posts/activity-{randomnumber}" 
+- Upwork: "https://upwork.com/jobs/~{randomnumber}"
+- GitHub: "https://github.com/{username}/{repo}/issues/{number}"
+- Never use the same URL twice
 `;
 
   try {
