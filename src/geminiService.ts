@@ -126,16 +126,23 @@ Return ONLY valid JSON array:
     "location": "City, State",
     "fitScore": 7,
     "budget": "Medium",
+    "budgetAmount": "$3,500",
     "urgency": "High",
     "contactInfo": "Contact through platform",
     "sourceUrl": "https://linkedin.com/posts/activity-demo-12345"
   }
 ]
 
-IMPORTANT: Use varied, realistic sourceUrl patterns like:
-- LinkedIn: "https://linkedin.com/posts/activity-{randomnumber}" 
-- Upwork: "https://upwork.com/jobs/~{randomnumber}"
-- GitHub: "https://github.com/{username}/{repo}/issues/{number}"
+IMPORTANT: 
+- Use varied, realistic sourceUrl patterns like:
+  * LinkedIn: "https://linkedin.com/posts/activity-{randomnumber}" 
+  * Upwork: "https://upwork.com/jobs/~{randomnumber}"
+  * GitHub: "https://github.com/{username}/{repo}/issues/{number}"
+- Include realistic budgetAmount when someone mentions a specific budget:
+  * Low budget: $500-$2,000
+  * Medium budget: $2,000-$5,000  
+  * High budget: $5,000+
+  * Sometimes use ranges like "$2,000-$5,000"
 - Never use the same URL twice
 `;
 

@@ -152,6 +152,7 @@ export class RealDataCollector {
           
           // Check if post matches query and contains lead indicators
           if (this.matchesQuery(fullText, query) && this.containsLeadIndicators(fullText, mode)) {
+            const budgetInfo = this.extractBudget(fullText);
             const lead: Lead = {
               id: `reddit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
               prospectName: postData.author,
@@ -161,7 +162,8 @@ export class RealDataCollector {
               source: 'Reddit',
               location: this.extractLocation(fullText),
               fitScore: this.calculateFitScore(fullText, query),
-              budget: this.extractBudget(fullText),
+              budget: budgetInfo.category,
+              budgetAmount: budgetInfo.amount,
               urgency: this.extractUrgency(fullText),
               contactInfo: `Reddit user: u/${postData.author}`,
               sourceUrl: `https://reddit.com${postData.permalink}`,
@@ -207,6 +209,7 @@ export class RealDataCollector {
         const fullText = `${item.title} ${item.text || ''}`.toLowerCase();
         
         if (this.matchesQuery(fullText, query) && this.containsLeadIndicators(fullText, WorkflowMode.LEAD)) {
+          const budgetInfo = this.extractBudget(fullText);
           const lead: Lead = {
             id: `hn_${item.id}`,
             prospectName: item.by || 'Anonymous',
@@ -215,7 +218,8 @@ export class RealDataCollector {
             postedAt: this.formatTimeAgo(item.time),
             source: 'HackerNews',
             fitScore: this.calculateFitScore(fullText, query),
-            budget: this.extractBudget(fullText),
+            budget: budgetInfo.category,
+            budgetAmount: budgetInfo.amount,
             urgency: this.extractUrgency(fullText),
             contactInfo: `HackerNews user: ${item.by}`,
             sourceUrl: item.url || `https://news.ycombinator.com/item?id=${item.id}`,
@@ -265,6 +269,7 @@ export class RealDataCollector {
         const fullText = `${issue.title} ${issue.body || ''}`.toLowerCase();
         
         if (this.matchesQuery(fullText, query)) {
+          const budgetInfo = this.extractBudget(fullText);
           const lead: Lead = {
             id: `github_${issue.id}`,
             prospectName: issue.user.login,
@@ -273,7 +278,8 @@ export class RealDataCollector {
             postedAt: this.formatTimeAgo(new Date(issue.created_at).getTime() / 1000),
             source: 'GitHub',
             fitScore: this.calculateFitScore(fullText, query),
-            budget: this.extractBudget(fullText),
+            budget: budgetInfo.category,
+            budgetAmount: budgetInfo.amount,
             urgency: this.extractUrgency(fullText),
             contactInfo: `GitHub user: @${issue.user.login}`,
             sourceUrl: issue.html_url,
@@ -373,22 +379,75 @@ export class RealDataCollector {
     return Math.min(Math.round(score), 10);
   }
 
-  private extractBudget(text: string): 'High' | 'Medium' | 'Low' | 'Unknown' {
-    // Look for dollar amounts
-    const dollarMatch = text.match(/\$(\d+(?:,\d+)*(?:\.\d+)?)/);
-    if (dollarMatch) {
-      const amount = parseInt(dollarMatch[1].replace(',', ''));
-      if (amount >= 5000) return 'High';
-      if (amount >= 1000) return 'Medium';
-      return 'Low';
+  private extractBudget(text: string): { category: 'High' | 'Medium' | 'Low' | 'Unknown'; amount?: string } {
+    // Look for various currency amounts
+    const currencyPatterns = [
+      /\$(\d+(?:,\d+)*(?:\.\d+)?k?)/gi,     // $5,000 or $5k
+      /(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:USD|dollars?|bucks)/gi, // 5000 USD
+      /€(\d+(?:,\d+)*(?:\.\d+)?)/gi,        // €5,000
+      /£(\d+(?:,\d+)*(?:\.\d+)?)/gi,        // £5,000
+      /(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:EUR|GBP)/gi, // 5000 EUR
+    ];
+    
+    for (const pattern of currencyPatterns) {
+      const matches = text.match(pattern);
+      if (matches && matches.length > 0) {
+        const fullMatch = matches[0];
+        const numberMatch = fullMatch.match(/(\d+(?:,\d+)*(?:\.\d+)?)/);
+        
+        if (numberMatch) {
+          let amount = numberMatch[1];
+          let numericValue = parseInt(amount.replace(/,/g, ''));
+          
+          // Handle 'k' suffix (e.g., 5k = 5000)
+          if (fullMatch.toLowerCase().includes('k') && !fullMatch.toLowerCase().includes('000')) {
+            numericValue = numericValue * 1000;
+            amount = numericValue.toLocaleString();
+          }
+          
+          // Determine category based on amount
+          let category: 'High' | 'Medium' | 'Low' = 'Low';
+          if (numericValue >= 5000) category = 'High';
+          else if (numericValue >= 1000) category = 'Medium';
+          
+          // Return formatted amount
+          const currency = fullMatch.match(/^[\$€£]/) ? fullMatch[0] : '$';
+          const formattedAmount = `${currency}${amount}`;
+          
+          return { category, amount: formattedAmount };
+        }
+      }
     }
     
-    // Look for budget keywords
-    if (/high budget|big budget|well funded|substantial/i.test(text)) return 'High';
-    if (/medium budget|reasonable budget|fair rate/i.test(text)) return 'Medium';
-    if (/low budget|tight budget|small budget|cheap/i.test(text)) return 'Low';
+    // Look for budget range indicators
+    const rangeMatch = text.match(/budget.*?(\d+(?:,\d+)*)\s*(?:-|to)\s*(\d+(?:,\d+)*)/i);
+    if (rangeMatch) {
+      const minAmount = parseInt(rangeMatch[1].replace(/,/g, ''));
+      const maxAmount = parseInt(rangeMatch[2].replace(/,/g, ''));
+      const avgAmount = (minAmount + maxAmount) / 2;
+      
+      let category: 'High' | 'Medium' | 'Low' = 'Low';
+      if (avgAmount >= 5000) category = 'High';
+      else if (avgAmount >= 1000) category = 'Medium';
+      
+      return { 
+        category, 
+        amount: `$${rangeMatch[1]}-$${rangeMatch[2]}` 
+      };
+    }
     
-    return 'Unknown';
+    // Look for budget keywords without specific amounts
+    if (/high budget|big budget|well funded|substantial|generous budget/i.test(text)) {
+      return { category: 'High' };
+    }
+    if (/medium budget|reasonable budget|fair rate|decent budget/i.test(text)) {
+      return { category: 'Medium' };
+    }
+    if (/low budget|tight budget|small budget|cheap|minimal budget|shoestring/i.test(text)) {
+      return { category: 'Low' };
+    }
+    
+    return { category: 'Unknown' };
   }
 
   private extractUrgency(text: string): 'High' | 'Medium' | 'Low' {

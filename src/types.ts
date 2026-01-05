@@ -29,6 +29,7 @@ export interface Lead {
   location?: string;
   fitScore: number;
   budget: 'High' | 'Medium' | 'Low' | 'Unknown';
+  budgetAmount?: string; // Actual budget amount if mentioned (e.g., "$5,000", "€2,500")
   urgency: 'High' | 'Medium' | 'Low';
   contactInfo: string;
   sourceUrl: string;

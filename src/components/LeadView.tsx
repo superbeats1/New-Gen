@@ -49,6 +49,15 @@ const LeadView: React.FC<Props> = ({ results, onSave, onGoTracker }) => {
     }
   };
 
+  const getBudgetDisplay = (lead: Lead) => {
+    // If we have a specific budget amount, show that
+    if (lead.budgetAmount) {
+      return lead.budgetAmount;
+    }
+    // Otherwise fall back to dollar signs
+    return getBudgetIcon(lead.budget);
+  };
+
   const handleSourceClick = (sourceUrl: string, source: string, prospectName: string) => {
     console.log('Attempting to open URL:', { sourceUrl, source, prospectName });
     
@@ -231,7 +240,7 @@ const LeadView: React.FC<Props> = ({ results, onSave, onGoTracker }) => {
                       <div className="flex items-center space-x-2 text-xs">
                         <DollarSign className="w-3 h-3 text-emerald-400" />
                         <span className="text-slate-400 font-medium">Budget:</span>
-                        <span className="text-emerald-400 font-bold">{getBudgetIcon(lead.budget)}</span>
+                        <span className="text-emerald-400 font-bold">{getBudgetDisplay(lead)}</span>
                       </div>
                       <div className="flex items-center space-x-2 text-xs">
                         <Clock className="w-3 h-3 text-slate-500" />
