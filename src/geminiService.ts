@@ -13,7 +13,7 @@ console.log('Environment check (v3):', {
   GEMINI_API_KEY: !!import.meta.env.GEMINI_API_KEY,
   hasApiKey: !!apiKey,
   apiKeyLength: apiKey?.length,
-  modelUsing: "gemini-1.5-flash",
+  modelUsing: "gemini-3-pro-preview",
   allEnvKeys: Object.keys(import.meta.env).filter(key => key.includes('API') || key.includes('GEMINI'))
 });
 
@@ -87,7 +87,7 @@ Return either "opportunities" array (for Opportunity Mode) OR "leads" array (for
 `;
 
     const response = await genAI.models.generateContent({
-      model: "gemini-1.5-flash",
+      model: "gemini-3-pro-preview",
       contents: prompt,
       config: {
         responseMimeType: "application/json"
@@ -105,6 +105,9 @@ Return either "opportunities" array (for Opportunity Mode) OR "leads" array (for
     };
   } catch (error) {
     console.error('Gemini API Error:', error);
+    if (error.message?.includes('429') || error.message?.includes('quota')) {
+      throw new Error('Daily quota exceeded. Please try again tomorrow or upgrade your plan in Google AI Studio.');
+    }
     throw new Error('Failed to analyze query. Please check your API key and try again.');
   }
 };
@@ -134,7 +137,7 @@ Return only the message text, no extra formatting.
 `;
 
     const response = await genAI.models.generateContent({
-      model: "gemini-1.5-flash",
+      model: "gemini-3-pro-preview",
       contents: prompt
     });
     
@@ -173,7 +176,7 @@ Return ONLY valid JSON in this format:
 `;
 
     const response = await genAI.models.generateContent({
-      model: "gemini-1.5-flash",
+      model: "gemini-3-pro-preview",
       contents: prompt,
       config: {
         responseMimeType: "application/json"
