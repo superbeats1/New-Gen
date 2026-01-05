@@ -33,6 +33,7 @@ import OpportunityView from './components/OpportunityView';
 import LeadView from './components/LeadView';
 import TrackerView from './components/TrackerView';
 import LandingPage from './components/LandingPage';
+import SuccessPage from './components/SuccessPage';
 import { supabase } from './lib/supabase';
 import { Auth } from './components/Auth';
 import { createCheckoutSession } from './lib/stripe';
@@ -103,10 +104,20 @@ const App: React.FC = () => {
   const [view, setView] = useState<'home' | 'results' | 'tracker'>('home');
   const [savedLeads, setSavedLeads] = useState<SavedLead[]>([]);
   const [isUpgrading, setIsUpgrading] = useState(false);
+  const [showSuccessPage, setShowSuccessPage] = useState(false);
   
   const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    // Check for success redirect from Stripe
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+    if (sessionId) {
+      setShowSuccessPage(true);
+      // Clear the URL parameters but keep the current path
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session) fetchProfile(session.user.id);
@@ -309,6 +320,16 @@ const App: React.FC = () => {
     }
   };
 
+  const handleSuccessContinue = async () => {
+    setShowSuccessPage(false);
+    setShowLanding(false);
+    setView('home');
+    // Refresh profile to get updated Pro status
+    if (session) {
+      await fetchProfile(session.user.id);
+    }
+  };
+
   // Auth Modal Component
   const AuthModal = () => {
     if (!showAuthModal) return null;
@@ -326,6 +347,10 @@ const App: React.FC = () => {
       </div>
     );
   };
+
+  if (showSuccessPage && session) {
+    return <SuccessPage onContinue={handleSuccessContinue} userId={session.user.id} />;
+  }
 
   if (showLanding || !session) {
     return (
