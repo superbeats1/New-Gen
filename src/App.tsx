@@ -360,6 +360,8 @@ const App: React.FC = () => {
           session={session} 
           onOpenAuth={() => setShowAuthModal(true)} 
           profile={profile}
+          onSignOut={handleSignOut}
+          onUpgrade={handleUpgrade}
         />
         <AuthModal />
       </>

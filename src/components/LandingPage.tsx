@@ -1,15 +1,18 @@
 
-import React from 'react';
-import { Zap, Target, Users, Search, ChevronRight, Briefcase, BarChart3, Globe, LogIn, User, Crown, CreditCard } from 'lucide-react';
+import React, { useState } from 'react';
+import { Zap, Target, Users, Search, ChevronRight, Briefcase, BarChart3, Globe, LogIn, User, Crown, CreditCard, ChevronDown, Settings, LogOut, Star } from 'lucide-react';
 
 interface Props {
   onStart: () => void;
   session: any;
   onOpenAuth: () => void;
   profile?: any;
+  onSignOut?: () => void;
+  onUpgrade?: () => void;
 }
 
-const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile }) => {
+const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, onSignOut, onUpgrade }) => {
+  const [showDropdown, setShowDropdown] = useState(false);
   return (
     <div className="min-h-screen bg-[#0a0b0e] overflow-x-hidden selection:bg-blue-500/30">
       {/* Background Grid & Ambient Glow */}
@@ -47,44 +50,98 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile })
               </button>
             </>
           ) : (
-            <>
-              {/* User Profile Section */}
-              <div className="flex items-center space-x-4 px-4 py-2 rounded-xl bg-slate-800/30 border border-slate-700/50 backdrop-blur-md">
-                <div className="flex items-center space-x-2">
-                  <CreditCard className="w-4 h-4 text-slate-400" />
-                  <span className="text-xs font-bold text-slate-300">
-                    {profile?.is_pro ? 'Unlimited' : `${profile?.credits || 0} Credits`}
+            <div className="relative">
+              {/* Credits Badge */}
+              <div className="flex items-center space-x-4">
+                <div className="px-3 py-1.5 rounded-full bg-blue-600/20 border border-blue-500/30 backdrop-blur-md">
+                  <span className="text-xs font-bold text-blue-400 uppercase tracking-wide">
+                    {profile?.credits || 0} Credits Left
                   </span>
                 </div>
-                {profile?.is_pro && (
-                  <span className="flex items-center text-[10px] font-bold text-amber-400 bg-amber-400/10 px-2 py-1 rounded uppercase">
-                    <Crown className="w-3 h-3 mr-1" /> Pro
-                  </span>
-                )}
-              </div>
-              
-              {/* User Avatar & Info */}
-              <div className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-slate-800/30 border border-slate-700/50 backdrop-blur-md">
-                <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center border border-slate-600">
-                  <User className="w-4 h-4 text-slate-300" />
+                
+                {/* User Dropdown */}
+                <div className="relative">
+                  <button 
+                    onClick={() => setShowDropdown(!showDropdown)}
+                    className="flex items-center space-x-2 px-3 py-2 rounded-xl bg-slate-800/80 border border-slate-700/50 backdrop-blur-md hover:bg-slate-800/90 transition-all"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center border border-slate-600">
+                      <User className="w-4 h-4 text-slate-300" />
+                    </div>
+                    <ChevronDown className="w-4 h-4 text-slate-400" />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {showDropdown && (
+                    <div className="absolute right-0 top-full mt-2 w-64 bg-slate-900/95 backdrop-blur-xl rounded-2xl border border-slate-700/50 shadow-2xl z-50 animate-in slide-in-from-top-2 duration-200">
+                      {/* User Info Section */}
+                      <div className="p-4 border-b border-slate-800">
+                        <div className="text-sm font-bold text-white mb-1">
+                          {profile?.first_name ? `${profile.first_name} ${profile?.last_name || ''}`.trim() : 'User'}
+                        </div>
+                        <div className="text-xs text-slate-400 mb-3">
+                          {session?.user?.email}
+                        </div>
+                        
+                        {/* Credits Display */}
+                        <div className="px-3 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-slate-400">Credits</span>
+                            <span className="text-xs font-bold text-blue-400">
+                              {profile?.is_pro ? 'Unlimited' : `${profile?.credits || 0} left`}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Menu Items */}
+                      <div className="p-2">
+                        <button className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800/50 transition-all text-sm">
+                          <CreditCard className="w-4 h-4" />
+                          <span>Billing</span>
+                        </button>
+                        
+                        {!profile?.is_pro && (
+                          <button 
+                            onClick={onUpgrade}
+                            className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-blue-400 hover:bg-blue-500/10 transition-all text-sm"
+                          >
+                            <Star className="w-4 h-4" />
+                            <span>Upgrade to Pro</span>
+                          </button>
+                        )}
+                        
+                        <button 
+                          onClick={onSignOut}
+                          className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-rose-400 hover:bg-rose-500/10 transition-all text-sm"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          <span>Log Out</span>
+                        </button>
+                      </div>
+
+                      {/* Go to Dashboard */}
+                      <div className="p-3 border-t border-slate-800">
+                        <button 
+                          onClick={() => { setShowDropdown(false); onStart(); }}
+                          className="w-full bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-all font-bold text-sm"
+                        >
+                          Go to Dashboard
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <div className="text-xs font-bold text-white truncate max-w-32">
-                    {profile?.first_name ? `${profile.first_name} ${profile?.last_name}` : 'User'}
-                  </div>
-                  <div className="text-[10px] text-slate-400 truncate max-w-32">
-                    {profile?.is_pro ? 'SIGNAL Pro' : 'Free Plan'}
-                  </div>
-                </div>
               </div>
-              
-              <button 
-                onClick={onStart}
-                className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-full transition-all shadow-lg shadow-blue-900/20 font-bold"
-              >
-                Go to Dashboard
-              </button>
-            </>
+
+              {/* Click outside to close dropdown */}
+              {showDropdown && (
+                <div 
+                  className="fixed inset-0 z-40" 
+                  onClick={() => setShowDropdown(false)}
+                />
+              )}
+            </div>
           )}
         </div>
       </nav>
