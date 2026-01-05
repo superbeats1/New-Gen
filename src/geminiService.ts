@@ -86,7 +86,7 @@ Return either "opportunities" array (for Opportunity Mode) OR "leads" array (for
 `;
 
     const response = await genAI.models.generateContent({
-      model: "gemini-1.5-flash-latest",
+      model: "gemini-1.5-pro",
       contents: prompt,
       config: {
         responseMimeType: "application/json"
@@ -133,7 +133,7 @@ Return only the message text, no extra formatting.
 `;
 
     const response = await genAI.models.generateContent({
-      model: "gemini-1.5-flash-latest",
+      model: "gemini-1.5-pro",
       contents: prompt
     });
     
@@ -172,7 +172,7 @@ Return ONLY valid JSON in this format:
 `;
 
     const response = await genAI.models.generateContent({
-      model: "gemini-1.5-flash-latest",
+      model: "gemini-1.5-pro",
       contents: prompt,
       config: {
         responseMimeType: "application/json"
