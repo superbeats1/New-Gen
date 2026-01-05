@@ -550,7 +550,13 @@ const App: React.FC = () => {
                       <textarea
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        placeholder="e.g., 'Find business opportunities in AI for legal firms' or 'Find clients who need a wedding photographer in Austin'"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSearch(e);
+                          }
+                        }}
+                        placeholder="e.g., 'Find business opportunities in AI for legal firms' or 'Find clients who need a wedding photographer in Austin' (Press Enter to scan, Shift+Enter for new line)"
                         className="w-full bg-transparent border-none focus:ring-0 text-xl text-white placeholder-slate-600 resize-none min-h-[120px]"
                       />
                       <div className="flex items-center justify-between pt-4 border-t border-slate-800/50">
@@ -562,6 +568,10 @@ const App: React.FC = () => {
                           <div className="flex items-center space-x-2 text-xs text-slate-400 font-medium bg-slate-800/30 px-3 py-1.5 rounded-full border border-slate-700/50">
                             <Globe className="w-3.5 h-3.5 text-indigo-500" />
                             <span>Global Sources</span>
+                          </div>
+                          <div className="flex items-center space-x-2 text-xs text-slate-500 font-medium">
+                            <kbd className="px-2 py-1 text-xs font-mono bg-slate-800/50 border border-slate-700/50 rounded">Enter</kbd>
+                            <span>to scan</span>
                           </div>
                         </div>
                         <button 
