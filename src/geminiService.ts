@@ -7,7 +7,7 @@ const apiKey = import.meta.env.VITE_GEMINI_API_KEY ||
                import.meta.env.GEMINI_API_KEY;
 
 // Debug logging for environment variables
-console.log('Environment check (v3):', {
+console.log('Environment check (v4):', {
   VITE_GEMINI_API_KEY: !!import.meta.env.VITE_GEMINI_API_KEY,
   VITE_GOOGLE_API_KEY: !!import.meta.env.VITE_GOOGLE_API_KEY,
   GEMINI_API_KEY: !!import.meta.env.GEMINI_API_KEY,
