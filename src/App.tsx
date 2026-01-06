@@ -1,15 +1,14 @@
-
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Search, 
-  Target, 
-  Users, 
-  BarChart3, 
-  History, 
-  Settings, 
-  HelpCircle, 
-  ChevronRight, 
-  Loader2, 
+import {
+  Search,
+  Target,
+  Users,
+  BarChart3,
+  History,
+  Settings,
+  HelpCircle,
+  ChevronRight,
+  Loader2,
   ArrowLeft,
   Briefcase,
   Zap,
@@ -25,7 +24,8 @@ import {
   CreditCard,
   User as UserIcon,
   Crown,
-  X
+  X,
+  Sparkles
 } from 'lucide-react';
 import { WorkflowMode, AnalysisResult, SavedLead, Lead } from './types';
 import { analyzeQuery } from './geminiService';
@@ -51,39 +51,44 @@ const SEARCH_STEPS = [
 
 const SearchingModule: React.FC<{ stepIndex: number; onStop: () => void }> = ({ stepIndex, onStop }) => {
   return (
-    <div className="relative bg-[#11131a] rounded-3xl p-10 border border-blue-500/30 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+    <div className="glass-panel rounded-3xl p-10 relative overflow-hidden animate-in zoom-in-95 duration-500 max-w-2xl mx-auto">
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent shadow-[0_0_20px_rgba(59,130,246,0.5)] animate-scanning-line"></div>
+        <div className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-violet-500 to-transparent shadow-[0_0_20px_rgba(139,92,246,0.5)] animate-scanning-line"></div>
       </div>
-      <div className="relative z-10 flex flex-col items-center space-y-8">
+
+      <div className="relative z-10 flex flex-col items-center space-y-10">
         <div className="relative">
-          <div className="absolute -inset-4 bg-blue-600/20 blur-2xl rounded-full animate-pulse"></div>
-          <div className="relative bg-slate-900/80 p-5 rounded-3xl border border-blue-500/20">
-            <Cpu className="w-12 h-12 text-blue-500 animate-spin-slow" />
+          <div className="absolute -inset-8 bg-violet-600/20 blur-3xl rounded-full animate-pulse"></div>
+          <div className="relative glass-card p-6 rounded-full border border-violet-500/30">
+            <Cpu className="w-12 h-12 text-violet-400 animate-spin-slow" />
           </div>
         </div>
-        <div className="w-full max-w-md space-y-4">
-          <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-slate-500">
+
+        <div className="w-full space-y-6">
+          <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
             <span className="flex items-center space-x-2">
-              <Activity className="w-3.5 h-3.5 text-blue-500" />
+              <Activity className="w-4 h-4 text-violet-500" />
               <span>Neural Processing</span>
             </span>
-            <span>{Math.round(((stepIndex + 1) / SEARCH_STEPS.length) * 100)}%</span>
+            <span className="text-violet-300">{Math.round(((stepIndex + 1) / SEARCH_STEPS.length) * 100)}%</span>
           </div>
-          <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden border border-slate-700/50">
-            <div 
-              className="h-full bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(59,130,246,0.5)]"
+
+          <div className="h-2 w-full bg-slate-800/50 rounded-full overflow-hidden border border-white/5">
+            <div
+              className="h-full bg-gradient-to-r from-violet-600 to-indigo-600 transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(139,92,246,0.5)]"
               style={{ width: `${((stepIndex + 1) / SEARCH_STEPS.length) * 100}%` }}
             ></div>
           </div>
-          <div className="flex items-center justify-center space-x-2 text-slate-400 font-mono text-xs h-6 overflow-hidden">
-            <Terminal className="w-4 h-4 text-blue-500 shrink-0" />
-            <span className="truncate">{SEARCH_STEPS[stepIndex]}</span>
+
+          <div className="flex items-center justify-center space-x-3 text-slate-400 font-mono text-xs h-6 overflow-hidden">
+            <Terminal className="w-4 h-4 text-violet-500 shrink-0" />
+            <span className="truncate animate-pulse">{SEARCH_STEPS[stepIndex]}</span>
           </div>
         </div>
-        <button 
+
+        <button
           onClick={onStop}
-          className="group flex items-center space-x-2 px-6 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 text-sm font-bold transition-all shadow-lg shadow-rose-900/10"
+          className="group flex items-center space-x-2 px-6 py-2.5 rounded-xl hover:bg-white/5 border border-white/5 text-slate-400 hover:text-white text-sm font-medium transition-all"
         >
           <XCircle className="w-4 h-4 group-hover:rotate-90 transition-transform" />
           <span>Stop Discovery</span>
@@ -107,7 +112,7 @@ const App: React.FC = () => {
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [showSuccessPage, setShowSuccessPage] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  
+
   const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
@@ -115,9 +120,7 @@ const App: React.FC = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentSuccess = urlParams.get('payment');
     if (paymentSuccess === 'success') {
-      // Clear the URL parameters but keep the current path
       window.history.replaceState({}, document.title, window.location.pathname);
-      // Force refresh of profile data after payment
       if (session) {
         fetchProfile(session.user.id);
       }
@@ -149,14 +152,11 @@ const App: React.FC = () => {
       .select('*')
       .eq('id', userId)
       .single();
-    
     if (data) setProfile(data);
   };
 
   const deductCredit = async () => {
     if (!profile) return false;
-    
-    // Safety check for free users
     if (!profile.is_pro && profile.credits <= 0) return false;
 
     const newTotalUsed = (profile.total_credits_used || 0) + 1;
@@ -167,12 +167,8 @@ const App: React.FC = () => {
       total_credits_used: newTotalUsed,
       updated_at: new Date().toISOString()
     };
-    
-    const { error } = await supabase
-      .from('profiles')
-      .update(updateData)
-      .eq('id', profile.id);
 
+    const { error } = await supabase.from('profiles').update(updateData).eq('id', profile.id);
     if (!error) {
       setProfile({ ...profile, ...updateData });
       return true;
@@ -182,9 +178,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const stored = localStorage.getItem('signal_saved_leads');
-    if (stored) {
-      setSavedLeads(JSON.parse(stored));
-    }
+    if (stored) setSavedLeads(JSON.parse(stored));
   }, []);
 
   useEffect(() => {
@@ -206,9 +200,7 @@ const App: React.FC = () => {
   };
 
   const stopSearch = () => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
+    if (abortControllerRef.current) abortControllerRef.current.abort();
     setIsSearching(false);
     setSearchStep(0);
   };
@@ -224,18 +216,15 @@ const App: React.FC = () => {
 
     setIsSearching(true);
     setSearchStep(0);
-    
-    if (view === 'results') {
-      setView('home');
-    }
+
+    if (view === 'results') setView('home');
 
     try {
       const animationTimer = new Promise(resolve => setTimeout(resolve, 4000));
       const resultPromise = analyzeQuery(query);
-      
+
       const [result] = await Promise.all([resultPromise, animationTimer]);
-      
-      // Deduct credit only after success
+
       await deductCredit();
       setResults(result);
       setView('results');
@@ -284,13 +273,10 @@ const App: React.FC = () => {
     localStorage.setItem('signal_saved_leads', JSON.stringify(updated));
   };
 
-  const handleUpgradeClick = () => {
-    setShowUpgradeModal(true);
-  };
+  const handleUpgradeClick = () => setShowUpgradeModal(true);
 
   const handleUpgrade = async () => {
     if (isUpgrading) return;
-    
     setIsUpgrading(true);
     try {
       setShowUpgradeModal(false);
@@ -303,25 +289,19 @@ const App: React.FC = () => {
     }
   };
 
-  // TEMPORARY: Manual Pro upgrade for testing (remove in production)
+  // TEMPORARY: Manual Pro upgrade for testing
   const handleManualUpgrade = async () => {
     if (!profile) return;
-    
     const confirmed = confirm('ADMIN: Manually upgrade this user to Pro status?');
     if (!confirmed) return;
 
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ 
-          is_pro: true,
-          updated_at: new Date().toISOString()
-        })
+        .update({ is_pro: true, updated_at: new Date().toISOString() })
         .eq('id', profile.id);
 
       if (error) throw error;
-
-      // Refresh profile
       await fetchProfile(profile.id);
       alert('✅ Successfully upgraded to Pro status!');
     } catch (error) {
@@ -334,19 +314,15 @@ const App: React.FC = () => {
     setShowSuccessPage(false);
     setShowLanding(false);
     setView('home');
-    // Refresh profile to get updated Pro status
-    if (session) {
-      await fetchProfile(session.user.id);
-    }
+    if (session) await fetchProfile(session.user.id);
   };
 
-  // Auth Modal Component
   const AuthModal = () => {
     if (!showAuthModal) return null;
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
         <div className="relative w-full max-w-md">
-          <button 
+          <button
             onClick={() => setShowAuthModal(false)}
             className="absolute -top-12 right-0 p-2 text-slate-400 hover:text-white transition-colors"
           >
@@ -365,16 +341,16 @@ const App: React.FC = () => {
   if (showLanding || !session) {
     return (
       <>
-        <LandingPage 
-          onStart={handleStartApp} 
-          session={session} 
-          onOpenAuth={() => setShowAuthModal(true)} 
+        <LandingPage
+          onStart={handleStartApp}
+          session={session}
+          onOpenAuth={() => setShowAuthModal(true)}
           profile={profile}
           onSignOut={handleSignOut}
           onUpgrade={handleUpgradeClick}
         />
         <AuthModal />
-        <UpgradeModal 
+        <UpgradeModal
           isOpen={showUpgradeModal}
           onClose={() => setShowUpgradeModal(false)}
           onUpgrade={handleUpgrade}
@@ -385,168 +361,153 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#0a0b0e] text-slate-200 animate-in fade-in duration-700">
+    <div className="flex h-screen overflow-hidden bg-[#050507] text-slate-200 selection:bg-violet-500/30">
+      {/* Background Gradients */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-violet-900/10 via-[#050507] to-[#050507]"></div>
+      </div>
+
       {/* Sidebar */}
-      <aside className="w-64 border-r border-slate-800/50 bg-[#0d0f14] flex flex-col p-6 space-y-8">
-        <div className="flex items-center space-x-3 mb-4 cursor-pointer" onClick={() => setShowLanding(true)}>
-          <div className="bg-blue-600 p-2 rounded-lg shadow-lg shadow-blue-600/20">
-            <Zap className="w-6 h-6 text-white" />
+      <aside className="w-72 glass-panel border-r-0 border-r-white/5 flex flex-col p-6 m-4 mr-0 rounded-3xl relative z-20">
+        <div className="flex items-center space-x-3 mb-10 cursor-pointer" onClick={() => setShowLanding(true)}>
+          <div className="bg-gradient-to-br from-violet-600 to-indigo-600 p-2 rounded-xl shadow-lg shadow-violet-600/20">
+            <Zap className="w-5 h-5 text-white fill-white" />
           </div>
-          <span className="text-2xl font-bold tracking-tight text-white uppercase italic">SIGNAL</span>
+          <span className="text-xl font-bold tracking-tight text-white">Signal</span>
         </div>
 
         <nav className="flex-1 space-y-2">
-          <button 
+          <button
             onClick={() => setView('home')}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all ${view === 'home' ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20 shadow-[0_0_15px_rgba(37,99,235,0.1)]' : 'hover:bg-slate-800/50 text-slate-400'}`}
+            className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all ${view === 'home' ? 'bg-white/10 text-white font-medium border border-white/5 shadow-inner' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
           >
-            <Search className="w-5 h-5" />
-            <span className="font-medium">Discover</span>
+            <Search className={`w-5 h-5 ${view === 'home' ? 'text-violet-400' : ''}`} />
+            <span>Discover</span>
           </button>
-          
-          <button 
+
+          <button
             onClick={() => setView('tracker')}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all ${view === 'tracker' ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20 shadow-[0_0_15px_rgba(37,99,235,0.1)]' : 'hover:bg-slate-800/50 text-slate-400'}`}
+            className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all ${view === 'tracker' ? 'bg-white/10 text-white font-medium border border-white/5 shadow-inner' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
           >
-            <BookmarkCheck className="w-5 h-5" />
-            <span className="font-medium">My Tracker</span>
+            <BookmarkCheck className={`w-5 h-5 ${view === 'tracker' ? 'text-violet-400' : ''}`} />
+            <span>Tracker</span>
             {savedLeads.length > 0 && (
-              <span className="ml-auto bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+              <span className="ml-auto bg-violet-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
                 {savedLeads.length}
               </span>
             )}
           </button>
-          
-          <div className="pt-8 text-xs font-semibold text-slate-500 uppercase tracking-widest px-4 mb-2">
-            Usage Metrics
+
+          <div className="pt-8 pb-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-widest">
+            Your Plan
           </div>
-          <div className="px-4 space-y-4">
-            <div className="p-3 bg-slate-800/30 rounded-xl border border-slate-700/50">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold text-slate-500 uppercase">Credits</span>
-                {profile?.is_pro ? (
-                   <span className="flex items-center text-[10px] font-bold text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded uppercase">
-                     <Crown className="w-3 h-3 mr-1" /> Pro
-                   </span>
-                ) : (
-                  <span className="text-[10px] font-bold text-blue-400">{profile?.credits} left</span>
-                )}
-              </div>
-              <div className="h-1.5 w-full bg-slate-700 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-blue-500 transition-all duration-500" 
-                  style={{ width: profile?.is_pro ? '100%' : `${Math.max(0, Math.min(100, (profile?.credits / 10) * 100))}%` }}
-                ></div>
-              </div>
-              <div className="mt-2 text-[10px] text-slate-500 flex justify-between">
-                <span>Lifetime Scans:</span>
-                <span className="text-slate-300 font-bold">{profile?.total_credits_used || 0}</span>
-              </div>
+          <div className="glass-card p-4 rounded-2xl mx-1 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-violet-500/10 rounded-full blur-2xl group-hover:bg-violet-500/20 transition-all"></div>
+            <div className="flex items-center justify-between mb-3 relative z-10">
+              <span className="text-xs font-medium text-slate-300">Credits</span>
+              {profile?.is_pro ? (
+                <span className="flex items-center text-[10px] font-bold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                  PRO
+                </span>
+              ) : (
+                <span className="text-xs font-bold text-white">{profile?.credits} left</span>
+              )}
             </div>
+
+            <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden mb-3">
+              <div
+                className="h-full bg-gradient-to-r from-violet-500 to-indigo-500 transition-all duration-500"
+                style={{ width: profile?.is_pro ? '100%' : `${Math.max(0, Math.min(100, (profile?.credits / 10) * 100))}%` }}
+              ></div>
+            </div>
+
+            {!profile?.is_pro && (
+              <button
+                onClick={handleUpgradeClick}
+                className="w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-white transition-all flex items-center justify-center space-x-2"
+              >
+                <Sparkles className="w-3 h-3 text-amber-400" />
+                <span>Upgrade Plan</span>
+              </button>
+            )}
           </div>
         </nav>
 
-        <div className="border-t border-slate-800 pt-6 space-y-2">
-          <div className="flex items-center space-x-3 px-4 py-2 mb-2">
-             <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700">
-               <UserIcon className="w-4 h-4 text-slate-400" />
-             </div>
-             <div className="flex-1 truncate">
-               <div className="flex items-center space-x-2">
-                 <div className="text-xs font-bold text-white truncate">{profile?.first_name} {profile?.last_name}</div>
-                 {profile?.is_pro && (
-                   <span className="flex items-center text-[9px] font-bold text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded uppercase">
-                     <Crown className="w-2.5 h-2.5 mr-0.5" /> Pro
-                   </span>
-                 )}
-               </div>
-               <div className="text-[10px] text-slate-500 truncate">{session?.user?.email}</div>
-               <div className="text-[9px] text-slate-600 truncate">
-                 {profile?.is_pro ? 'SIGNAL Pro Plan' : 'Free Plan (10 credits)'}
-               </div>
-             </div>
+        <div className="border-t border-white/5 pt-6 space-y-2">
+          <div className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-white/5 border border-white/5">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white border border-white/10">
+              {profile?.first_name?.[0] || 'U'}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-xs font-bold text-white truncate">{profile?.first_name} {profile?.last_name}</div>
+              <div className="text-[10px] text-slate-400 truncate">{session?.user?.email}</div>
+            </div>
           </div>
-          {/* TEMPORARY ADMIN BUTTON - Remove in production */}
+
+          {/* TEMPORARY ADMIN BUTTON */}
           {!profile?.is_pro && (
-            <button 
-              onClick={handleManualUpgrade}
-              className="w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-amber-400 hover:bg-amber-500/10 transition-all text-xs"
-            >
-              <Crown className="w-4 h-4" />
-              <span>Admin: Upgrade to Pro</span>
+            <button onClick={handleManualUpgrade} className="w-full text-[10px] text-slate-600 hover:text-amber-500 p-1 text-center">
+              (Admin: Upgrade)
             </button>
           )}
-          
-          <button 
+
+          <button
             onClick={handleSignOut}
-            className="w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-rose-400 hover:bg-rose-500/10 transition-all"
+            className="w-full flex items-center space-x-3 px-4 py-2 rounded-xl text-rose-400 hover:bg-rose-500/10 transition-all ml-1"
           >
-            <LogOut className="w-5 h-5" />
-            <span>Sign Out</span>
+            <LogOut className="w-4 h-4" />
+            <span className="text-sm">Sign Out</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col h-full relative overflow-y-auto bg-[radial-gradient(ellipse_at_top,#11131a_0%,#0a0b0e_100%)]">
-        <header className="h-16 border-b border-slate-800/50 flex items-center justify-between px-8 bg-[#0a0b0e]/80 backdrop-blur-md sticky top-0 z-30">
+      <main className="flex-1 flex flex-col h-full relative overflow-y-auto z-10">
+        <header className="h-20 flex items-center justify-between px-10 sticky top-0 z-30">
           <div className="flex items-center space-x-4">
             {(view !== 'home' || isSearching) && (
-              <button 
+              <button
                 onClick={() => { setView('home'); stopSearch(); }}
-                className="p-2 hover:bg-slate-800 rounded-full text-slate-400 transition-colors"
+                className="w-10 h-10 flex items-center justify-center glass-panel rounded-full text-slate-400 hover:text-white transition-all"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
             )}
-            <h1 className="text-lg font-semibold text-slate-200">
+            <h1 className="text-xl font-bold text-white tracking-tight">
               {isSearching ? 'Neural Extraction Protocol' :
-               view === 'home' ? 'Intelligence Hub' : 
-               view === 'tracker' ? 'Lead Tracker' : 
-               results?.mode === WorkflowMode.OPPORTUNITY ? 'Opportunity Analysis' : 'Lead Discovery'}
+                view === 'home' ? 'Intelligence Hub' :
+                  view === 'tracker' ? 'Lead Tracker' :
+                    results?.mode === WorkflowMode.OPPORTUNITY ? 'Opportunity Analysis' : 'Lead Discovery'}
             </h1>
           </div>
+
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-700/50">
-              <CreditCard className="w-4 h-4 text-slate-400" />
-              <span className="text-xs font-bold text-slate-300">{profile?.is_pro ? 'Unlimited' : `${profile?.credits} Credits`}</span>
+            <div className="glass-panel px-4 py-2 rounded-full flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span className="text-xs font-medium text-slate-300">System Online</span>
             </div>
-            {!profile?.is_pro && (
-              <button 
-                onClick={handleUpgradeClick}
-                className="bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold px-4 py-1.5 rounded-xl transition-all flex items-center space-x-2"
-              >
-                <Crown className="w-3 h-3" />
-                <span>Upgrade</span>
-              </button>
-            )}
           </div>
         </header>
 
-        <div className="flex-1 p-8">
+        <div className="flex-1 px-10 pb-10">
           {view === 'home' && (
-            <div className="max-w-4xl mx-auto py-12">
-              <div className="text-center mb-12 space-y-4">
-                <div className="inline-block px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest">
-                  Live Market Analysis
-                </div>
-                <h2 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight">
-                  Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">{profile?.first_name || 'Agent'}</span>.
+            <div className="max-w-4xl mx-auto py-16">
+              <div className="text-center mb-16 space-y-6">
+                <h2 className="text-5xl font-bold text-white tracking-tight">
+                  Hello, <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400">{profile?.first_name || 'Agent'}</span>.
                 </h2>
-                <p className="text-slate-400 text-lg max-w-xl mx-auto">
-                  Ready to uncover some hidden market signals?
+                <p className="text-slate-400 text-xl font-light">
+                  What are we discovering today?
                 </p>
               </div>
 
               {isSearching ? (
-                <div className="max-w-2xl mx-auto">
-                   <SearchingModule stepIndex={searchStep} onStop={stopSearch} />
-                </div>
+                <SearchingModule stepIndex={searchStep} onStop={stopSearch} />
               ) : (
-                <div className="relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl blur opacity-25 group-focus-within:opacity-50 transition duration-1000"></div>
-                  <form onSubmit={handleSearch} className="relative bg-[#11131a] rounded-2xl p-6 border border-slate-800/50 shadow-2xl">
-                    <div className="flex flex-col space-y-4">
+                <div className="relative group max-w-3xl mx-auto">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 via-indigo-600 to-violet-600 rounded-[2rem] blur opacity-40 group-focus-within:opacity-75 transition duration-1000 animate-pulse-glow"></div>
+                  <form onSubmit={handleSearch} className="relative glass-card p-1 rounded-[2rem]">
+                    <div className="bg-[#050507]/80 rounded-[1.8rem] p-6">
                       <textarea
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
@@ -556,30 +517,26 @@ const App: React.FC = () => {
                             handleSearch(e);
                           }
                         }}
-                        placeholder="e.g., 'Find business opportunities in AI for legal firms' or 'Find clients who need a wedding photographer in Austin' (Press Enter to scan, Shift+Enter for new line)"
-                        className="w-full bg-transparent border-none focus:ring-0 text-xl text-white placeholder-slate-600 resize-none min-h-[120px]"
+                        placeholder="Describe your target market or ideal lead... (e.g., 'Small business owners needing SEO' or 'Market gaps in the pet food industry')"
+                        className="w-full bg-transparent border-none focus:ring-0 text-xl text-white placeholder-slate-600 resize-none min-h-[100px]"
                       />
-                      <div className="flex items-center justify-between pt-4 border-t border-slate-800/50">
-                        <div className="flex space-x-4">
-                          <div className="flex items-center space-x-2 text-xs text-slate-400 font-medium bg-slate-800/30 px-3 py-1.5 rounded-full border border-slate-700/50">
-                            <Target className="w-3.5 h-3.5 text-blue-500" />
-                            <span>Last 30 Days</span>
-                          </div>
-                          <div className="flex items-center space-x-2 text-xs text-slate-400 font-medium bg-slate-800/30 px-3 py-1.5 rounded-full border border-slate-700/50">
-                            <Globe className="w-3.5 h-3.5 text-indigo-500" />
+                      <div className="flex items-center justify-between pt-6 mt-2 border-t border-white/5">
+                        <div className="flex space-x-3">
+                          <button type="button" className="glass-panel px-3 py-1.5 rounded-full text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors flex items-center space-x-1.5">
+                            <Globe className="w-3 h-3" />
                             <span>Global Sources</span>
-                          </div>
-                          <div className="flex items-center space-x-2 text-xs text-slate-500 font-medium">
-                            <kbd className="px-2 py-1 text-xs font-mono bg-slate-800/50 border border-slate-700/50 rounded">Enter</kbd>
-                            <span>to scan</span>
-                          </div>
+                          </button>
+                          <button type="button" className="glass-panel px-3 py-1.5 rounded-full text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors flex items-center space-x-1.5">
+                            <Target className="w-3 h-3" />
+                            <span>High Intent</span>
+                          </button>
                         </div>
-                        <button 
+                        <button
                           type="submit"
                           disabled={!query.trim()}
-                          className="bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg flex items-center space-x-2 shadow-blue-900/20"
+                          className="bg-white text-black hover:bg-slate-200 disabled:bg-slate-700 disabled:text-slate-500 font-bold py-3 px-8 rounded-xl transition-all shadow-lg flex items-center space-x-2"
                         >
-                          <Search className="w-5 h-5" />
+                          <Search className="w-4 h-4" />
                           <span>Start Scan</span>
                         </button>
                       </div>
@@ -589,29 +546,30 @@ const App: React.FC = () => {
               )}
 
               {!isSearching && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-16 animate-in fade-in slide-in-from-top-4 duration-700">
-                  <div 
-                    className="p-6 glass-card rounded-2xl border border-slate-800/50 group hover:border-blue-500/30 hover:bg-slate-800/30 transition-all cursor-pointer" 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-20 max-w-3xl mx-auto">
+                  <div
+                    className="group glass-card p-8 rounded-3xl cursor-pointer hover:bg-white/[0.02] transition-all border border-white/5 hover:border-violet-500/30"
                     onClick={() => setQuery("Find business opportunities in the remote team collaboration space")}
                   >
-                    <div className="bg-blue-500/10 p-3 rounded-xl w-fit mb-4 group-hover:bg-blue-500/20 transition-all border border-blue-500/20">
-                      <Briefcase className="w-6 h-6 text-blue-500" />
+                    <div className="w-12 h-12 rounded-2xl bg-violet-500/10 flex items-center justify-center mb-6 border border-violet-500/20 group-hover:scale-110 transition-transform">
+                      <Briefcase className="w-6 h-6 text-violet-400" />
                     </div>
-                    <h3 className="text-lg font-bold text-white mb-2">Opportunity Mode</h3>
+                    <h3 className="text-xl font-bold text-white mb-2">Strategy Mode</h3>
                     <p className="text-slate-400 text-sm leading-relaxed">
-                      Identify market gaps, common complaints, and unserved niches in any industry.
+                      Find blue ocean opportunities and validate market gaps.
                     </p>
                   </div>
-                  <div 
-                    className="p-6 glass-card rounded-2xl border border-slate-800/50 group hover:border-indigo-500/30 hover:bg-slate-800/30 transition-all cursor-pointer" 
+
+                  <div
+                    className="group glass-card p-8 rounded-3xl cursor-pointer hover:bg-white/[0.02] transition-all border border-white/5 hover:border-pink-500/30"
                     onClick={() => setQuery("Find clients who need a video editor for YouTube creators")}
                   >
-                    <div className="bg-indigo-500/10 p-3 rounded-xl w-fit mb-4 group-hover:bg-indigo-500/20 transition-all border border-indigo-500/20">
-                      <Users className="w-6 h-6 text-indigo-500" />
+                    <div className="w-12 h-12 rounded-2xl bg-pink-500/10 flex items-center justify-center mb-6 border border-pink-500/20 group-hover:scale-110 transition-transform">
+                      <Users className="w-6 h-6 text-pink-400" />
                     </div>
-                    <h3 className="text-lg font-bold text-white mb-2">Lead Mode</h3>
+                    <h3 className="text-xl font-bold text-white mb-2">Sales Mode</h3>
                     <p className="text-slate-400 text-sm leading-relaxed">
-                      Scan social posts, forums, and job boards for active buyers seeking your skills.
+                      Find validated leads ready to buy your services.
                     </p>
                   </div>
                 </div>
@@ -620,15 +578,15 @@ const App: React.FC = () => {
           )}
 
           {view === 'results' && results && !isSearching && (
-            <div className="max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
               {results.mode === WorkflowMode.OPPORTUNITY ? (
-                <OpportunityView 
-                  results={results} 
-                  onNewSearch={() => setView('home')} 
+                <OpportunityView
+                  results={results}
+                  onNewSearch={() => setView('home')}
                 />
               ) : (
-                <LeadView 
-                  results={results} 
+                <LeadView
+                  results={results}
                   onSave={handleSaveLead}
                   onGoTracker={() => setView('tracker')}
                   onRefresh={() => handleSearch()}
@@ -638,9 +596,9 @@ const App: React.FC = () => {
           )}
 
           {view === 'tracker' && (
-            <div className="max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <TrackerView 
-                leads={savedLeads} 
+            <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <TrackerView
+                leads={savedLeads}
                 onDelete={handleDeleteLead}
                 onUpdateStatus={handleUpdateLeadStatus}
               />
@@ -649,7 +607,7 @@ const App: React.FC = () => {
         </div>
       </main>
       <AuthModal />
-      <UpgradeModal 
+      <UpgradeModal
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
         onUpgrade={handleUpgrade}

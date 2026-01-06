@@ -1,21 +1,22 @@
-
 import React, { useState } from 'react';
 import { AnalysisResult, Lead } from '../types';
-import { 
-  Users, 
-  Search, 
-  MapPin, 
-  Clock, 
-  ExternalLink, 
-  UserPlus, 
-  MessageSquare, 
+import {
+  Users,
+  Search,
+  MapPin,
+  Clock,
+  ExternalLink,
+  UserPlus,
+  MessageSquare,
   Bookmark,
   Filter,
   RefreshCw,
   TrendingUp,
   DollarSign,
   Briefcase,
-  Zap
+  Zap,
+  Globe,
+  Sparkles
 } from 'lucide-react';
 import OutreachModal from './OutreachModal';
 import EnrichModal from './EnrichModal';
@@ -41,8 +42,9 @@ const LeadView: React.FC<Props> = ({ results, onSave, onGoTracker, onRefresh }) 
     }
   };
 
-  const getBudgetIcon = (budget: string) => {
-    switch (budget) {
+  const getBudgetDisplay = (lead: Lead) => {
+    if (lead.budgetAmount) return lead.budgetAmount;
+    switch (lead.budget) {
       case 'High': return '$$$';
       case 'Medium': return '$$';
       case 'Low': return '$';
@@ -50,251 +52,174 @@ const LeadView: React.FC<Props> = ({ results, onSave, onGoTracker, onRefresh }) 
     }
   };
 
-  const getBudgetDisplay = (lead: Lead) => {
-    // If we have a specific budget amount, show that
-    if (lead.budgetAmount) {
-      return lead.budgetAmount;
-    }
-    // Otherwise fall back to dollar signs
-    return getBudgetIcon(lead.budget);
-  };
-
   const handleSourceClick = (sourceUrl: any, source: any, prospectName: any) => {
-    console.log('Attempting to open URL:', { sourceUrl, source, prospectName, types: { sourceUrl: typeof sourceUrl, source: typeof source, prospectName: typeof prospectName } });
-    
-    // Convert to strings and provide defaults
-    const safeSourceUrl = sourceUrl ? String(sourceUrl) : '';
-    const safeSource = source ? String(source) : 'Unknown';
-    const safeName = prospectName ? String(prospectName) : 'Anonymous';
-    
-    // Check if URL is valid and not a demo URL
-    if (!safeSourceUrl || safeSourceUrl.length === 0) {
-      console.warn('No valid sourceUrl provided:', { original: sourceUrl, converted: safeSourceUrl });
-      alert(`This is a demo lead from ${safeSource}. In a real implementation, this would link to the original ${safeSource} profile/post by ${safeName}.`);
+    // Check if valid URL
+    if (!sourceUrl || sourceUrl.includes('undefined')) {
+      alert("This is a demo/AI enriched lead. In production, this would link to the live post.");
       return;
     }
-
-    // Check for demo URLs and patterns
-    const demoUrls = [
-      'https://example.com/post',
-      'https://linkedin.com/in/johndoe',
-      'https://linkedin.com/in/realistic-profile',
-      'undefined',
-      'null',
-      ''
-    ];
-
-    const isDemoPattern = demoUrls.includes(safeSourceUrl) || 
-                         safeSourceUrl.includes('activity-demo-') ||
-                         safeSourceUrl.includes('realistic-profile') ||
-                         !safeSourceUrl.startsWith('http');
-
-    if (isDemoPattern) {
-      alert(`This is an enhanced lead from ${safeSource}. The AI generated this realistic example to supplement live data. Real leads will have working links to actual platform posts.`);
-      return;
-    }
-
-    try {
-      // Validate URL before opening
-      const url = new URL(safeSourceUrl);
-      
-      // Handle platform-specific URLs (including Reddit and HackerNews)
-      const platformDomains = [
-        'reddit.com', 'news.ycombinator.com', 'github.com',
-        'linkedin.com', 'facebook.com', 'upwork.com', 'fiverr.com', 
-        '99designs.com', 'behance.net', 'angel.co',
-        'indiehackers.com', 'producthunt.com', 'discord.gg'
-      ];
-      
-      const isPlatform = platformDomains.some(domain => {
-        try {
-          return url.hostname && url.hostname.includes(domain);
-        } catch {
-          return false;
-        }
-      });
-      
-      if (isPlatform) {
-        console.log('Opening trusted platform URL:', safeSourceUrl);
-        window.open(safeSourceUrl, '_blank', 'noopener,noreferrer');
-      } else {
-        // For unknown domains, show a warning
-        const proceed = confirm(`This link will take you to ${url.hostname}. Continue?`);
-        if (proceed) {
-          window.open(safeSourceUrl, '_blank', 'noopener,noreferrer');
-        }
-      }
-    } catch (error) {
-      console.error('URL validation failed:', error, 'URL was:', safeSourceUrl);
-      alert(`Invalid link for ${safeName}. This appears to be a demo lead with a mock URL.`);
-    }
+    window.open(sourceUrl, '_blank');
   };
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
         <div>
-          <div className="flex items-center space-x-2 text-slate-500 text-sm mb-1 font-medium">
-            <span>Finding Leads for</span>
-            <span className="text-indigo-400 italic">"{results.query}"</span>
+          <div className="flex items-center space-x-2 text-slate-500 text-sm mb-2 font-medium">
+            <Globe className="w-4 h-4 text-violet-400" />
+            <span>Active Scans</span>
           </div>
-          <div className="flex items-center space-x-4">
-            <p className="text-slate-400 text-sm max-w-2xl">{results.summary}</p>
+          <div className="flex items-baseline space-x-3">
+            <h2 className="text-3xl font-bold text-white">Lead Report</h2>
+            <span className="text-slate-500 text-sm font-medium">for "{results.query}"</span>
+          </div>
+
+          <div className="flex items-center space-x-4 mt-3">
             {results.leads && (
               <div className="flex items-center space-x-2">
-                <span className="text-[8px] bg-emerald-600/20 text-emerald-400 px-1.5 py-0.5 rounded uppercase tracking-wide">
-                  {results.leads.filter(lead => !lead.notes?.includes('AI-generated')).length} Live
+                <span className="text-[10px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full uppercase tracking-wide font-bold">
+                  {results.leads.filter(lead => !lead.notes?.includes('AI-generated')).length} Live Verified
                 </span>
                 {results.leads.filter(lead => lead.notes?.includes('AI-generated')).length > 0 && (
-                  <span className="text-[8px] bg-indigo-600/20 text-indigo-400 px-1.5 py-0.5 rounded uppercase tracking-wide">
-                    {results.leads.filter(lead => lead.notes?.includes('AI-generated')).length} Enhanced
+                  <span className="text-[10px] bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded-full uppercase tracking-wide font-bold">
+                    {results.leads.filter(lead => lead.notes?.includes('AI-generated')).length} AI Enriched
                   </span>
                 )}
               </div>
             )}
           </div>
         </div>
+
         <div className="flex items-center space-x-3">
-          <button 
+          <button
             onClick={onGoTracker}
-            className="flex items-center space-x-2 bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-slate-300 transition-all text-sm font-semibold border border-slate-700"
+            className="flex items-center space-x-2 bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl text-slate-300 transition-all text-sm font-medium border border-white/5"
           >
             <Bookmark className="w-4 h-4" />
-            <span>My Tracker</span>
+            <span>Saved Leads</span>
           </button>
-          <button 
+          <button
             onClick={onRefresh}
             disabled={!onRefresh}
-            className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-lg text-white transition-all text-sm font-semibold shadow-lg shadow-indigo-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center space-x-2 bg-violet-600 hover:bg-violet-500 px-4 py-2 rounded-xl text-white transition-all text-sm font-bold shadow-lg shadow-violet-900/20 disabled:opacity-50"
           >
             <RefreshCw className="w-4 h-4" />
-            <span>Refresh All</span>
+            <span>Refresh Feed</span>
           </button>
         </div>
       </div>
 
-      <div className="bg-[#11131a] rounded-2xl border border-slate-800/50 overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-800/50 bg-slate-800/20 flex items-center justify-between">
+      <div className="glass-card rounded-3xl overflow-hidden border border-white/5">
+        <div className="px-8 py-5 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
           <div className="flex items-center space-x-6">
-            <div className="flex items-center space-x-2">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Sort:</span>
-              <button className="text-sm font-semibold text-slate-300 hover:text-white flex items-center space-x-1">
-                <span>Fit Score</span>
-                <Filter className="w-3 h-3" />
-              </button>
-            </div>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Found {results.leads?.length} Matches</span>
           </div>
           <div className="flex items-center space-x-2 text-xs text-slate-500">
             <Clock className="w-3 h-3" />
-            <span>Auto-refreshing every 60m</span>
+            <span>Updated just now</span>
           </div>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-slate-800/50 bg-slate-900/30">
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Fit</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Prospect / Source</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Request Summary</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Budget / Urgency</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Actions</th>
+              <tr className="border-b border-white/5 text-slate-400">
+                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest">Fit Score</th>
+                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest">Prospect</th>
+                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest w-1/3">Need</th>
+                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest">Value</th>
+                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/30">
+            <tbody className="divide-y divide-white/5">
               {results.leads?.map((lead) => (
-                <tr key={lead.id} className="hover:bg-slate-800/20 transition-colors group">
-                  <td className="px-6 py-6">
+                <tr key={lead.id} className="hover:bg-white/[0.02] transition-colors group">
+                  <td className="px-8 py-6">
                     <div className="relative w-12 h-12 flex items-center justify-center">
                       <svg className="w-full h-full transform -rotate-90">
-                        <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-slate-800" />
-                        <circle 
-                          cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="3" fill="transparent" 
+                        <circle cx="24" cy="24" r="20" stroke="#334155" strokeWidth="3" fill="transparent" />
+                        <circle
+                          cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="3" fill="transparent"
                           strokeDasharray={2 * Math.PI * 20}
                           strokeDashoffset={2 * Math.PI * 20 * (1 - lead.fitScore / 10)}
-                          className="text-indigo-500" 
+                          className={lead.fitScore > 7 ? "text-emerald-400" : "text-violet-400"}
+                          strokeLinecap="round"
                         />
                       </svg>
                       <span className="absolute text-xs font-bold text-white">{lead.fitScore}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-6">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-indigo-600/20 group-hover:text-indigo-400 transition-all">
-                        <Users className="w-5 h-5" />
+                  <td className="px-8 py-6">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center text-slate-400 border border-white/5">
+                        <Users className="w-4 h-4" />
                       </div>
                       <div>
                         <div className="text-sm font-bold text-white mb-0.5 flex items-center space-x-2">
                           <span>{lead.prospectName}</span>
-                          {lead.notes?.includes('AI-generated') ? (
-                            <span className="text-[8px] bg-indigo-600/20 text-indigo-400 px-1.5 py-0.5 rounded uppercase tracking-wide">
-                              Enhanced
-                            </span>
-                          ) : (
-                            <span className="text-[8px] bg-emerald-600/20 text-emerald-400 px-1.5 py-0.5 rounded uppercase tracking-wide">
-                              Live
-                            </span>
+                          {/* Badge */}
+                          {lead.notes?.includes('AI-generated') && (
+                            <Sparkles className="w-3 h-3 text-indigo-400" />
                           )}
                         </div>
                         <div className="flex items-center space-x-2">
-                          <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">{lead.source}</span>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 border border-white/5 text-slate-400 font-medium">
+                            {lead.source}
+                          </span>
                           <span className="text-[10px] text-slate-500">{lead.postedAt}</span>
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-6">
-                    <p className="text-sm text-slate-300 max-w-md line-clamp-2">
+                  <td className="px-8 py-6">
+                    <p className="text-sm text-slate-300 leading-relaxed line-clamp-2">
                       {lead.requestSummary}
                     </p>
                     {lead.location && (
-                      <div className="flex items-center space-x-1 mt-1 text-[10px] text-slate-500">
+                      <div className="flex items-center space-x-1 mt-2 text-[10px] text-slate-500 font-medium uppercase tracking-wide">
                         <MapPin className="w-3 h-3" />
                         <span>{lead.location}</span>
                       </div>
                     )}
                   </td>
-                  <td className="px-6 py-6">
-                    <div className="space-y-1.5">
+                  <td className="px-8 py-6">
+                    <div className="space-y-1">
                       <div className="flex items-center space-x-2 text-xs">
-                        <DollarSign className="w-3 h-3 text-emerald-400" />
-                        <span className="text-slate-400 font-medium">Budget:</span>
-                        <span className="text-emerald-400 font-bold">{getBudgetDisplay(lead)}</span>
+                        <span className="text-slate-500">Budget:</span>
+                        <span className="text-emerald-400 font-bold bg-emerald-400/10 px-1.5 rounded">{getBudgetDisplay(lead)}</span>
                       </div>
                       <div className="flex items-center space-x-2 text-xs">
-                        <Clock className="w-3 h-3 text-slate-500" />
-                        <span className="text-slate-400 font-medium">Urgency:</span>
+                        <span className="text-slate-500">Urgency:</span>
                         <span className={`font-bold ${getUrgencyColor(lead.urgency)}`}>{lead.urgency}</span>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-6 text-right">
-                    <div className="flex items-center justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button 
+                  <td className="px-8 py-6 text-right">
+                    <div className="flex items-center justify-end space-x-2 opacity-60 group-hover:opacity-100 transition-all">
+                      <button
                         onClick={() => setEnrichLead(lead)}
-                        className="p-2 hover:bg-slate-700 rounded-lg text-slate-400 hover:text-white transition-all border border-transparent hover:border-slate-600"
-                        title="Enrich Contact"
+                        className="p-2 hover:bg-violet-500/20 rounded-lg text-slate-400 hover:text-violet-300 transition-all"
+                        title="Enrich Data"
                       >
                         <UserPlus className="w-4 h-4" />
                       </button>
-                      <button 
+                      <button
                         onClick={() => setOutreachLead(lead)}
-                        className="p-2 hover:bg-slate-700 rounded-lg text-slate-400 hover:text-white transition-all border border-transparent hover:border-slate-600"
-                        title="Generate Outreach"
+                        className="p-2 hover:bg-violet-500/20 rounded-lg text-slate-400 hover:text-violet-300 transition-all"
+                        title="Draft Outreach"
                       >
                         <MessageSquare className="w-4 h-4" />
                       </button>
-                      <button 
+                      <button
                         onClick={() => onSave(lead)}
-                        className="p-2 hover:bg-indigo-600 rounded-lg text-slate-400 hover:text-white transition-all border border-transparent"
-                        title="Add to Tracker"
+                        className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 hover:text-white transition-all border border-white/5"
+                        title="Save Lead"
                       >
                         <Bookmark className="w-4 h-4" />
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleSourceClick(lead.sourceUrl || '', lead.source || 'Unknown', lead.prospectName || 'Anonymous')}
-                        className="p-2 hover:bg-slate-700 rounded-lg text-slate-400 hover:text-white transition-all border border-transparent hover:border-slate-600"
-                        title="View Original Post"
+                        className="p-2 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-all"
                       >
                         <ExternalLink className="w-4 h-4" />
                       </button>

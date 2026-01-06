@@ -1,6 +1,27 @@
-
 import React, { useState, useEffect } from 'react';
-import { Zap, Target, Users, Search, ChevronRight, Briefcase, BarChart3, Globe, LogIn, User, Crown, CreditCard, ChevronDown, Settings, LogOut, Star, CheckCircle, X } from 'lucide-react';
+import { 
+  Zap, 
+  Target, 
+  Users, 
+  Search, 
+  ChevronRight, 
+  Briefcase, 
+  BarChart3, 
+  Globe, 
+  LogIn, 
+  User, 
+  Crown, 
+  CreditCard, 
+  ChevronDown, 
+  LogOut, 
+  Star, 
+  CheckCircle, 
+  X,
+  ArrowRight,
+  Shield,
+  Activity,
+  Cpu
+} from 'lucide-react';
 
 interface Props {
   onStart: () => void;
@@ -12,362 +33,277 @@ interface Props {
   showPaymentSuccess?: boolean;
 }
 
-const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, onSignOut, onUpgrade, showPaymentSuccess }) => {
+const LandingPage: React.FC<Props> = ({ 
+  onStart, 
+  session, 
+  onOpenAuth, 
+  profile, 
+  onSignOut, 
+  onUpgrade, 
+  showPaymentSuccess 
+}) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showSuccessBanner, setShowSuccessBanner] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('payment') === 'success') {
       setShowSuccessBanner(true);
-      // Auto-hide banner after 10 seconds
       const timer = setTimeout(() => setShowSuccessBanner(false), 10000);
       return () => clearTimeout(timer);
     }
   }, []);
+
   return (
-    <div className="min-h-screen bg-[#0a0b0e] overflow-x-hidden selection:bg-blue-500/30">
-      {/* Background Grid & Ambient Glow */}
-      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full animate-pulse"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '2s' }}></div>
+    <div className="min-h-screen relative overflow-hidden selection:bg-violet-500/30">
+      {/* Background Ambience */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-violet-600/10 rounded-full blur-[150px] animate-pulse"></div>
+        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-indigo-600/10 rounded-full blur-[150px] animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
       </div>
 
       {/* Navigation */}
-      <nav className="relative z-50 max-w-7xl mx-auto px-8 py-8 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="bg-blue-600 p-2 rounded-lg shadow-lg shadow-blue-600/20">
-            <Zap className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-2xl font-bold tracking-tight text-white uppercase italic">Signal</span>
-        </div>
-        
-        <div className="hidden md:flex items-center space-x-6 text-sm font-medium">
-          <a href="#workflow" className="text-slate-400 hover:text-blue-400 transition-colors">Workflow</a>
-          {!session ? (
-            <>
-              <button 
-                onClick={onOpenAuth}
-                className="text-white hover:text-blue-400 transition-colors flex items-center space-x-2"
-              >
-                <LogIn className="w-4 h-4" />
-                <span>Sign In</span>
-              </button>
-              <button 
-                onClick={onOpenAuth}
-                className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-full transition-all shadow-lg shadow-blue-900/20 font-bold"
-              >
-                Get Started
-              </button>
-            </>
-          ) : (
-            <div className="relative">
-              {/* Credits Badge */}
-              <div className="flex items-center space-x-4">
-                <div className="px-3 py-1.5 rounded-full bg-blue-600/20 border border-blue-500/30 backdrop-blur-md">
-                  <span className="text-xs font-bold text-blue-400 uppercase tracking-wide">
-                    {profile?.credits || 0} Credits Left
-                  </span>
-                </div>
-                
-                {/* User Dropdown */}
-                <div className="relative">
-                  <button 
-                    onClick={() => setShowDropdown(!showDropdown)}
-                    className="flex items-center space-x-2 px-3 py-2 rounded-xl bg-slate-800/80 border border-slate-700/50 backdrop-blur-md hover:bg-slate-800/90 transition-all"
-                  >
-                    <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center border border-slate-600">
-                      <User className="w-4 h-4 text-slate-300" />
-                    </div>
-                    <ChevronDown className="w-4 h-4 text-slate-400" />
-                  </button>
-
-                  {/* Dropdown Menu */}
-                  {showDropdown && (
-                    <div className="absolute right-0 top-full mt-2 w-64 bg-slate-900/95 backdrop-blur-xl rounded-2xl border border-slate-700/50 shadow-2xl z-50 animate-in slide-in-from-top-2 duration-200">
-                      {/* User Info Section */}
-                      <div className="p-4 border-b border-slate-800">
-                        <div className="text-sm font-bold text-white mb-1">
-                          {profile?.first_name ? `${profile.first_name} ${profile?.last_name || ''}`.trim() : 'User'}
-                        </div>
-                        <div className="text-xs text-slate-400 mb-3">
-                          {session?.user?.email}
-                        </div>
-                        
-                        {/* Credits Display */}
-                        <div className="px-3 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-slate-400">Credits</span>
-                            <span className="text-xs font-bold text-blue-400">
-                              {profile?.is_pro ? 'Unlimited' : `${profile?.credits || 0} left`}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Menu Items */}
-                      <div className="p-2">
-                        <button className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800/50 transition-all text-sm">
-                          <CreditCard className="w-4 h-4" />
-                          <span>Billing</span>
-                        </button>
-                        
-                        {!profile?.is_pro && (
-                          <button 
-                            onClick={onUpgrade}
-                            className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-blue-400 hover:bg-blue-500/10 transition-all text-sm"
-                          >
-                            <Star className="w-4 h-4" />
-                            <span>Upgrade to Pro</span>
-                          </button>
-                        )}
-                        
-                        <button 
-                          onClick={onSignOut}
-                          className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-rose-400 hover:bg-rose-500/10 transition-all text-sm"
-                        >
-                          <LogOut className="w-4 h-4" />
-                          <span>Log Out</span>
-                        </button>
-                      </div>
-
-                      {/* Go to Dashboard */}
-                      <div className="p-3 border-t border-slate-800">
-                        <button 
-                          onClick={() => { setShowDropdown(false); onStart(); }}
-                          className="w-full bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-all font-bold text-sm"
-                        >
-                          Go to Dashboard
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Click outside to close dropdown */}
-              {showDropdown && (
-                <div 
-                  className="fixed inset-0 z-40" 
-                  onClick={() => setShowDropdown(false)}
-                />
-              )}
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-[#050507]/80 backdrop-blur-md border-b border-white/5' : 'bg-transparent'}`}>
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <div className="bg-gradient-to-br from-violet-600 to-indigo-600 p-2 rounded-xl shadow-lg shadow-violet-500/20">
+              <Zap className="w-5 h-5 text-white fill-white" />
             </div>
-          )}
+            <span className="text-xl font-bold tracking-tight text-white">Signal</span>
+          </div>
+
+          <div className="hidden md:flex items-center space-x-8">
+            <a href="#features" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Features</a>
+            <a href="#pricing" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Pricing</a>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            {!session ? (
+              <>
+                <button 
+                  onClick={onOpenAuth}
+                  className="hidden md:flex text-sm font-medium text-slate-300 hover:text-white transition-colors"
+                >
+                  Sign In
+                </button>
+                <button 
+                  onClick={onOpenAuth}
+                  className="glass-button text-white px-5 py-2.5 rounded-full text-sm font-semibold tracking-wide"
+                >
+                  Get Started
+                </button>
+              </>
+            ) : (
+              <div className="relative">
+                <button 
+                  onClick={() => setShowDropdown(!showDropdown)}
+                  className="glass-panel flex items-center space-x-2 pl-2 pr-3 py-1.5 rounded-full hover:bg-white/5 transition-all"
+                >
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center text-xs font-bold text-white">
+                    {profile?.first_name?.[0] || 'U'}
+                  </div>
+                  <ChevronDown className="w-4 h-4 text-slate-400" />
+                </button>
+
+                {showDropdown && (
+                  <div className="absolute right-0 top-full mt-2 w-64 glass-card rounded-2xl overflow-hidden p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="px-3 py-2 border-b border-white/5 mb-2">
+                       <div className="text-sm font-bold text-white truncate">{profile?.first_name} {profile?.last_name}</div>
+                       <div className="text-xs text-slate-400 truncate">{session.user.email}</div>
+                    </div>
+                    
+                    <button onClick={onStart} className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-slate-300 transition-colors text-left">
+                      <Briefcase className="w-4 h-4 text-violet-400" />
+                      <span>Dashboard</span>
+                    </button>
+                    {!profile?.is_pro && (
+                      <button onClick={onUpgrade} className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-slate-300 transition-colors text-left">
+                        <Crown className="w-4 h-4 text-amber-400" />
+                        <span>Upgrade to Pro</span>
+                      </button>
+                    )}
+                    <button onClick={onSignOut} className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-rose-500/10 text-sm text-rose-400 transition-colors text-left">
+                      <LogOut className="w-4 h-4" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </nav>
 
-      {/* Payment Success Banner */}
-      {showSuccessBanner && (
-        <div className="relative z-50 bg-gradient-to-r from-green-600 to-emerald-600 border-b border-green-500">
-          <div className="max-w-7xl mx-auto px-8 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <CheckCircle className="w-6 h-6 text-white" />
-                <div>
-                  <h3 className="text-white font-bold">Payment Successful!</h3>
-                  <p className="text-green-100 text-sm">Welcome to SIGNAL Pro! You now have unlimited searches and advanced features.</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => setShowSuccessBanner(false)}
-                className="text-white hover:text-green-200 transition-colors p-1"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+     {/* Success Banner */}
+     {showSuccessBanner && (
+        <div className="fixed top-24 right-4 z-[100] glass-card border-l-4 border-l-emerald-500 p-4 rounded-xl flex items-start space-x-4 max-w-sm animate-in slide-in-from-right duration-500">
+          <div className="bg-emerald-500/20 p-2 rounded-full">
+            <CheckCircle className="w-5 h-5 text-emerald-400" />
           </div>
+          <div className="flex-1">
+            <h3 className="font-bold text-white text-sm">Upgrade Successful</h3>
+            <p className="text-slate-400 text-xs mt-1">Your account has been upgraded to Pro. Enjoy unlimited access.</p>
+          </div>
+          <button onClick={() => setShowSuccessBanner(false)} className="text-slate-500 hover:text-white"><X className="w-4 h-4" /></button>
         </div>
       )}
 
       {/* Hero Section */}
-      <section className="relative z-10 max-w-7xl mx-auto px-8 pt-20 pb-32 flex flex-col lg:flex-row items-center gap-16">
-        <div className="flex-1 text-center lg:text-left space-y-8">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest animate-bounce">
-            <Zap className="w-3.5 h-3.5" />
-            <span>Market Intelligence v2.5</span>
+      <section className="relative z-10 pt-40 pb-32 px-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="text-center lg:text-left space-y-8">
+            <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 backdrop-blur-sm">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
+              </span>
+              <span className="text-xs font-bold text-violet-200 tracking-wide uppercase">AI-Powered Market Intelligence</span>
+            </div>
+            
+            <h1 className="text-5xl md:text-7xl font-bold text-white leading-[1.1] tracking-tight">
+              Identify Opportunities <br />
+              <span className="text-gradient">Before They Trend.</span>
+            </h1>
+            
+            <p className="text-lg text-slate-400 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              Signal uses dual-agent AI to scan millions of discussions across Reddit, X, and forums to find valid business ideas and high-intent leads in seconds.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
+              <button 
+                onClick={onStart}
+                className="group glass-button px-8 py-4 rounded-2xl flex items-center space-x-3 text-white font-semibold text-lg"
+              >
+                <span>Start Discovery</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+              
+              <button onClick={() => window.open('https://github.com/superbeats1/New-Gen', '_blank')} className="px-8 py-4 rounded-2xl border border-white/10 hover:bg-white/5 text-slate-300 font-medium transition-all flex items-center space-x-2">
+                 <span>View Source</span>
+              </button>
+            </div>
+            
+            <div className="pt-8 flex items-center justify-center lg:justify-start space-x-8 text-sm text-slate-500 font-medium">
+              <span className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-violet-500" /> Real-time Scan</span>
+              <span className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-violet-500" /> 94% Accuracy</span>
+              <span className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-violet-500" /> Instant Export</span>
+            </div>
           </div>
-          <h1 className="text-6xl md:text-7xl lg:text-8xl font-black text-white leading-none tracking-tighter">
-            Decode the <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500">Market</span> Noise.
-          </h1>
-          <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-            The world's first dual-agent discovery platform. Find validated business opportunities or high-intent client leads using neural market scanning.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-            <button 
-              onClick={onStart}
-              className="group relative bg-blue-600 hover:bg-blue-500 text-white font-bold py-5 px-10 rounded-2xl transition-all shadow-2xl shadow-blue-600/20 flex items-center space-x-3 text-lg overflow-hidden"
-            >
-              <span className="relative z-10">{session ? 'Enter Platform' : 'Start Discovery'}</span>
-              <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform relative z-10" />
-              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-            </button>
-            <button className="text-slate-400 hover:text-white font-semibold py-5 px-10 rounded-2xl transition-all border border-white/5 hover:bg-white/5 flex items-center space-x-2">
-              <span>View Live Feed</span>
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-            </button>
+
+          {/* Hero Visual - Glass Cards */}
+          <div className="relative">
+             {/* Abstract Glow Behind */}
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-violet-600/20 to-indigo-600/20 rounded-full blur-[100px] animate-pulse-glow"></div>
+             
+             <div className="relative grid grid-cols-2 gap-4">
+               {/* Card 1 */}
+               <div className="glass-card p-6 rounded-3xl col-span-2 transform hover:scale-[1.02] transition-all duration-500">
+                 <div className="flex items-center justify-between mb-4">
+                   <div className="bg-violet-500/20 p-3 rounded-xl">
+                     <Target className="w-6 h-6 text-violet-400" />
+                   </div>
+                   <span className="text-xs font-bold text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-lg">High Confidence</span>
+                 </div>
+                 <h3 className="text-xl font-bold text-white mb-2">Market Gap Detected</h3>
+                 <p className="text-slate-400 text-sm">"Teams are looking for a unified dashboard to manage multiple AI agents. Current solutions are fragmented."</p>
+               </div>
+
+               {/* Card 2 */}
+               <div className="glass-card p-6 rounded-3xl mt-8 transform hover:scale-[1.02] transition-all duration-500" style={{ animationDelay: '0.2s' }}>
+                 <div className="bg-indigo-500/20 p-3 rounded-xl w-fit mb-4">
+                   <Users className="w-6 h-6 text-indigo-400" />
+                 </div>
+                 <h3 className="text-lg font-bold text-white mb-1">Active Leads</h3>
+                 <div className="text-3xl font-bold text-white">124</div>
+                 <p className="text-xs text-slate-500 mt-2">Found in last hour</p>
+               </div>
+
+               {/* Card 3 */}
+               <div className="glass-card p-6 rounded-3xl transform hover:scale-[1.02] transition-all duration-500" style={{ animationDelay: '0.4s' }}>
+                 <div className="bg-pink-500/20 p-3 rounded-xl w-fit mb-4">
+                   <Activity className="w-6 h-6 text-pink-400" />
+                 </div>
+                 <h3 className="text-lg font-bold text-white mb-1">Growth</h3>
+                 <div className="text-3xl font-bold text-white">+48%</div>
+                 <p className="text-xs text-slate-500 mt-2">Trend Velocity</p>
+               </div>
+             </div>
           </div>
         </div>
+      </section>
 
-        {/* Animated Signal Graphic */}
-        <div className="flex-1 relative w-full max-w-[500px] aspect-square">
-          <div className="absolute inset-0 flex items-center justify-center">
-            {/* Sonar Rings */}
-            {[...Array(4)].map((_, i) => (
-              <div 
-                key={i}
-                className="absolute border border-blue-500/20 rounded-full animate-ping-slow"
-                style={{ 
-                  width: `${(i + 1) * 25}%`, 
-                  height: `${(i + 1) * 25}%`,
-                  animationDelay: `${i * 0.8}s`
-                }}
-              />
-            ))}
-            
-            {/* Main Scanner Line */}
-            <div className="absolute inset-0 rounded-full border border-white/5 bg-[#11131a]/50 backdrop-blur-3xl overflow-hidden shadow-2xl">
-              <div className="absolute top-1/2 left-1/2 w-full h-[2px] bg-gradient-to-r from-blue-500 to-transparent origin-left animate-scan"></div>
-              
-              {/* Data Nodes */}
-              {[...Array(12)].map((_, i) => (
-                <div 
-                  key={i}
-                  className="absolute w-2 h-2 rounded-full bg-blue-500/60 animate-glow-node"
-                  style={{
-                    top: `${Math.random() * 80 + 10}%`,
-                    left: `${Math.random() * 80 + 10}%`,
-                    animationDelay: `${Math.random() * 5}s`
-                  }}
-                >
-                  <div className="absolute inset-0 bg-blue-400 blur-md opacity-50"></div>
-                </div>
-              ))}
+      {/* Features Grid */}
+      <section id="features" className="relative z-10 py-32 px-6 bg-[#050507]">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl font-bold text-white mb-6">Dual-Mode Intelligence</h2>
+            <p className="text-slate-400 max-w-2xl mx-auto">Whether you're building a product or finding clients, Signal adapts to your objective.</p>
+          </div>
 
-              {/* Central Signal Icon */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
-                <div className="bg-blue-600 p-6 rounded-3xl shadow-2xl animate-float">
-                  <Zap className="w-12 h-12 text-white" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Feature 1 */}
+            <div className="group glass-card p-10 rounded-[2.5rem] hover:border-violet-500/30 transition-all">
+              <div className="flex items-center justify-between mb-8">
+                <div className="bg-gradient-to-br from-violet-600 to-indigo-600 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:scale-110 transition-transform duration-500">
+                  <Briefcase className="w-8 h-8 text-white" />
                 </div>
+                <button onClick={onStart} className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <ArrowRight className="w-5 h-5 text-white" />
+                </button>
+              </div>
+              <h3 className="text-3xl font-bold text-white mb-4">Opportunity Mode</h3>
+              <p className="text-slate-400 text-lg leading-relaxed mb-8">
+                Identify unserved market niches. Analyse complaints and "wish I had" posts to validate your startup ideas before you build.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <span className="text-xs font-bold text-violet-300 bg-violet-500/10 border border-violet-500/20 px-3 py-1.5 rounded-full">Gap Analysis</span>
+                <span className="text-xs font-bold text-violet-300 bg-violet-500/10 border border-violet-500/20 px-3 py-1.5 rounded-full">Competitor Mapping</span>
+              </div>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="group glass-card p-10 rounded-[2.5rem] hover:border-pink-500/30 transition-all">
+              <div className="flex items-center justify-between mb-8">
+                 <div className="bg-gradient-to-br from-pink-600 to-rose-600 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg shadow-pink-500/20 group-hover:scale-110 transition-transform duration-500">
+                  <Users className="w-8 h-8 text-white" />
+                </div>
+                 <button onClick={onStart} className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <ArrowRight className="w-5 h-5 text-white" />
+                </button>
+              </div>
+              <h3 className="text-3xl font-bold text-white mb-4">Lead Mode</h3>
+              <p className="text-slate-400 text-lg leading-relaxed mb-8">
+                Find clients who are asking for your services right now. We scan job boards and social feeds to bring you high-intent leads.
+              </p>
+               <div className="flex flex-wrap gap-3">
+                <span className="text-xs font-bold text-pink-300 bg-pink-500/10 border border-pink-500/20 px-3 py-1.5 rounded-full">Intent Verification</span>
+                <span className="text-xs font-bold text-pink-300 bg-pink-500/10 border border-pink-500/20 px-3 py-1.5 rounded-full">Direct Contact</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Feature Split */}
-      <section id="workflow" className="relative z-10 max-w-7xl mx-auto px-8 py-24 border-t border-white/5">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Opportunity Column */}
-          <div className="group p-10 glass-card rounded-[40px] border border-slate-800/50 hover:border-blue-500/30 transition-all duration-500">
-            <div className="bg-blue-600/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-              <Briefcase className="w-8 h-8 text-blue-500" />
-            </div>
-            <h3 className="text-3xl font-bold text-white mb-4">Opportunity Discovery</h3>
-            <p className="text-slate-400 text-lg leading-relaxed mb-8">
-              Strategize your next venture. We scan millions of conversations to find real problems waiting for a software or service solution.
-            </p>
-            <ul className="space-y-4 mb-8">
-              {['Sentiment Intensity Analysis', 'Market Readiness Scoring', 'Competitor Gap Mapping'].map((feat, i) => (
-                <li key={i} className="flex items-center space-x-3 text-slate-300">
-                  <div className="w-5 h-5 rounded-full bg-blue-500/10 flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                  </div>
-                  <span>{feat}</span>
-                </li>
-              ))}
-            </ul>
-            <button onClick={onStart} className="text-blue-400 font-bold flex items-center space-x-2 group/btn">
-              <span>Try Strategy Mode</span>
-              <ChevronRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
-            </button>
-          </div>
-
-          {/* Leads Column */}
-          <div className="group p-10 glass-card rounded-[40px] border border-slate-800/50 hover:border-indigo-500/30 transition-all duration-500">
-            <div className="bg-indigo-600/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-              <Users className="w-8 h-8 text-indigo-500" />
-            </div>
-            <h3 className="text-3xl font-bold text-white mb-4">Lead Generation</h3>
-            <p className="text-slate-400 text-lg leading-relaxed mb-8">
-              Execute your sales. Monitor job boards, social platforms, and forums for active buyers looking for your specific creative service.
-            </p>
-            <ul className="space-y-4 mb-8">
-              {['Real-time RSS Monitoring', 'AI Outreach Generator', 'Contact Enrichment API'].map((feat, i) => (
-                <li key={i} className="flex items-center space-x-3 text-slate-300">
-                  <div className="w-5 h-5 rounded-full bg-indigo-500/10 flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
-                  </div>
-                  <span>{feat}</span>
-                </li>
-              ))}
-            </ul>
-            <button onClick={onStart} className="text-indigo-400 font-bold flex items-center space-x-2 group/btn">
-              <span>Try Lead Mode</span>
-              <ChevronRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
-            </button>
-          </div>
+      {/* Footer */}
+      <footer className="relative z-10 border-t border-white/5 py-16 bg-[#030304]">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center opacity-60">
+           <div className="flex items-center space-x-2 mb-4 md:mb-0">
+             <div className="bg-slate-800 p-1.5 rounded-lg">
+                <Zap className="w-4 h-4 text-slate-400" />
+             </div>
+             <span className="font-bold text-slate-300 tracking-tight">Signal Is Live</span>
+           </div>
+           <p className="text-sm text-slate-500">© 2025 Signal Discovery. All rights reserved.</p>
         </div>
-      </section>
-
-      {/* Trust Stats */}
-      <section className="relative z-10 max-w-7xl mx-auto px-8 py-24 border-t border-white/5 text-center">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-12">
-          <div>
-            <div className="text-4xl font-black text-white mb-1">2.4M</div>
-            <div className="text-slate-500 text-sm font-bold uppercase tracking-widest">Signals Analyzed</div>
-          </div>
-          <div>
-            <div className="text-4xl font-black text-white mb-1">12k+</div>
-            <div className="text-slate-500 text-sm font-bold uppercase tracking-widest">Leads Found Daily</div>
-          </div>
-          <div>
-            <div className="text-4xl font-black text-white mb-1">87%</div>
-            <div className="text-slate-500 text-sm font-bold uppercase tracking-widest">Intent Accuracy</div>
-          </div>
-          <div>
-            <div className="text-4xl font-black text-white mb-1">500ms</div>
-            <div className="text-slate-500 text-sm font-bold uppercase tracking-widest">Processing Speed</div>
-          </div>
-        </div>
-      </section>
-
-      <footer className="relative z-10 py-12 text-center text-slate-600 text-sm border-t border-white/5">
-        <p>&copy; 2025 SIGNAL Market Discovery Platform. Powered by Gemini Pro.</p>
       </footer>
-
-      <style>{`
-        @keyframes ping-slow {
-          0% { transform: scale(0.1); opacity: 0; }
-          20% { opacity: 0.5; }
-          100% { transform: scale(1.5); opacity: 0; }
-        }
-        @keyframes scan {
-          from { transform: rotate(0deg) translateX(0); }
-          to { transform: rotate(360deg) translateX(0); }
-        }
-        @keyframes glow-node {
-          0%, 100% { opacity: 0.2; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.5); }
-        }
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
-        }
-        .animate-ping-slow {
-          animation: ping-slow 4s cubic-bezier(0, 0, 0.2, 1) infinite;
-        }
-        .animate-scan {
-          animation: scan 4s linear infinite;
-        }
-        .animate-glow-node {
-          animation: glow-node 3s ease-in-out infinite;
-        }
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-      `}</style>
     </div>
   );
 };

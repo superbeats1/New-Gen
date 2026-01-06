@@ -1,17 +1,18 @@
-
 import React, { useState } from 'react';
 import { AnalysisResult, Opportunity } from '../types';
-import { 
-  TrendingUp, 
-  AlertTriangle, 
-  Lightbulb, 
-  Quote, 
+import {
+  TrendingUp,
+  AlertTriangle,
+  Lightbulb,
+  Quote,
   ArrowRight,
   Download,
   Filter,
   BarChart2,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Target,
+  Zap
 } from 'lucide-react';
 
 interface Props {
@@ -38,61 +39,61 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
   };
 
   return (
-    <div className={`glass-card rounded-2xl border border-slate-800/50 overflow-hidden transition-all duration-300 ${isExpanded ? 'ring-1 ring-blue-500/30' : 'hover:border-slate-700'}`}>
-      <div 
-        className="p-6 cursor-pointer flex items-start justify-between"
+    <div className={`glass-card rounded-3xl overflow-hidden transition-all duration-300 ${isExpanded ? 'border-violet-500/30 shadow-[0_0_30px_rgba(124,58,237,0.1)]' : 'hover:border-white/10'}`}>
+      <div
+        className="p-8 cursor-pointer flex items-start justify-between"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex-1">
-          <div className="flex items-center space-x-3 mb-2">
-            <span className="text-xs font-bold bg-blue-600 text-white px-2 py-0.5 rounded uppercase">Signal #{index + 1}</span>
-            <span className={`text-sm font-semibold ${getScoreColor(opportunity.overallScore)}`}>
-              Overall: {opportunity.overallScore}/10
+          <div className="flex items-center space-x-3 mb-3">
+            <span className="text-[10px] font-bold bg-violet-600 text-white px-2 py-0.5 rounded uppercase tracking-wider">Signal #{index + 1}</span>
+            <span className={`text-sm font-bold ${getScoreColor(opportunity.overallScore)}`}>
+              Score: {opportunity.overallScore}/10
             </span>
           </div>
-          <h3 className="text-xl font-bold text-white mb-2">{opportunity.problemStatement}</h3>
-          
-          <div className="flex flex-wrap gap-4 mt-4">
-            <div className="flex items-center space-x-2 bg-slate-800/50 px-3 py-1 rounded-full border border-slate-700/50">
-              <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Demand</span>
+          <h3 className="text-2xl font-bold text-white mb-2 leading-tight">{opportunity.problemStatement}</h3>
+
+          <div className="flex flex-wrap gap-4 mt-6">
+            <div className="flex items-center space-x-2 bg-white/5 px-4 py-1.5 rounded-full border border-white/5">
+              <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Demand</span>
               <span className={`text-sm font-bold ${getScoreColor(opportunity.demandSignal)}`}>{opportunity.demandSignal}/10</span>
             </div>
-            <div className="flex items-center space-x-2 bg-slate-800/50 px-3 py-1 rounded-full border border-slate-700/50">
-              <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Readiness</span>
+            <div className="flex items-center space-x-2 bg-white/5 px-4 py-1.5 rounded-full border border-white/5">
+              <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Readiness</span>
               <span className={`text-sm font-bold ${getScoreColor(opportunity.marketReadiness)}`}>{opportunity.marketReadiness}/10</span>
             </div>
-            <div className={`px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider ${getDifficultyColor(opportunity.entryDifficulty)}`}>
+            <div className={`px-4 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-wider ${getDifficultyColor(opportunity.entryDifficulty)}`}>
               Entry: {opportunity.entryDifficulty}
             </div>
           </div>
         </div>
-        <button className="p-2 hover:bg-slate-800 rounded-lg text-slate-500">
+        <button className="p-3 bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 transition-all ml-4">
           {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
         </button>
       </div>
 
       {isExpanded && (
-        <div className="px-6 pb-8 border-t border-slate-800/50 pt-6 animate-in slide-in-from-top-2 duration-300">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="space-y-6">
+        <div className="px-8 pb-10 border-t border-white/5 pt-8 animate-in slide-in-from-top-2 duration-300">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div className="space-y-8">
               <div>
-                <h4 className="flex items-center space-x-2 text-sm font-bold text-blue-400 mb-3 uppercase tracking-widest">
+                <h4 className="flex items-center space-x-2 text-xs font-bold text-violet-400 mb-4 uppercase tracking-widest">
                   <Lightbulb className="w-4 h-4" />
                   <span>Why This Matters</span>
                 </h4>
-                <p className="text-slate-300 text-sm leading-relaxed">
+                <p className="text-slate-300 text-base leading-relaxed">
                   {opportunity.whyItMatters}
                 </p>
               </div>
 
               <div>
-                <h4 className="flex items-center space-x-2 text-sm font-bold text-slate-400 mb-3 uppercase tracking-widest">
+                <h4 className="flex items-center space-x-2 text-xs font-bold text-slate-500 mb-4 uppercase tracking-widest">
                   <Quote className="w-4 h-4" />
-                  <span>Supporting Evidence</span>
+                  <span>Evidence From The Field</span>
                 </h4>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {opportunity.evidence.map((quote, i) => (
-                    <div key={i} className="p-3 bg-slate-900/50 rounded-xl border-l-4 border-blue-600 italic text-slate-400 text-sm">
+                    <div key={i} className="p-4 bg-white/[0.02] rounded-2xl border-l-2 border-violet-500 italic text-slate-400 text-sm">
                       "{quote}"
                     </div>
                   ))}
@@ -101,23 +102,25 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
             </div>
 
             <div className="space-y-6">
-              <div className="bg-rose-500/5 border border-rose-500/10 rounded-2xl p-4">
-                <h4 className="flex items-center space-x-2 text-sm font-bold text-rose-400 mb-2 uppercase tracking-widest">
+              <div className="bg-rose-500/5 border border-rose-500/10 rounded-3xl p-6">
+                <h4 className="flex items-center space-x-2 text-xs font-bold text-rose-400 mb-3 uppercase tracking-widest">
                   <AlertTriangle className="w-4 h-4" />
-                  <span>Red Flags</span>
+                  <span>Potential Risks</span>
                 </h4>
-                <p className="text-slate-400 text-sm">{opportunity.redFlags}</p>
+                <p className="text-slate-400 text-sm leading-relaxed">{opportunity.redFlags}</p>
               </div>
 
-              <div className="bg-blue-600/5 border border-blue-600/10 rounded-2xl p-4">
-                <h4 className="flex items-center space-x-2 text-sm font-bold text-blue-400 mb-3 uppercase tracking-widest">
+              <div className="bg-violet-600/5 border border-violet-600/10 rounded-3xl p-6">
+                <h4 className="flex items-center space-x-2 text-xs font-bold text-violet-400 mb-4 uppercase tracking-widest">
                   <TrendingUp className="w-4 h-4" />
-                  <span>Next Steps</span>
+                  <span>Recommended Next Steps</span>
                 </h4>
-                <ul className="space-y-2">
+                <ul className="space-y-3">
                   {opportunity.nextSteps.map((step, i) => (
-                    <li key={i} className="flex items-start space-x-2 text-slate-400 text-sm">
-                      <ArrowRight className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                    <li key={i} className="flex items-start space-x-3 text-slate-300 text-sm">
+                      <div className="mt-1 bg-violet-500/20 p-1 rounded-full">
+                        <ArrowRight className="w-3 h-3 text-violet-400" />
+                      </div>
                       <span>{step}</span>
                     </li>
                   ))}
@@ -133,65 +136,72 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
 
 const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
+    <div className="space-y-10">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
         <div>
-          <div className="flex items-center space-x-2 text-slate-500 text-sm mb-1 font-medium">
-            <span>Query Analysis</span>
-            <ArrowRight className="w-3 h-3" />
-            <span className="text-blue-400 italic">"{results.query}"</span>
+          <div className="flex items-center space-x-2 text-slate-500 text-sm mb-2 font-medium">
+            <Zap className="w-4 h-4 text-amber-400" />
+            <span>Analysis Complete</span>
           </div>
-          <p className="text-slate-400 text-sm max-w-2xl">{results.summary}</p>
+          <div className="flex items-baseline space-x-3">
+            <h2 className="text-3xl font-bold text-white">Market Report</h2>
+            <span className="text-slate-500 text-sm font-medium">for "{results.query}"</span>
+          </div>
+          <p className="text-slate-400 text-sm max-w-2xl mt-2">{results.summary}</p>
         </div>
         <div className="flex items-center space-x-3">
-          <button className="flex items-center space-x-2 bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-slate-300 transition-all text-sm font-semibold">
+          <button className="flex items-center space-x-2 bg-white/5 hover:bg-white/10 px-5 py-2.5 rounded-xl text-slate-300 transition-all text-sm font-semibold border border-white/5">
             <Download className="w-4 h-4" />
-            <span>Export PDF</span>
+            <span>Export</span>
           </button>
-          <button 
+          <button
             onClick={onNewSearch}
-            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-white transition-all text-sm font-semibold shadow-lg shadow-blue-900/20"
+            className="flex items-center space-x-2 bg-violet-600 hover:bg-violet-500 px-5 py-2.5 rounded-xl text-white transition-all text-sm font-semibold shadow-lg shadow-violet-900/20"
           >
-            <BarChart2 className="w-4 h-4" />
-            <span>New Strategy</span>
+            <Target className="w-4 h-4" />
+            <span>New Search</span>
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="p-6 glass-card rounded-2xl border border-slate-800/50">
-          <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1 block">Total Sources Analyzed</span>
-          <div className="text-3xl font-bold text-white">482</div>
-          <div className="text-xs text-emerald-500 mt-1 font-medium flex items-center">
-            <TrendingUp className="w-3 h-3 mr-1" /> High relevance
+        <div className="p-8 glass-card rounded-3xl group hover:border-violet-500/30">
+          <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-2 block">Data Points</span>
+          <div className="text-4xl font-bold text-white mb-2">482</div>
+          <div className="text-xs text-emerald-400 font-medium flex items-center bg-emerald-400/10 w-fit px-2 py-1 rounded">
+            <TrendingUp className="w-3 h-3 mr-1" /> High Confidence
           </div>
         </div>
-        <div className="p-6 glass-card rounded-2xl border border-slate-800/50">
-          <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1 block">Avg. Signal Strength</span>
-          <div className="text-3xl font-bold text-white">7.8/10</div>
-          <div className="text-xs text-slate-500 mt-1 font-medium">Composite market score</div>
+        <div className="p-8 glass-card rounded-3xl group hover:border-violet-500/30">
+          <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-2 block">Signal Strength</span>
+          <div className="text-4xl font-bold text-white mb-2">7.8</div>
+          <div className="text-xs text-slate-400 font-medium">/ 10.0 Composite Score</div>
         </div>
-        <div className="p-6 glass-card rounded-2xl border border-slate-800/50">
-          <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1 block">Validation Confidence</span>
-          <div className="text-3xl font-bold text-white">High</div>
-          <div className="text-xs text-blue-500 mt-1 font-medium">92% Data consistency</div>
+        <div className="p-8 glass-card rounded-3xl group hover:border-violet-500/30">
+          <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-2 block">Market Status</span>
+          <div className="text-4xl font-bold text-white mb-2">Valid</div>
+          <div className="text-xs text-violet-400 font-medium bg-violet-400/10 w-fit px-2 py-1 rounded">
+            92% Consensus
+          </div>
         </div>
       </div>
 
-      <div className="space-y-4">
-        <div className="flex items-center justify-between mb-2">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between px-2">
           <h3 className="text-lg font-bold text-white flex items-center space-x-2">
-            <Lightbulb className="w-5 h-5 text-yellow-400" />
-            <span>Top Opportunities</span>
+            <Lightbulb className="w-5 h-5 text-amber-400" />
+            <span>Identified Opportunities</span>
           </h3>
-          <button className="text-slate-500 hover:text-slate-300 text-sm flex items-center space-x-1">
+          <button className="text-slate-500 hover:text-slate-300 text-sm flex items-center space-x-1 px-3 py-1 rounded-lg hover:bg-white/5 transition-all">
             <Filter className="w-4 h-4" />
-            <span>Filter Results</span>
+            <span>Filter</span>
           </button>
         </div>
-        {results.opportunities?.map((opp, idx) => (
-          <OpportunityCard key={opp.id} opportunity={opp} index={idx} />
-        ))}
+        <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-700">
+          {results.opportunities?.map((opp, idx) => (
+            <OpportunityCard key={opp.id} opportunity={opp} index={idx} />
+          ))}
+        </div>
       </div>
     </div>
   );
