@@ -1,6 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import { WorkflowMode, AnalysisResult } from "./types";
 import { RealDataCollector } from "./services/realDataService";
+import { analyzeTrendData } from "./services/trendsService";
 
 // Check multiple possible environment variable names
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY ||
@@ -71,6 +72,23 @@ Return ONLY one word: "LEAD" or "OPPORTUNITY"
     } else {
       console.log(`💡 Generating opportunities analysis...`);
       realOpportunities = await generateOpportunitiesAnalysis(query);
+
+      // Add trend data to each opportunity
+      console.log(`📈 Enriching opportunities with trend data...`);
+      for (const opp of realOpportunities) {
+        try {
+          const trendData = await analyzeTrendData(opp.problemStatement);
+          opp.trendData = {
+            searchVolume: trendData.searchVolume.toString(),
+            growthRate: trendData.growthRate,
+            trend: trendData.trend,
+            relatedQueries: trendData.relatedQueries
+          };
+        } catch (error) {
+          console.warn(`Failed to fetch trend data for opportunity:`, error);
+          // Continue without trend data
+        }
+      }
     }
 
     // Step 3: Create summary

@@ -32,6 +32,14 @@ export interface Opportunity {
   validationSources?: string[];
   timeToMarket?: string;
   estimatedStartupCost?: string;
+
+  // Trend data from Google Trends
+  trendData?: {
+    searchVolume: string;
+    growthRate: string;
+    trend: 'rising' | 'stable' | 'declining';
+    relatedQueries?: string[];
+  };
 }
 
 export interface Lead {

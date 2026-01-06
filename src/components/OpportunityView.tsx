@@ -20,7 +20,10 @@ import {
   Clock,
   Wallet,
   CheckCircle2,
-  XCircle
+  XCircle,
+  TrendingDown,
+  Minus,
+  Search
 } from 'lucide-react';
 
 interface Props {
@@ -82,6 +85,64 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
 
       {isExpanded && (
         <div className="px-8 pb-10 border-t border-white/5 pt-8 animate-in slide-in-from-top-2 duration-300">
+          {/* Trend Data Banner */}
+          {opportunity.trendData && (
+            <div className="mb-6 p-6 rounded-2xl bg-gradient-to-r from-violet-500/10 to-indigo-500/10 border border-violet-500/20">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="flex items-center space-x-4">
+                  <div className="bg-violet-500/20 p-3 rounded-xl">
+                    <Search className="w-6 h-6 text-violet-400" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Search Volume</div>
+                    <div className="text-lg font-bold text-white">{opportunity.trendData.searchVolume}</div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <div className={`p-3 rounded-xl ${
+                    opportunity.trendData.trend === 'rising' ? 'bg-emerald-500/20' :
+                    opportunity.trendData.trend === 'declining' ? 'bg-rose-500/20' : 'bg-slate-500/20'
+                  }`}>
+                    {opportunity.trendData.trend === 'rising' ? <TrendingUp className="w-6 h-6 text-emerald-400" /> :
+                     opportunity.trendData.trend === 'declining' ? <TrendingDown className="w-6 h-6 text-rose-400" /> :
+                     <Minus className="w-6 h-6 text-slate-400" />}
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Growth Rate</div>
+                    <div className={`text-lg font-bold ${
+                      opportunity.trendData.trend === 'rising' ? 'text-emerald-400' :
+                      opportunity.trendData.trend === 'declining' ? 'text-rose-400' : 'text-slate-400'
+                    }`}>
+                      {opportunity.trendData.growthRate}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <div className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider ${
+                    opportunity.trendData.trend === 'rising' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                    opportunity.trendData.trend === 'declining' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
+                    'bg-slate-500/20 text-slate-400 border border-slate-500/30'
+                  }`}>
+                    {opportunity.trendData.trend === 'rising' ? '📈 Rising Trend' :
+                     opportunity.trendData.trend === 'declining' ? '📉 Declining' : '➡️ Stable'}
+                  </div>
+                </div>
+              </div>
+              {opportunity.trendData.relatedQueries && opportunity.trendData.relatedQueries.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-white/10">
+                  <div className="text-xs text-slate-400 uppercase tracking-wider font-bold mb-2">Related Searches</div>
+                  <div className="flex flex-wrap gap-2">
+                    {opportunity.trendData.relatedQueries.map((query, i) => (
+                      <span key={i} className="px-3 py-1 bg-white/5 rounded-full text-xs text-slate-300 border border-white/10">
+                        {query}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Revenue & Market Overview */}
           {(opportunity.revenueEstimate || opportunity.marketSize) && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
