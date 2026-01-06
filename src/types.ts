@@ -17,6 +17,29 @@ export interface Opportunity {
   whyItMatters: string;
   redFlags: string;
   nextSteps: string[];
+
+  // Enhanced fields for better opportunity analysis
+  revenueEstimate?: {
+    low: string;
+    high: string;
+    confidence: string;
+  };
+  marketSize?: string;
+  targetAudience?: string;
+  existingCompetitors?: string[];
+  competitorWeaknesses?: string[];
+  monetizationStrategies?: string[];
+  validationSources?: string[];
+  timeToMarket?: string;
+  estimatedStartupCost?: string;
+
+  // Trend data from Google Trends
+  trendData?: {
+    searchVolume: string;
+    growthRate: string;
+    trend: 'rising' | 'stable' | 'declining';
+    relatedQueries?: string[];
+  };
 }
 
 export interface Lead {

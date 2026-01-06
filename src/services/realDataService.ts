@@ -53,7 +53,18 @@ const DATA_SOURCES = {
     baseUrl: 'https://www.reddit.com/r',
     subreddits: {
       leads: ['entrepreneur', 'startups', 'smallbusiness', 'freelance', 'forhire', 'slavelabour'],
-      opportunities: ['entrepreneur', 'startups', 'SomebodyMakeThis', 'AppIdeas', 'Startup_Ideas']
+      opportunities: [
+        // Idea & problem discussion
+        'entrepreneur', 'startups', 'SomebodyMakeThis', 'AppIdeas', 'Startup_Ideas',
+        'Business_Ideas', 'EntrepreneurRideAlong', 'SideProject',
+        // Pain point & complaint subreddits
+        'mildlyinfuriating', 'assholedesign', 'CrappyDesign',
+        // Domain-specific pain points
+        'smallbusiness', 'freelance', 'solopreneur', 'SaaS',
+        'productivity', 'GetStudying', 'ADHD', 'selfimprovement',
+        // Tech & product feedback
+        'CrazyIdeas', 'LightBulb', 'MillionDollarIdeas'
+      ]
     }
   },
   hackernews: {
@@ -89,13 +100,26 @@ const LEAD_KEYWORDS = [
 
 const OPPORTUNITY_KEYWORDS = [
   // Problem statements
-  'problem', 'issue', 'challenge', 'pain point', 'frustrated',
-  'difficult', 'hard to find', 'no good solution',
+  'problem', 'issue', 'challenge', 'pain point', 'frustrated', 'struggling',
+  'difficult', 'hard to find', 'no good solution', 'sucks', 'terrible',
+  'annoying', 'hate that', 'why is it so', 'can\'t find', 'impossible to',
+  // Complaints & dissatisfaction
+  'complaint', 'complaining', 'unhappy with', 'disappointed', 'fed up',
+  'sick of', 'tired of', 'wasting time', 'so many issues', 'doesn\'t work',
+  'broken', 'buggy', 'unreliable', 'slow', 'expensive for what', 'overpriced',
   // Market gaps
-  'wish there was', 'someone should make', 'why isn\'t there',
-  'would pay for', 'need a tool', 'missing feature',
+  'wish there was', 'someone should make', 'why isn\'t there', 'should exist',
+  'would pay for', 'need a tool', 'missing feature', 'no tool for',
+  'lacking', 'gap in the market', 'untapped', 'overlooked',
+  // Desire for solution
+  'looking for a way to', 'how can I', 'any recommendations for',
+  'alternative to', 'better than', 'cheaper alternative', 'simpler way to',
   // Idea validation
-  'what do you think', 'would this be useful', 'market research'
+  'what do you think', 'would this be useful', 'market research',
+  'would you pay', 'is there demand', 'who would use',
+  // Unmet needs
+  'no one is solving', 'nobody focuses on', 'underserved', 'neglected',
+  'needs improvement', 'could be so much better', 'why don\'t they'
 ];
 
 export class RealDataCollector {
