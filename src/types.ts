@@ -46,6 +46,16 @@ export interface AnalysisResult {
   leads?: Lead[];
 }
 
+
+export interface Alert {
+  id: string;
+  userId: string;
+  keyword: string;
+  frequency: 'daily' | 'weekly';
+  lastChecked?: string;
+  createdAt: string;
+}
+
 export interface SavedLead extends Lead {
   savedDate: string;
 }

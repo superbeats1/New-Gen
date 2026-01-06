@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   Search,
   Target,
-  Users,
   BarChart3,
   History,
   Settings,
@@ -27,11 +26,10 @@ import {
   X,
   Sparkles
 } from 'lucide-react';
-import { WorkflowMode, AnalysisResult, SavedLead, Lead } from './types';
+import { WorkflowMode, AnalysisResult } from './types';
 import { analyzeQuery } from './geminiService';
 import OpportunityView from './components/OpportunityView';
-import LeadView from './components/LeadView';
-import TrackerView from './components/TrackerView';
+import { AlertsManager } from './components/AlertsManager';
 import LandingPage from './components/LandingPage';
 import SuccessPage from './components/SuccessPage';
 import UpgradeModal from './components/UpgradeModal';
@@ -107,8 +105,7 @@ const App: React.FC = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchStep, setSearchStep] = useState(0);
   const [results, setResults] = useState<AnalysisResult | null>(null);
-  const [view, setView] = useState<'home' | 'results' | 'tracker'>('home');
-  const [savedLeads, setSavedLeads] = useState<SavedLead[]>([]);
+  const [showAlerts, setShowAlerts] = useState(false);
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [showSuccessPage, setShowSuccessPage] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -138,7 +135,7 @@ const App: React.FC = () => {
         setShowAuthModal(false);
       } else {
         setProfile(null);
-        setView('home');
+        setResults(null);
         setShowLanding(true);
       }
     });
@@ -177,11 +174,6 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    const stored = localStorage.getItem('signal_saved_leads');
-    if (stored) setSavedLeads(JSON.parse(stored));
-  }, []);
-
-  useEffect(() => {
     let interval: any;
     if (isSearching) {
       interval = setInterval(() => {
@@ -217,8 +209,6 @@ const App: React.FC = () => {
     setIsSearching(true);
     setSearchStep(0);
 
-    if (view === 'results') setView('home');
-
     try {
       const animationTimer = new Promise(resolve => setTimeout(resolve, 4000));
       const resultPromise = analyzeQuery(query);
@@ -227,7 +217,6 @@ const App: React.FC = () => {
 
       await deductCredit();
       setResults(result);
-      setView('results');
     } catch (error: any) {
       if (error.name === 'AbortError') {
         console.log("Search cancelled by user");
@@ -245,32 +234,6 @@ const App: React.FC = () => {
     setSession(null);
     setProfile(null);
     setShowLanding(true);
-  };
-
-  const handleSaveLead = (lead: Lead) => {
-    const alreadySaved = savedLeads.find(l => l.id === lead.id);
-    if (alreadySaved) return;
-
-    const newLead: SavedLead = {
-      ...lead,
-      savedDate: new Date().toISOString(),
-      status: 'New'
-    };
-    const updated = [...savedLeads, newLead];
-    setSavedLeads(updated);
-    localStorage.setItem('signal_saved_leads', JSON.stringify(updated));
-  };
-
-  const handleDeleteLead = (id: string) => {
-    const updated = savedLeads.filter(l => l.id !== id);
-    setSavedLeads(updated);
-    localStorage.setItem('signal_saved_leads', JSON.stringify(updated));
-  };
-
-  const handleUpdateLeadStatus = (id: string, status: any) => {
-    const updated = savedLeads.map(l => l.id === id ? { ...l, status } : l);
-    setSavedLeads(updated);
-    localStorage.setItem('signal_saved_leads', JSON.stringify(updated));
   };
 
   const handleUpgradeClick = () => setShowUpgradeModal(true);
@@ -313,7 +276,6 @@ const App: React.FC = () => {
   const handleSuccessContinue = async () => {
     setShowSuccessPage(false);
     setShowLanding(false);
-    setView('home');
     if (session) await fetchProfile(session.user.id);
   };
 
@@ -378,25 +340,21 @@ const App: React.FC = () => {
 
         <nav className="flex-1 space-y-2">
           <button
-            onClick={() => setView('home')}
-            className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all ${view === 'home' ? 'bg-white/10 text-white font-medium border border-white/5 shadow-inner' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
+            className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all ${!results ? 'bg-white/10 text-white font-medium border border-white/5 shadow-inner' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
+            onClick={() => { setResults(null); setQuery(''); }}
           >
-            <Search className={`w-5 h-5 ${view === 'home' ? 'text-violet-400' : ''}`} />
+            <Search className={`w-5 h-5 ${!results ? 'text-violet-400' : ''}`} />
             <span>Discover</span>
           </button>
 
           <button
-            onClick={() => setView('tracker')}
-            className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all ${view === 'tracker' ? 'bg-white/10 text-white font-medium border border-white/5 shadow-inner' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
+            onClick={() => setShowAlerts(true)}
+            className="w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all hover:bg-white/5 text-slate-400 hover:text-white"
           >
-            <BookmarkCheck className={`w-5 h-5 ${view === 'tracker' ? 'text-violet-400' : ''}`} />
-            <span>Tracker</span>
-            {savedLeads.length > 0 && (
-              <span className="ml-auto bg-violet-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                {savedLeads.length}
-              </span>
-            )}
+            <History className="w-5 h-5" />
+            <span>Alerts</span>
           </button>
+
 
           <div className="pt-8 pb-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-widest">
             Your Plan
@@ -465,19 +423,9 @@ const App: React.FC = () => {
       <main className="flex-1 flex flex-col h-full relative overflow-y-auto z-10">
         <header className="h-20 flex items-center justify-between px-10 sticky top-0 z-30">
           <div className="flex items-center space-x-4">
-            {(view !== 'home' || isSearching) && (
-              <button
-                onClick={() => { setView('home'); stopSearch(); }}
-                className="w-10 h-10 flex items-center justify-center glass-panel rounded-full text-slate-400 hover:text-white transition-all"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-            )}
             <h1 className="text-xl font-bold text-white tracking-tight">
               {isSearching ? 'Neural Extraction Protocol' :
-                view === 'home' ? 'Intelligence Hub' :
-                  view === 'tracker' ? 'Lead Tracker' :
-                    results?.mode === WorkflowMode.OPPORTUNITY ? 'Opportunity Analysis' : 'Lead Discovery'}
+                !results ? 'Intelligence Hub' : 'Opportunity Analysis'}
             </h1>
           </div>
 
@@ -490,7 +438,7 @@ const App: React.FC = () => {
         </header>
 
         <div className="flex-1 px-10 pb-10">
-          {view === 'home' && (
+          {!results && (
             <div className="max-w-4xl mx-auto py-16">
               <div className="text-center mb-16 space-y-6">
                 <h2 className="text-5xl font-bold text-white tracking-tight">
@@ -546,9 +494,9 @@ const App: React.FC = () => {
               )}
 
               {!isSearching && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-20 max-w-3xl mx-auto">
+                <div className="mt-20 max-w-3xl mx-auto">
                   <div
-                    className="group glass-card p-8 rounded-3xl cursor-pointer hover:bg-white/[0.02] transition-all border border-white/5 hover:border-violet-500/30"
+                    className="group glass-card p-8 rounded-3xl cursor-pointer hover:bg-white/[0.02] transition-all border border-white/5 hover:border-violet-500/30 w-full"
                     onClick={() => setQuery("Find business opportunities in the remote team collaboration space")}
                   >
                     <div className="w-12 h-12 rounded-2xl bg-violet-500/10 flex items-center justify-center mb-6 border border-violet-500/20 group-hover:scale-110 transition-transform">
@@ -559,59 +507,33 @@ const App: React.FC = () => {
                       Find blue ocean opportunities and validate market gaps.
                     </p>
                   </div>
-
-                  <div
-                    className="group glass-card p-8 rounded-3xl cursor-pointer hover:bg-white/[0.02] transition-all border border-white/5 hover:border-pink-500/30"
-                    onClick={() => setQuery("Find clients who need a video editor for YouTube creators")}
-                  >
-                    <div className="w-12 h-12 rounded-2xl bg-pink-500/10 flex items-center justify-center mb-6 border border-pink-500/20 group-hover:scale-110 transition-transform">
-                      <Users className="w-6 h-6 text-pink-400" />
-                    </div>
-                    <h3 className="text-xl font-bold text-white mb-2">Sales Mode</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed">
-                      Find validated leads ready to buy your services.
-                    </p>
-                  </div>
                 </div>
               )}
             </div>
           )}
 
-          {view === 'results' && results && !isSearching && (
+          {results && !isSearching && (
             <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-              {results.mode === WorkflowMode.OPPORTUNITY ? (
-                <OpportunityView
-                  results={results}
-                  onNewSearch={() => setView('home')}
-                />
-              ) : (
-                <LeadView
-                  results={results}
-                  onSave={handleSaveLead}
-                  onGoTracker={() => setView('tracker')}
-                  onRefresh={() => handleSearch()}
-                />
-              )}
-            </div>
-          )}
-
-          {view === 'tracker' && (
-            <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <TrackerView
-                leads={savedLeads}
-                onDelete={handleDeleteLead}
-                onUpdateStatus={handleUpdateLeadStatus}
+              <OpportunityView
+                results={results}
+                onNewSearch={() => { setResults(null); setQuery(''); }}
               />
             </div>
           )}
         </div>
       </main>
+
       <AuthModal />
       <UpgradeModal
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
         onUpgrade={handleUpgrade}
         isUpgrading={isUpgrading}
+      />
+      <AlertsManager
+        userId={profile?.id}
+        isOpen={showAlerts}
+        onClose={() => setShowAlerts(false)}
       />
     </div>
   );

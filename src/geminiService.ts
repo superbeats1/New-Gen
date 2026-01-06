@@ -30,69 +30,31 @@ const getRealDataCollector = () => {
 
 export const analyzeQuery = async (query: string): Promise<AnalysisResult> => {
   try {
-    console.log(`🧠 Starting analysis for: "${query}"`);
+    console.log(`🧠 Starting opportunity analysis for: "${query}"`);
 
-    // Step 1: Determine mode using AI (quick analysis)
-    const modePrompt = `
-Analyze this query and determine if the user wants:
-- "LEAD" mode: Finding active clients/prospects who need services right now
-- "OPPORTUNITY" mode: Identifying business opportunities/market gaps
+    // Force Opportunity Mode (Pivot Phase 1)
+    const detectedMode = WorkflowMode.OPPORTUNITY;
+    console.log(`🎯 Mode set to: ${detectedMode}`);
 
-Query: "${query}"
-
-Return ONLY one word: "LEAD" or "OPPORTUNITY"
-`;
-
-    const modeResponse = await getGenAI().models.generateContent({
-      model: "gemini-3-pro-preview",
-      contents: modePrompt
-    });
-
-    const detectedMode = modeResponse.text.trim().toUpperCase().includes('OPPORTUNITY')
-      ? WorkflowMode.OPPORTUNITY
-      : WorkflowMode.LEAD;
-
-    console.log(`🎯 Detected mode: ${detectedMode}`);
-
-    // Step 2: Get real data from live sources
-    let realLeads: any[] = [];
-    let realOpportunities: any[] = [];
-
-    if (detectedMode === WorkflowMode.LEAD) {
-      console.log(`🔍 Scanning live sources for leads...`);
-      realLeads = await getRealDataCollector().findRealLeads(query, detectedMode);
-
-      // If we don't find enough real leads, supplement with AI-generated ones
-      if (realLeads.length < 3) {
-        console.log(`📈 Found ${realLeads.length} real leads, generating ${3 - realLeads.length} additional leads...`);
-        const supplementalLeads = await generateSupplementalLeads(query, 3 - realLeads.length);
-        realLeads.push(...supplementalLeads);
-      }
-    } else {
-      console.log(`💡 Generating opportunities analysis...`);
-      realOpportunities = await generateOpportunitiesAnalysis(query);
-    }
+    // Step 2: Get real data/analysis
+    console.log(`💡 Generating opportunities analysis...`);
+    const realOpportunities = await generateOpportunitiesAnalysis(query);
 
     // Step 3: Create summary
-    const summary = detectedMode === WorkflowMode.LEAD
-      ? `Found ${realLeads.length} active leads from Reddit, HackerNews, and GitHub`
-      : `Identified ${realOpportunities.length} potential opportunities through market analysis`;
+    const summary = `Identified ${realOpportunities.length} potential opportunities through market analysis`;
 
     const result: AnalysisResult = {
       mode: detectedMode,
       query,
       summary,
       timestamp: new Date().toISOString(),
-      ...(detectedMode === WorkflowMode.LEAD
-        ? { leads: realLeads }
-        : { opportunities: realOpportunities }
-      )
+      opportunities: realOpportunities
     };
 
-    console.log(`✅ Analysis complete: ${detectedMode} mode with ${detectedMode === WorkflowMode.LEAD ? realLeads.length : realOpportunities.length} results`);
+    console.log(`✅ Analysis complete: ${detectedMode} mode with ${realOpportunities.length} results`);
     return result;
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Analysis failed:', error);
     if (error.message?.includes('429') || error.message?.includes('quota')) {
       throw new Error('Daily quota exceeded. Please try again tomorrow or upgrade your plan in Google AI Studio.');
