@@ -17,6 +17,21 @@ export interface Opportunity {
   whyItMatters: string;
   redFlags: string;
   nextSteps: string[];
+
+  // Enhanced fields for better opportunity analysis
+  revenueEstimate?: {
+    low: string;
+    high: string;
+    confidence: string;
+  };
+  marketSize?: string;
+  targetAudience?: string;
+  existingCompetitors?: string[];
+  competitorWeaknesses?: string[];
+  monetizationStrategies?: string[];
+  validationSources?: string[];
+  timeToMarket?: string;
+  estimatedStartupCost?: string;
 }
 
 export interface Lead {

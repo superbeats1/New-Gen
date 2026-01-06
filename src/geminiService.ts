@@ -168,27 +168,59 @@ IMPORTANT:
 // Generate opportunities analysis
 async function generateOpportunitiesAnalysis(query: string): Promise<any[]> {
   const prompt = `
-Analyze market opportunities for: "${query}"
+You are a market intelligence analyst specializing in opportunity discovery. Analyze market opportunities for: "${query}"
 
-Generate 3-5 realistic business opportunities based on market research.
-Focus on underserved markets and real problems people face.
+Generate 3-5 HIGH-QUALITY, VALIDATED business opportunities. Each opportunity must be backed by real market signals, competitor analysis, and revenue potential.
 
-Return ONLY valid JSON array:
+For each opportunity, provide COMPREHENSIVE analysis:
+
+1. **Problem Validation**: What specific pain point exists? Who experiences it? How frequently?
+2. **Market Size**: Estimate TAM (Total Addressable Market) with reasoning
+3. **Revenue Potential**: Realistic first-year revenue estimates (low/high range) with confidence level
+4. **Competition Analysis**: List 2-3 existing competitors and their specific weaknesses/gaps
+5. **Demand Signals**: What evidence shows people want this? (search volume, forum posts, complaint frequency)
+6. **Monetization**: 2-3 specific ways to monetize this opportunity
+7. **Validation Sources**: Where did you find evidence? (subreddits, trends, competitor reviews)
+8. **Time to Market**: Realistic timeline from idea to launch
+9. **Startup Costs**: Estimated initial investment needed
+
+Return ONLY valid JSON array in this EXACT format:
 [
   {
     "id": "opp-1",
-    "problemStatement": "Clear description of the problem",
+    "problemStatement": "Clear, specific problem statement in 1-2 sentences",
     "overallScore": 8,
     "demandSignal": 9,
     "marketReadiness": 7,
     "competition": "Underserved",
     "entryDifficulty": "Medium",
-    "evidence": ["Market indicator 1", "Market indicator 2"],
-    "whyItMatters": "Why this opportunity matters now",
-    "redFlags": "Potential risks or concerns",
-    "nextSteps": ["Actionable step 1", "Actionable step 2"]
+    "evidence": ["Specific market indicator with numbers", "Another concrete signal"],
+    "whyItMatters": "Why this opportunity is valuable NOW (timing, market conditions, trends)",
+    "redFlags": "Honest concerns: regulatory risks, market saturation, technical challenges, etc.",
+    "nextSteps": ["Specific actionable step", "Another concrete action"],
+    "revenueEstimate": {
+      "low": "$50K/year",
+      "high": "$250K/year",
+      "confidence": "Medium - based on similar SaaS pricing at $29-99/mo with 50-200 customers"
+    },
+    "marketSize": "$2.5B annually (500K small businesses × $5K average spend)",
+    "targetAudience": "Specific persona: role, pain points, willingness to pay",
+    "existingCompetitors": ["Competitor 1 (market leader, $150/mo)", "Competitor 2 (emerging player, $50/mo)"],
+    "competitorWeaknesses": ["Competitor 1: Poor UI, expensive", "Competitor 2: Limited features, bad support"],
+    "monetizationStrategies": ["Strategy 1 with pricing", "Strategy 2 with details", "Strategy 3"],
+    "validationSources": ["r/entrepreneur: 50+ posts asking for this", "Google Trends: 300% growth", "Competitor reviews: 'wish it had X'"],
+    "timeToMarket": "3-6 months for MVP",
+    "estimatedStartupCost": "$5K-15K (dev tools, hosting, initial marketing)"
   }
 ]
+
+CRITICAL REQUIREMENTS:
+- Use REAL competitor names when possible (check for actual products)
+- Base revenue estimates on realistic pricing and customer acquisition
+- Include specific numbers in evidence (not vague statements)
+- Identify concrete next steps (not generic advice like "research the market")
+- Be honest about red flags and challenges
+- Focus on opportunities that can realistically generate $50K-500K/year for a solo founder or small team
 `;
 
   try {
