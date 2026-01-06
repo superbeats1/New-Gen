@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Check, Lock, Shield } from 'lucide-react';
+import { X, Check, Lock, Shield, Sparkles, Zap } from 'lucide-react';
 
 interface UpgradeModalProps {
   isOpen: boolean;
@@ -12,121 +12,124 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose, onUpgrade,
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="relative w-full max-w-4xl bg-[#0d1117] rounded-3xl border border-slate-700/50 shadow-2xl animate-in zoom-in-95 duration-300">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-in fade-in duration-300">
+      <div className="glass-panel relative w-full max-w-4xl rounded-[2.5rem] border border-white/10 shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden">
+        {/* Decorative background blobs */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-violet-600/20 blur-[100px] rounded-full"></div>
+          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/20 blur-[100px] rounded-full"></div>
+        </div>
+
         {/* Close Button */}
-        <button 
+        <button
           onClick={onClose}
-          className="absolute top-6 right-6 p-2 text-slate-400 hover:text-white transition-colors z-10"
+          className="absolute top-8 right-8 p-2 text-slate-400 hover:text-white transition-colors z-10 hover:bg-white/5 rounded-full"
         >
           <X className="w-6 h-6" />
         </button>
 
-        <div className="p-8">
+        <div className="p-10 relative z-10">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-white mb-2">Upgrade to Pro</h2>
-            <p className="text-slate-400 text-lg">Unlock unlimited searches and advanced features</p>
+          <div className="text-center mb-12 space-y-3">
+            <h2 className="text-4xl font-bold text-white tracking-tight">Upgrade your <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400">Intelligence</span></h2>
+            <p className="text-slate-400 text-lg">Unlock unlimited neural discovery and premium data enrichment.</p>
           </div>
 
           {/* Pricing Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* Free Plan */}
-            <div className="bg-slate-800/30 rounded-2xl p-6 border border-slate-700/50">
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-white mb-2">Free</h3>
-                <div className="flex items-baseline justify-center">
+            <div className="bg-white/5 rounded-3xl p-8 border border-white/5 flex flex-col hover:bg-white/[0.07] transition-colors relative group">
+              <div className="mb-6">
+                <div className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Starter</div>
+                <div className="flex items-baseline">
                   <span className="text-4xl font-bold text-white">$0</span>
-                  <span className="text-slate-400 ml-1">/month</span>
+                  <span className="text-slate-500 ml-2 font-medium">/month</span>
                 </div>
               </div>
 
-              <div className="space-y-4 mb-8">
+              <div className="space-y-4 mb-8 flex-1">
                 <div className="flex items-center space-x-3 text-slate-300">
-                  <Check className="w-5 h-5 text-green-500 shrink-0" />
-                  <span>10 searches per month</span>
+                  <div className="bg-slate-800 p-1 rounded-full"><Check className="w-3 h-3 text-slate-400" /></div>
+                  <span className="text-sm">10 Searches / Month</span>
                 </div>
                 <div className="flex items-center space-x-3 text-slate-300">
-                  <Check className="w-5 h-5 text-green-500 shrink-0" />
-                  <span>Basic pain point analysis</span>
+                  <div className="bg-slate-800 p-1 rounded-full"><Check className="w-3 h-3 text-slate-400" /></div>
+                  <span className="text-sm">Basic signal detection</span>
                 </div>
                 <div className="flex items-center space-x-3 text-slate-300">
-                  <Check className="w-5 h-5 text-green-500 shrink-0" />
-                  <span>Community support</span>
-                </div>
-                <div className="flex items-center space-x-3 text-slate-300">
-                  <Check className="w-5 h-5 text-green-500 shrink-0" />
-                  <span>Search history (7 days)</span>
+                  <div className="bg-slate-800 p-1 rounded-full"><Check className="w-3 h-3 text-slate-400" /></div>
+                  <span className="text-sm">Standard community support</span>
                 </div>
               </div>
 
-              <button 
+              <button
                 disabled
-                className="w-full py-3 px-6 rounded-xl bg-slate-700/50 text-slate-500 font-bold text-sm cursor-not-allowed"
+                className="w-full py-4 text-slate-500 font-bold text-sm bg-white/5 rounded-2xl cursor-not-allowed border border-white/5"
               >
                 Current Plan
               </button>
             </div>
 
             {/* Pro Plan */}
-            <div className="relative bg-gradient-to-b from-blue-900/20 to-indigo-900/20 rounded-2xl p-6 border border-blue-500/30 shadow-xl">
-              {/* Most Popular Badge */}
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <div className="bg-blue-600 text-white px-4 py-1.5 rounded-full text-sm font-bold">
-                  Most Popular
-                </div>
+            <div className="glass-card rounded-3xl p-1 relative border border-violet-500/30">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg shadow-violet-500/30 flex items-center space-x-1">
+                <Sparkles className="w-3 h-3 text-yellow-300" />
+                <span>Recommended</span>
               </div>
 
-              <div className="text-center mb-6 pt-4">
-                <h3 className="text-2xl font-bold text-white mb-2">Pro</h3>
-                <div className="flex items-baseline justify-center">
-                  <span className="text-4xl font-bold text-white">$10</span>
-                  <span className="text-slate-400 ml-1">/month</span>
+              <div className="bg-[#0f1116]/80 backdrop-blur-md rounded-[1.4rem] p-7 h-full flex flex-col">
+                <div className="mb-6">
+                  <div className="text-sm font-bold text-violet-400 uppercase tracking-widest mb-2">Pro</div>
+                  <div className="flex items-baseline">
+                    <span className="text-5xl font-bold text-white">$10</span>
+                    <span className="text-slate-500 ml-2 font-medium">/month</span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-4 mb-8">
-                <div className="flex items-center space-x-3 text-slate-300">
-                  <Check className="w-5 h-5 text-blue-500 shrink-0" />
-                  <span>Unlimited searches</span>
+                <div className="space-y-4 mb-8 flex-1">
+                  <div className="flex items-center space-x-3 text-white">
+                    <div className="bg-violet-600 p-1 rounded-full"><Check className="w-3 h-3 text-white" /></div>
+                    <span className="text-sm font-medium">Unlimited Searches</span>
+                  </div>
+                  <div className="flex items-center space-x-3 text-white">
+                    <div className="bg-violet-600 p-1 rounded-full"><Check className="w-3 h-3 text-white" /></div>
+                    <span className="text-sm font-medium">Advanced AI Models (More accurate)</span>
+                  </div>
+                  <div className="flex items-center space-x-3 text-white">
+                    <div className="bg-violet-600 p-1 rounded-full"><Check className="w-3 h-3 text-white" /></div>
+                    <span className="text-sm font-medium">Priority Enrichment Data</span>
+                  </div>
+                  <div className="flex items-center space-x-3 text-white">
+                    <div className="bg-violet-600 p-1 rounded-full"><Check className="w-3 h-3 text-white" /></div>
+                    <span className="text-sm font-medium">Unlimited Export to CSV</span>
+                  </div>
+                  <div className="flex items-center space-x-3 text-white">
+                    <div className="bg-violet-600 p-1 rounded-full"><Check className="w-3 h-3 text-white" /></div>
+                    <span className="text-sm font-medium">Early Access to Agents</span>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-3 text-slate-300">
-                  <Check className="w-5 h-5 text-blue-500 shrink-0" />
-                  <span>Advanced AI analysis</span>
-                </div>
-                <div className="flex items-center space-x-3 text-slate-300">
-                  <Check className="w-5 h-5 text-blue-500 shrink-0" />
-                  <span>Priority support</span>
-                </div>
-                <div className="flex items-center space-x-3 text-slate-300">
-                  <Check className="w-5 h-5 text-blue-500 shrink-0" />
-                  <span>Unlimited search history</span>
-                </div>
-                <div className="flex items-center space-x-3 text-slate-300">
-                  <Check className="w-5 h-5 text-blue-500 shrink-0" />
-                  <span>Export results to CSV</span>
-                </div>
-                <div className="flex items-center space-x-3 text-slate-300">
-                  <Check className="w-5 h-5 text-blue-500 shrink-0" />
-                  <span>Early access to new features</span>
-                </div>
-              </div>
 
-              <button 
-                onClick={onUpgrade}
-                disabled={isUpgrading}
-                className="w-full py-3 px-6 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50 text-white font-bold text-sm transition-all shadow-lg"
-              >
-                {isUpgrading ? 'Processing...' : 'Upgrade to Pro'}
-              </button>
+                <button
+                  onClick={onUpgrade}
+                  disabled={isUpgrading}
+                  className="w-full py-4 bg-white text-black hover:bg-slate-200 font-bold text-sm rounded-2xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 flex items-center justify-center space-x-2"
+                >
+                  {isUpgrading ? <span className="animate-pulse">Processing...</span> : (
+                    <>
+                      <span>Upgrade Now</span>
+                      <Zap className="w-4 h-4 fill-black" />
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="text-center mt-8 pt-6 border-t border-slate-700/50">
-            <div className="flex items-center justify-center space-x-2 text-slate-500 text-sm">
-              <Shield className="w-4 h-4" />
-              <span>Secure payment powered by Stripe • Cancel anytime</span>
+          <div className="text-center mt-10 pt-6 border-t border-white/5">
+            <div className="flex items-center justify-center space-x-2 text-slate-500 text-xs font-medium">
+              <Shield className="w-3 h-3" />
+              <span>Secure payment via Stripe • 14-day money back guarantee • Cancel anytime</span>
             </div>
           </div>
         </div>

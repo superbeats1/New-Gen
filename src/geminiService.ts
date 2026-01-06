@@ -3,40 +3,35 @@ import { WorkflowMode, AnalysisResult } from "./types";
 import { RealDataCollector } from "./services/realDataService";
 
 // Check multiple possible environment variable names
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY || 
-               import.meta.env.VITE_GOOGLE_API_KEY ||
-               import.meta.env.GEMINI_API_KEY;
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY ||
+  import.meta.env.VITE_GOOGLE_API_KEY ||
+  import.meta.env.GEMINI_API_KEY;
 
-// Debug logging for environment variables
-console.log('Environment check (v4):', {
-  VITE_GEMINI_API_KEY: !!import.meta.env.VITE_GEMINI_API_KEY,
-  VITE_GOOGLE_API_KEY: !!import.meta.env.VITE_GOOGLE_API_KEY,
-  GEMINI_API_KEY: !!import.meta.env.GEMINI_API_KEY,
-  hasApiKey: !!apiKey,
-  apiKeyLength: apiKey?.length,
-  modelUsing: "gemini-3-pro-preview",
-  allEnvKeys: Object.keys(import.meta.env).filter(key => key.includes('API') || key.includes('GEMINI'))
-});
+let genAIInstance: GoogleGenAI | null = null;
+let realDataCollector: RealDataCollector | null = null;
 
-if (!apiKey) {
-  console.error('All environment variables:', import.meta.env);
-  throw new Error(`VITE_GEMINI_API_KEY environment variable is not set. Please add it to your Vercel environment variables. 
-  
-Available env vars: ${Object.keys(import.meta.env).join(', ')}
-  
-Steps:
-1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables
-2. Add: Name="VITE_GEMINI_API_KEY", Value=Your API Key
-3. Redeploy`);
-}
+const getGenAI = () => {
+  if (!genAIInstance) {
+    if (!apiKey) {
+      console.error('All environment variables:', import.meta.env);
+      throw new Error(`VITE_GEMINI_API_KEY environment variable is not set.`);
+    }
+    genAIInstance = new GoogleGenAI({ apiKey });
+  }
+  return genAIInstance;
+};
 
-const genAI = new GoogleGenAI({ apiKey });
-const realDataCollector = new RealDataCollector();
+const getRealDataCollector = () => {
+  if (!realDataCollector) {
+    realDataCollector = new RealDataCollector();
+  }
+  return realDataCollector;
+};
 
 export const analyzeQuery = async (query: string): Promise<AnalysisResult> => {
   try {
     console.log(`🧠 Starting analysis for: "${query}"`);
-    
+
     // Step 1: Determine mode using AI (quick analysis)
     const modePrompt = `
 Analyze this query and determine if the user wants:
@@ -48,13 +43,13 @@ Query: "${query}"
 Return ONLY one word: "LEAD" or "OPPORTUNITY"
 `;
 
-    const modeResponse = await genAI.models.generateContent({
+    const modeResponse = await getGenAI().models.generateContent({
       model: "gemini-3-pro-preview",
       contents: modePrompt
     });
 
-    const detectedMode = modeResponse.text.trim().toUpperCase().includes('OPPORTUNITY') 
-      ? WorkflowMode.OPPORTUNITY 
+    const detectedMode = modeResponse.text.trim().toUpperCase().includes('OPPORTUNITY')
+      ? WorkflowMode.OPPORTUNITY
       : WorkflowMode.LEAD;
 
     console.log(`🎯 Detected mode: ${detectedMode}`);
@@ -65,8 +60,8 @@ Return ONLY one word: "LEAD" or "OPPORTUNITY"
 
     if (detectedMode === WorkflowMode.LEAD) {
       console.log(`🔍 Scanning live sources for leads...`);
-      realLeads = await realDataCollector.findRealLeads(query, detectedMode);
-      
+      realLeads = await getRealDataCollector().findRealLeads(query, detectedMode);
+
       // If we don't find enough real leads, supplement with AI-generated ones
       if (realLeads.length < 3) {
         console.log(`📈 Found ${realLeads.length} real leads, generating ${3 - realLeads.length} additional leads...`);
@@ -88,7 +83,7 @@ Return ONLY one word: "LEAD" or "OPPORTUNITY"
       query,
       summary,
       timestamp: new Date().toISOString(),
-      ...(detectedMode === WorkflowMode.LEAD 
+      ...(detectedMode === WorkflowMode.LEAD
         ? { leads: realLeads }
         : { opportunities: realOpportunities }
       )
@@ -147,7 +142,7 @@ IMPORTANT:
 `;
 
   try {
-    const response = await genAI.models.generateContent({
+    const response = await getGenAI().models.generateContent({
       model: "gemini-3-pro-preview",
       contents: prompt,
       config: {
@@ -157,7 +152,7 @@ IMPORTANT:
 
     const text = response.text.replace(/```json\n?|\n?```/g, '').trim();
     const leads = JSON.parse(text);
-    
+
     // Mark as AI-generated for transparency
     return leads.map((lead: any) => ({
       ...lead,
@@ -197,7 +192,7 @@ Return ONLY valid JSON array:
 `;
 
   try {
-    const response = await genAI.models.generateContent({
+    const response = await getGenAI().models.generateContent({
       model: "gemini-3-pro-preview",
       contents: prompt,
       config: {
@@ -237,11 +232,11 @@ Requirements:
 Return only the message text, no extra formatting.
 `;
 
-    const response = await genAI.models.generateContent({
+    const response = await getGenAI().models.generateContent({
       model: "gemini-3-pro-preview",
       contents: prompt
     });
-    
+
     return response.text;
   } catch (error) {
     console.error('Gemini API Error:', error);
@@ -276,14 +271,14 @@ Return ONLY valid JSON in this format:
 }
 `;
 
-    const response = await genAI.models.generateContent({
+    const response = await getGenAI().models.generateContent({
       model: "gemini-3-pro-preview",
       contents: prompt,
       config: {
         responseMimeType: "application/json"
       }
     });
-    
+
     // Clean and parse JSON
     const text = response.text;
     const cleanText = text.replace(/```json\n?|\n?```/g, '').trim();
