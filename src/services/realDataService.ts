@@ -325,6 +325,24 @@ export class RealDataCollector {
   }
 
   // Helper methods
+  // Strict matching: Ensures the post is actually relevant to the SEARCH TERMS
+  private matchesQueryStrict(text: string, cleanQuery: string): boolean {
+    const queryWords = cleanQuery.toLowerCase().split(' ').filter(w => w.length > 2);
+    if (queryWords.length === 0) return true; // Fallback
+
+    // Count how many query words appear in the text
+    const matches = queryWords.filter(word => text.includes(word));
+
+    // For short queries (1-2 words), require ALL of them
+    if (queryWords.length <= 2) {
+      return matches.length === queryWords.length;
+    }
+
+    // For longer queries, require at least 75% match
+    return (matches.length / queryWords.length) >= 0.75;
+  }
+
+  // Deprecated naive matcher
   private matchesQuery(text: string, query: string): boolean {
     const queryWords = query.toLowerCase().split(' ');
     return queryWords.some(word => text.includes(word.toLowerCase()));
