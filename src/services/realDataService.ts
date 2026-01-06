@@ -110,29 +110,29 @@ export class RealDataCollector {
     const now = Date.now();
     const limit = this.rateLimits[source];
     const timeSinceLastCall = now - limit.lastCall;
-    
+
     if (timeSinceLastCall < limit.minInterval) {
       await new Promise(resolve => setTimeout(resolve, limit.minInterval - timeSinceLastCall));
     }
-    
+
     this.rateLimits[source].lastCall = Date.now();
   }
 
   // Reddit API integration
   async scanRedditForLeads(query: string, mode: WorkflowMode): Promise<Lead[]> {
     await this.respectRateLimit('reddit');
-    
+
     const leads: Lead[] = [];
-    const subreddits = mode === WorkflowMode.LEAD 
+    const subreddits = mode === WorkflowMode.LEAD
       ? DATA_SOURCES.reddit.subreddits.leads
       : DATA_SOURCES.reddit.subreddits.opportunities;
 
     try {
       for (const subreddit of subreddits.slice(0, 2)) { // Limit to 2 subreddits per query
         const url = `${DATA_SOURCES.reddit.baseUrl}/${subreddit}/new.json?limit=25`;
-        
+
         console.log(`Scanning Reddit r/${subreddit} for: ${query}`);
-        
+
         const response = await fetch(url, {
           headers: {
             'User-Agent': 'SIGNAL-LeadDiscovery/1.0'
@@ -145,11 +145,11 @@ export class RealDataCollector {
         }
 
         const data: RedditResponse = await response.json();
-        
+
         for (const post of data.data.children) {
           const postData = post.data;
           const fullText = `${postData.title} ${postData.selftext}`.toLowerCase();
-          
+
           // Check if post matches query and contains lead indicators
           if (this.matchesQuery(fullText, query) && this.containsLeadIndicators(fullText, mode)) {
             const budgetInfo = this.extractBudget(fullText);
@@ -171,11 +171,11 @@ export class RealDataCollector {
             };
 
             leads.push(lead);
-            
+
             if (leads.length >= 5) break; // Limit results per subreddit
           }
         }
-        
+
         // Rate limit between subreddit calls
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
@@ -189,7 +189,7 @@ export class RealDataCollector {
   // HackerNews API integration  
   async scanHackerNewsForLeads(query: string): Promise<Lead[]> {
     await this.respectRateLimit('hackernews');
-    
+
     const leads: Lead[] = [];
 
     try {
@@ -200,14 +200,14 @@ export class RealDataCollector {
       // Check first 50 stories
       for (const storyId of storyIds.slice(0, 50)) {
         await this.respectRateLimit('hackernews');
-        
+
         const itemResponse = await fetch(`${DATA_SOURCES.hackernews.baseUrl}/item/${storyId}.json`);
         const item: HNItem = await itemResponse.json();
 
         if (!item.title) continue;
 
         const fullText = `${item.title} ${item.text || ''}`.toLowerCase();
-        
+
         if (this.matchesQuery(fullText, query) && this.containsLeadIndicators(fullText, WorkflowMode.LEAD)) {
           const budgetInfo = this.extractBudget(fullText);
           const lead: Lead = {
@@ -227,7 +227,7 @@ export class RealDataCollector {
           };
 
           leads.push(lead);
-          
+
           if (leads.length >= 3) break; // Limit HN results
         }
       }
@@ -241,16 +241,16 @@ export class RealDataCollector {
   // GitHub API integration (no auth needed for public data)
   async scanGitHubForLeads(query: string): Promise<Lead[]> {
     await this.respectRateLimit('github');
-    
+
     const leads: Lead[] = [];
 
     try {
       // Search for issues with help-wanted labels
       const searchQuery = `"${query}" label:"help wanted" OR label:"good first issue" OR label:"freelance" is:issue is:open`;
       const url = `${DATA_SOURCES.github.baseUrl}/search/issues?q=${encodeURIComponent(searchQuery)}&per_page=10`;
-      
+
       console.log('Scanning GitHub issues for:', query);
-      
+
       const response = await fetch(url, {
         headers: {
           'Accept': 'application/vnd.github.v3+json',
@@ -264,10 +264,10 @@ export class RealDataCollector {
       }
 
       const data = await response.json();
-      
+
       for (const issue of data.items || []) {
         const fullText = `${issue.title} ${issue.body || ''}`.toLowerCase();
-        
+
         if (this.matchesQuery(fullText, query)) {
           const budgetInfo = this.extractBudget(fullText);
           const lead: Lead = {
@@ -299,13 +299,13 @@ export class RealDataCollector {
   // Main aggregation method
   async findRealLeads(query: string, mode: WorkflowMode): Promise<Lead[]> {
     console.log(`🔍 Starting real data collection for: "${query}" (Mode: ${mode})`);
-    
+
     const allLeads: Lead[] = [];
 
     // Collect from all sources in parallel
     const [redditLeads, hnLeads, githubLeads] = await Promise.all([
       this.scanRedditForLeads(query, mode),
-      this.scanHackerNewsForLeads(query), 
+      this.scanHackerNewsForLeads(query),
       mode === WorkflowMode.LEAD ? this.scanGitHubForLeads(query) : Promise.resolve([])
     ]);
 
@@ -315,7 +315,7 @@ export class RealDataCollector {
     allLeads.sort((a, b) => {
       const scoreDiff = b.fitScore - a.fitScore;
       if (scoreDiff !== 0) return scoreDiff;
-      
+
       // If scores are equal, prefer more recent
       return this.parseTimeAgo(b.postedAt) - this.parseTimeAgo(a.postedAt);
     });
@@ -351,102 +351,83 @@ export class RealDataCollector {
       /\b([A-Z][a-z]+,\s*[A-Z]{2})\b/g, // City, ST format
       /\b(remote|anywhere|global|worldwide)\b/gi
     ];
-    
+
     for (const pattern of locationPatterns) {
       const match = text.match(pattern);
       if (match) return match[0];
     }
-    
+
     return undefined;
   }
 
   private calculateFitScore(text: string, query: string): number {
     let score = 5; // Base score
-    
+
     const queryWords = query.toLowerCase().split(' ');
     const wordMatches = queryWords.filter(word => text.includes(word)).length;
     score += (wordMatches / queryWords.length) * 3; // Up to +3 for query relevance
-    
+
     // Boost for budget mentions
     if (/\$\d+|budget|pay|rate/i.test(text)) score += 1;
-    
+
     // Boost for urgency
     if (/urgent|asap|immediately|quickly/i.test(text)) score += 1;
-    
+
     // Boost for professional terms
     if (/project|professional|experienced|portfolio/i.test(text)) score += 1;
-    
+
     return Math.min(Math.round(score), 10);
   }
 
   private extractBudget(text: string): { category: 'High' | 'Medium' | 'Low' | 'Unknown'; amount?: string } {
-    // Look for various currency amounts
+    // 1. Look for explicit currency values first (most accurate)
+    // Matches: $500, $5k, $5,000, 500 USD, 5k euro, etc.
     const currencyPatterns = [
-      /\$(\d+(?:,\d+)*(?:\.\d+)?k?)/gi,     // $5,000 or $5k
-      /(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:USD|dollars?|bucks)/gi, // 5000 USD
-      /€(\d+(?:,\d+)*(?:\.\d+)?)/gi,        // €5,000
-      /£(\d+(?:,\d+)*(?:\.\d+)?)/gi,        // £5,000
-      /(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:EUR|GBP)/gi, // 5000 EUR
+      /[\$£€](\d+(?:,\d+)*(?:\.\d+)?k?)/gi,                 // $500, $5k
+      /(\d+(?:,\d+)*(?:\.\d+)?k?)\s*(?:USD|EUR|GBP|dollars?)/gi, // 500 USD
     ];
-    
+
     for (const pattern of currencyPatterns) {
       const matches = text.match(pattern);
       if (matches && matches.length > 0) {
-        const fullMatch = matches[0];
-        const numberMatch = fullMatch.match(/(\d+(?:,\d+)*(?:\.\d+)?)/);
-        
-        if (numberMatch) {
-          let amount = numberMatch[1];
-          let numericValue = parseInt(amount.replace(/,/g, ''));
-          
-          // Handle 'k' suffix (e.g., 5k = 5000)
-          if (fullMatch.toLowerCase().includes('k') && !fullMatch.toLowerCase().includes('000')) {
-            numericValue = numericValue * 1000;
-            amount = numericValue.toLocaleString();
+        // Take the first match that looks like a budget
+        const rawString = matches[0];
+        const numberPart = rawString.match(/(\d+(?:,\d+)*(?:\.\d+)?)/)?.[0];
+
+        if (numberPart) {
+          let value = parseFloat(numberPart.replace(/,/g, ''));
+          // Handle 'k' multiplier
+          if (rawString.toLowerCase().includes('k')) value *= 1000;
+
+          if (value > 0) {
+            let category: 'High' | 'Medium' | 'Low' = 'Low';
+            if (value >= 5000) category = 'High';
+            else if (value >= 1000) category = 'Medium';
+
+            return {
+              category,
+              amount: rawString.startsWith('$') ? rawString : `$${value.toLocaleString()}` // Standardize to $ for display if needed, or keep original
+            };
           }
-          
-          // Determine category based on amount
-          let category: 'High' | 'Medium' | 'Low' = 'Low';
-          if (numericValue >= 5000) category = 'High';
-          else if (numericValue >= 1000) category = 'Medium';
-          
-          // Return formatted amount
-          const currency = fullMatch.match(/^[\$€£]/) ? fullMatch[0] : '$';
-          const formattedAmount = `${currency}${amount}`;
-          
-          return { category, amount: formattedAmount };
         }
       }
     }
-    
-    // Look for budget range indicators
-    const rangeMatch = text.match(/budget.*?(\d+(?:,\d+)*)\s*(?:-|to)\s*(\d+(?:,\d+)*)/i);
-    if (rangeMatch) {
-      const minAmount = parseInt(rangeMatch[1].replace(/,/g, ''));
-      const maxAmount = parseInt(rangeMatch[2].replace(/,/g, ''));
-      const avgAmount = (minAmount + maxAmount) / 2;
-      
-      let category: 'High' | 'Medium' | 'Low' = 'Low';
-      if (avgAmount >= 5000) category = 'High';
-      else if (avgAmount >= 1000) category = 'Medium';
-      
-      return { 
-        category, 
-        amount: `$${rangeMatch[1]}-$${rangeMatch[2]}` 
-      };
-    }
-    
-    // Look for budget keywords without specific amounts
-    if (/high budget|big budget|well funded|substantial|generous budget/i.test(text)) {
+
+    // 2. Look for keywords if no explicit amount found
+    const lowerText = text.toLowerCase();
+
+    if (lowerText.match(/high budget|well funded|unlimited budget|money is no object|good pay/)) {
       return { category: 'High' };
     }
-    if (/medium budget|reasonable budget|fair rate|decent budget/i.test(text)) {
+
+    if (lowerText.match(/average budget|standard rate|market rate|negotiable/)) {
       return { category: 'Medium' };
     }
-    if (/low budget|tight budget|small budget|cheap|minimal budget|shoestring/i.test(text)) {
+
+    if (lowerText.match(/low budget|tight budget|small budget|cheap|student|volunteer|equity|unpaid/)) {
       return { category: 'Low' };
     }
-    
+
     return { category: 'Unknown' };
   }
 
@@ -458,10 +439,10 @@ export class RealDataCollector {
 
   private formatTimeAgo(timestamp: number | undefined): string {
     if (!timestamp) return 'Recently';
-    
+
     const now = Date.now() / 1000;
     const diff = now - timestamp;
-    
+
     if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
     if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
     if (diff < 604800) return `${Math.floor(diff / 86400)} days ago`;

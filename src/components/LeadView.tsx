@@ -156,23 +156,23 @@ const LeadView: React.FC<Props> = ({ results, onSave, onGoTracker, onRefresh }) 
                       </div>
                       <div>
                         <div className="text-sm font-bold text-white mb-0.5 flex items-center space-x-2">
-                          <span>{lead.prospectName}</span>
+                          <span className="line-clamp-1 max-w-[140px]" title={lead.prospectName}>{lead.prospectName}</span>
                           {/* Badge */}
                           {lead.notes?.includes('AI-generated') && (
-                            <Sparkles className="w-3 h-3 text-indigo-400" />
+                            <Sparkles className="w-3 h-3 text-indigo-400 shrink-0" />
                           )}
                         </div>
                         <div className="flex items-center space-x-2">
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 border border-white/5 text-slate-400 font-medium">
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 border border-white/5 text-slate-400 font-medium whitespace-nowrap">
                             {lead.source}
                           </span>
-                          <span className="text-[10px] text-slate-500">{lead.postedAt}</span>
+                          <span className="text-[10px] text-slate-500 whitespace-nowrap">{lead.postedAt}</span>
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-8 py-6">
-                    <p className="text-sm text-slate-300 leading-relaxed line-clamp-2">
+                    <p className="text-sm text-slate-300 leading-relaxed line-clamp-2" title={lead.requestSummary}>
                       {lead.requestSummary}
                     </p>
                     {lead.location && (
@@ -183,13 +183,21 @@ const LeadView: React.FC<Props> = ({ results, onSave, onGoTracker, onRefresh }) 
                     )}
                   </td>
                   <td className="px-8 py-6">
-                    <div className="space-y-1">
+                    <div className="space-y-1.5">
                       <div className="flex items-center space-x-2 text-xs">
-                        <span className="text-slate-500">Budget:</span>
-                        <span className="text-emerald-400 font-bold bg-emerald-400/10 px-1.5 rounded">{getBudgetDisplay(lead)}</span>
+                        <span className="text-slate-500 w-14">Budget:</span>
+                        <div className={`font-bold px-2 py-0.5 rounded text-[11px] ${lead.budget === 'Unknown' && !lead.budgetAmount
+                            ? 'bg-slate-800 text-slate-400'
+                            : 'bg-emerald-400/10 text-emerald-400'
+                          }`}>
+                          {lead.budgetAmount ? lead.budgetAmount :
+                            lead.budget === 'High' ? '$$$' :
+                              lead.budget === 'Medium' ? '$$' :
+                                lead.budget === 'Low' ? '$' : 'N/A'}
+                        </div>
                       </div>
                       <div className="flex items-center space-x-2 text-xs">
-                        <span className="text-slate-500">Urgency:</span>
+                        <span className="text-slate-500 w-14">Urgency:</span>
                         <span className={`font-bold ${getUrgencyColor(lead.urgency)}`}>{lead.urgency}</span>
                       </div>
                     </div>
@@ -217,12 +225,15 @@ const LeadView: React.FC<Props> = ({ results, onSave, onGoTracker, onRefresh }) 
                       >
                         <Bookmark className="w-4 h-4" />
                       </button>
-                      <button
-                        onClick={() => handleSourceClick(lead.sourceUrl || '', lead.source || 'Unknown', lead.prospectName || 'Anonymous')}
-                        className="p-2 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-all"
+                      <a
+                        href={lead.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-all inline-flex items-center justify-center"
+                        title="Open Source"
                       >
                         <ExternalLink className="w-4 h-4" />
-                      </button>
+                      </a>
                     </div>
                   </td>
                 </tr>
