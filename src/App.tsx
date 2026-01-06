@@ -1,37 +1,25 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Search, 
-  Target, 
-  Users, 
-  BarChart3, 
-  History, 
-  Settings, 
-  HelpCircle, 
-  ChevronRight, 
-  Loader2, 
-  ArrowLeft,
+import {
+  Search,
+  Target,
   Briefcase,
   Zap,
-  BookmarkCheck,
-  LayoutDashboard,
   Globe,
   Terminal,
   Activity,
   Cpu,
   XCircle,
-  ShieldAlert,
   LogOut,
   CreditCard,
   User as UserIcon,
   Crown,
-  X
+  X,
+  ArrowLeft
 } from 'lucide-react';
-import { WorkflowMode, AnalysisResult, SavedLead, Lead } from './types';
+import { WorkflowMode, AnalysisResult } from './types';
 import { analyzeQuery } from './geminiService';
 import OpportunityView from './components/OpportunityView';
-import LeadView from './components/LeadView';
-import TrackerView from './components/TrackerView';
 import LandingPage from './components/LandingPage';
 import SuccessPage from './components/SuccessPage';
 import UpgradeModal from './components/UpgradeModal';
@@ -102,8 +90,7 @@ const App: React.FC = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchStep, setSearchStep] = useState(0);
   const [results, setResults] = useState<AnalysisResult | null>(null);
-  const [view, setView] = useState<'home' | 'results' | 'tracker'>('home');
-  const [savedLeads, setSavedLeads] = useState<SavedLead[]>([]);
+  const [view, setView] = useState<'home' | 'results'>('home');
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [showSuccessPage, setShowSuccessPage] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -180,12 +167,6 @@ const App: React.FC = () => {
     return false;
   };
 
-  useEffect(() => {
-    const stored = localStorage.getItem('signal_saved_leads');
-    if (stored) {
-      setSavedLeads(JSON.parse(stored));
-    }
-  }, []);
 
   useEffect(() => {
     let interval: any;
@@ -258,31 +239,6 @@ const App: React.FC = () => {
     setShowLanding(true);
   };
 
-  const handleSaveLead = (lead: Lead) => {
-    const alreadySaved = savedLeads.find(l => l.id === lead.id);
-    if (alreadySaved) return;
-
-    const newLead: SavedLead = {
-      ...lead,
-      savedDate: new Date().toISOString(),
-      status: 'New'
-    };
-    const updated = [...savedLeads, newLead];
-    setSavedLeads(updated);
-    localStorage.setItem('signal_saved_leads', JSON.stringify(updated));
-  };
-
-  const handleDeleteLead = (id: string) => {
-    const updated = savedLeads.filter(l => l.id !== id);
-    setSavedLeads(updated);
-    localStorage.setItem('signal_saved_leads', JSON.stringify(updated));
-  };
-
-  const handleUpdateLeadStatus = (id: string, status: any) => {
-    const updated = savedLeads.map(l => l.id === id ? { ...l, status } : l);
-    setSavedLeads(updated);
-    localStorage.setItem('signal_saved_leads', JSON.stringify(updated));
-  };
 
   const handleUpgradeClick = () => {
     setShowUpgradeModal(true);
@@ -396,27 +352,14 @@ const App: React.FC = () => {
         </div>
 
         <nav className="flex-1 space-y-2">
-          <button 
+          <button
             onClick={() => setView('home')}
             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all ${view === 'home' ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20 shadow-[0_0_15px_rgba(37,99,235,0.1)]' : 'hover:bg-slate-800/50 text-slate-400'}`}
           >
             <Search className="w-5 h-5" />
             <span className="font-medium">Discover</span>
           </button>
-          
-          <button 
-            onClick={() => setView('tracker')}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all ${view === 'tracker' ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20 shadow-[0_0_15px_rgba(37,99,235,0.1)]' : 'hover:bg-slate-800/50 text-slate-400'}`}
-          >
-            <BookmarkCheck className="w-5 h-5" />
-            <span className="font-medium">My Tracker</span>
-            {savedLeads.length > 0 && (
-              <span className="ml-auto bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                {savedLeads.length}
-              </span>
-            )}
-          </button>
-          
+
           <div className="pt-8 text-xs font-semibold text-slate-500 uppercase tracking-widest px-4 mb-2">
             Usage Metrics
           </div>
@@ -501,9 +444,8 @@ const App: React.FC = () => {
             )}
             <h1 className="text-lg font-semibold text-slate-200">
               {isSearching ? 'Neural Extraction Protocol' :
-               view === 'home' ? 'Intelligence Hub' : 
-               view === 'tracker' ? 'Lead Tracker' : 
-               results?.mode === WorkflowMode.OPPORTUNITY ? 'Opportunity Analysis' : 'Lead Discovery'}
+               view === 'home' ? 'Intelligence Hub' :
+               results?.mode === WorkflowMode.OPPORTUNITY ? 'Opportunity Analysis' : 'Market Intelligence'}
             </h1>
           </div>
           <div className="flex items-center space-x-4">
@@ -556,7 +498,7 @@ const App: React.FC = () => {
                             handleSearch(e);
                           }
                         }}
-                        placeholder="e.g., 'Find business opportunities in AI for legal firms' or 'Find clients who need a wedding photographer in Austin' (Press Enter to scan, Shift+Enter for new line)"
+                        placeholder="e.g., 'Find profitable opportunities in AI tools for small businesses' or 'Discover underserved markets in health and fitness' (Press Enter to scan, Shift+Enter for new line)"
                         className="w-full bg-transparent border-none focus:ring-0 text-xl text-white placeholder-slate-600 resize-none min-h-[120px]"
                       />
                       <div className="flex items-center justify-between pt-4 border-t border-slate-800/50">
@@ -589,29 +531,41 @@ const App: React.FC = () => {
               )}
 
               {!isSearching && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-16 animate-in fade-in slide-in-from-top-4 duration-700">
-                  <div 
-                    className="p-6 glass-card rounded-2xl border border-slate-800/50 group hover:border-blue-500/30 hover:bg-slate-800/30 transition-all cursor-pointer" 
-                    onClick={() => setQuery("Find business opportunities in the remote team collaboration space")}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 animate-in fade-in slide-in-from-top-4 duration-700">
+                  <div
+                    className="p-6 glass-card rounded-2xl border border-slate-800/50 group hover:border-blue-500/30 hover:bg-slate-800/30 transition-all cursor-pointer"
+                    onClick={() => setQuery("Find profitable business opportunities in AI for small businesses")}
                   >
                     <div className="bg-blue-500/10 p-3 rounded-xl w-fit mb-4 group-hover:bg-blue-500/20 transition-all border border-blue-500/20">
                       <Briefcase className="w-6 h-6 text-blue-500" />
                     </div>
-                    <h3 className="text-lg font-bold text-white mb-2">Opportunity Mode</h3>
+                    <h3 className="text-lg font-bold text-white mb-2">Market Gaps</h3>
                     <p className="text-slate-400 text-sm leading-relaxed">
-                      Identify market gaps, common complaints, and unserved niches in any industry.
+                      Discover underserved niches and untapped opportunities in growing markets.
                     </p>
                   </div>
-                  <div 
-                    className="p-6 glass-card rounded-2xl border border-slate-800/50 group hover:border-indigo-500/30 hover:bg-slate-800/30 transition-all cursor-pointer" 
-                    onClick={() => setQuery("Find clients who need a video editor for YouTube creators")}
+                  <div
+                    className="p-6 glass-card rounded-2xl border border-slate-800/50 group hover:border-indigo-500/30 hover:bg-slate-800/30 transition-all cursor-pointer"
+                    onClick={() => setQuery("Analyze demand for subscription box services in wellness")}
                   >
                     <div className="bg-indigo-500/10 p-3 rounded-xl w-fit mb-4 group-hover:bg-indigo-500/20 transition-all border border-indigo-500/20">
-                      <Users className="w-6 h-6 text-indigo-500" />
+                      <Target className="w-6 h-6 text-indigo-500" />
                     </div>
-                    <h3 className="text-lg font-bold text-white mb-2">Lead Mode</h3>
+                    <h3 className="text-lg font-bold text-white mb-2">Trend Analysis</h3>
                     <p className="text-slate-400 text-sm leading-relaxed">
-                      Scan social posts, forums, and job boards for active buyers seeking your skills.
+                      Validate demand signals and market readiness before building your product.
+                    </p>
+                  </div>
+                  <div
+                    className="p-6 glass-card rounded-2xl border border-slate-800/50 group hover:border-emerald-500/30 hover:bg-slate-800/30 transition-all cursor-pointer"
+                    onClick={() => setQuery("Find pain points in the freelancer productivity tools market")}
+                  >
+                    <div className="bg-emerald-500/10 p-3 rounded-xl w-fit mb-4 group-hover:bg-emerald-500/20 transition-all border border-emerald-500/20">
+                      <Search className="w-6 h-6 text-emerald-500" />
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-2">Problem Discovery</h3>
+                    <p className="text-slate-400 text-sm leading-relaxed">
+                      Identify real problems people are struggling with that need solutions.
                     </p>
                   </div>
                 </div>
@@ -621,28 +575,9 @@ const App: React.FC = () => {
 
           {view === 'results' && results && !isSearching && (
             <div className="max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-              {results.mode === WorkflowMode.OPPORTUNITY ? (
-                <OpportunityView 
-                  results={results} 
-                  onNewSearch={() => setView('home')} 
-                />
-              ) : (
-                <LeadView 
-                  results={results} 
-                  onSave={handleSaveLead}
-                  onGoTracker={() => setView('tracker')}
-                  onRefresh={() => handleSearch()}
-                />
-              )}
-            </div>
-          )}
-
-          {view === 'tracker' && (
-            <div className="max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <TrackerView 
-                leads={savedLeads} 
-                onDelete={handleDeleteLead}
-                onUpdateStatus={handleUpdateLeadStatus}
+              <OpportunityView
+                results={results}
+                onNewSearch={() => setView('home')}
               />
             </div>
           )}

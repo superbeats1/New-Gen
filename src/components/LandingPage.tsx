@@ -189,10 +189,10 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
             <span>Market Intelligence v2.5</span>
           </div>
           <h1 className="text-6xl md:text-7xl lg:text-8xl font-black text-white leading-none tracking-tighter">
-            Decode the <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500">Market</span> Noise.
+            Find Your Next <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500">$100K</span> Idea.
           </h1>
           <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-            The world's first dual-agent discovery platform. Find validated business opportunities or high-intent client leads using neural market scanning.
+            Discover validated business opportunities before your competitors. AI-powered market intelligence that analyzes millions of conversations to find profitable gaps.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
             <button 
@@ -258,56 +258,88 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
 
       {/* Feature Split */}
       <section id="workflow" className="relative z-10 max-w-7xl mx-auto px-8 py-24 border-t border-white/5">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Opportunity Column */}
-          <div className="group p-10 glass-card rounded-[40px] border border-slate-800/50 hover:border-blue-500/30 transition-all duration-500">
-            <div className="bg-blue-600/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-              <Briefcase className="w-8 h-8 text-blue-500" />
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
+            How SIGNAL Works
+          </h2>
+          <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+            Powered by AI, fueled by real conversations. We analyze Reddit, HackerNews, and GitHub to uncover opportunities others miss.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Market Gap Analysis */}
+          <div className="group p-8 glass-card rounded-3xl border border-slate-800/50 hover:border-blue-500/30 transition-all duration-500">
+            <div className="bg-blue-600/10 w-14 h-14 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <Briefcase className="w-7 h-7 text-blue-500" />
             </div>
-            <h3 className="text-3xl font-bold text-white mb-4">Opportunity Discovery</h3>
-            <p className="text-slate-400 text-lg leading-relaxed mb-8">
-              Strategize your next venture. We scan millions of conversations to find real problems waiting for a software or service solution.
+            <h3 className="text-2xl font-bold text-white mb-3">Market Gaps</h3>
+            <p className="text-slate-400 leading-relaxed mb-6">
+              Discover underserved niches and untapped opportunities in growing markets with real demand signals.
             </p>
-            <ul className="space-y-4 mb-8">
-              {['Sentiment Intensity Analysis', 'Market Readiness Scoring', 'Competitor Gap Mapping'].map((feat, i) => (
-                <li key={i} className="flex items-center space-x-3 text-slate-300">
-                  <div className="w-5 h-5 rounded-full bg-blue-500/10 flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+            <ul className="space-y-3">
+              {['Demand Signal Analysis', 'Competition Mapping', 'Revenue Potential'].map((feat, i) => (
+                <li key={i} className="flex items-center space-x-2 text-slate-300 text-sm">
+                  <div className="w-4 h-4 rounded-full bg-blue-500/10 flex items-center justify-center">
+                    <div className="w-1 h-1 rounded-full bg-blue-500"></div>
                   </div>
                   <span>{feat}</span>
                 </li>
               ))}
             </ul>
-            <button onClick={onStart} className="text-blue-400 font-bold flex items-center space-x-2 group/btn">
-              <span>Try Strategy Mode</span>
-              <ChevronRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
-            </button>
           </div>
 
-          {/* Leads Column */}
-          <div className="group p-10 glass-card rounded-[40px] border border-slate-800/50 hover:border-indigo-500/30 transition-all duration-500">
-            <div className="bg-indigo-600/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-              <Users className="w-8 h-8 text-indigo-500" />
+          {/* Problem Discovery */}
+          <div className="group p-8 glass-card rounded-3xl border border-slate-800/50 hover:border-indigo-500/30 transition-all duration-500">
+            <div className="bg-indigo-600/10 w-14 h-14 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <Search className="w-7 h-7 text-indigo-500" />
             </div>
-            <h3 className="text-3xl font-bold text-white mb-4">Lead Generation</h3>
-            <p className="text-slate-400 text-lg leading-relaxed mb-8">
-              Execute your sales. Monitor job boards, social platforms, and forums for active buyers looking for your specific creative service.
+            <h3 className="text-2xl font-bold text-white mb-3">Problem Discovery</h3>
+            <p className="text-slate-400 leading-relaxed mb-6">
+              Identify real pain points people are struggling with across forums, social media, and developer communities.
             </p>
-            <ul className="space-y-4 mb-8">
-              {['Real-time RSS Monitoring', 'AI Outreach Generator', 'Contact Enrichment API'].map((feat, i) => (
-                <li key={i} className="flex items-center space-x-3 text-slate-300">
-                  <div className="w-5 h-5 rounded-full bg-indigo-500/10 flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
+            <ul className="space-y-3">
+              {['Sentiment Analysis', 'Pain Point Extraction', 'Urgency Scoring'].map((feat, i) => (
+                <li key={i} className="flex items-center space-x-2 text-slate-300 text-sm">
+                  <div className="w-4 h-4 rounded-full bg-indigo-500/10 flex items-center justify-center">
+                    <div className="w-1 h-1 rounded-full bg-indigo-500"></div>
                   </div>
                   <span>{feat}</span>
                 </li>
               ))}
             </ul>
-            <button onClick={onStart} className="text-indigo-400 font-bold flex items-center space-x-2 group/btn">
-              <span>Try Lead Mode</span>
-              <ChevronRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
-            </button>
           </div>
+
+          {/* Trend Validation */}
+          <div className="group p-8 glass-card rounded-3xl border border-slate-800/50 hover:border-emerald-500/30 transition-all duration-500">
+            <div className="bg-emerald-600/10 w-14 h-14 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <Target className="w-7 h-7 text-emerald-500" />
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-3">Trend Validation</h3>
+            <p className="text-slate-400 leading-relaxed mb-6">
+              Validate market readiness and timing before investing months building the wrong product.
+            </p>
+            <ul className="space-y-3">
+              {['Market Readiness Score', 'Entry Difficulty', 'Next Steps Roadmap'].map((feat, i) => (
+                <li key={i} className="flex items-center space-x-2 text-slate-300 text-sm">
+                  <div className="w-4 h-4 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                    <div className="w-1 h-1 rounded-full bg-emerald-500"></div>
+                  </div>
+                  <span>{feat}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div className="text-center mt-12">
+          <button
+            onClick={onStart}
+            className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-8 rounded-xl transition-all shadow-lg shadow-blue-900/20 inline-flex items-center space-x-2"
+          >
+            <span>Start Discovering Opportunities</span>
+            <ChevronRight className="w-5 h-5" />
+          </button>
         </div>
       </section>
 
@@ -315,20 +347,20 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
       <section className="relative z-10 max-w-7xl mx-auto px-8 py-24 border-t border-white/5 text-center">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-12">
           <div>
-            <div className="text-4xl font-black text-white mb-1">2.4M</div>
-            <div className="text-slate-500 text-sm font-bold uppercase tracking-widest">Signals Analyzed</div>
+            <div className="text-4xl font-black text-white mb-1">2.4M+</div>
+            <div className="text-slate-500 text-sm font-bold uppercase tracking-widest">Conversations Analyzed</div>
           </div>
           <div>
-            <div className="text-4xl font-black text-white mb-1">12k+</div>
-            <div className="text-slate-500 text-sm font-bold uppercase tracking-widest">Leads Found Daily</div>
+            <div className="text-4xl font-black text-white mb-1">500+</div>
+            <div className="text-slate-500 text-sm font-bold uppercase tracking-widest">Opportunities Found</div>
           </div>
           <div>
-            <div className="text-4xl font-black text-white mb-1">87%</div>
-            <div className="text-slate-500 text-sm font-bold uppercase tracking-widest">Intent Accuracy</div>
+            <div className="text-4xl font-black text-white mb-1">92%</div>
+            <div className="text-slate-500 text-sm font-bold uppercase tracking-widest">Market Validation Rate</div>
           </div>
           <div>
-            <div className="text-4xl font-black text-white mb-1">500ms</div>
-            <div className="text-slate-500 text-sm font-bold uppercase tracking-widest">Processing Speed</div>
+            <div className="text-4xl font-black text-white mb-1">4sec</div>
+            <div className="text-slate-500 text-sm font-bold uppercase tracking-widest">Analysis Time</div>
           </div>
         </div>
       </section>
