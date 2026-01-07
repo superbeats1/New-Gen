@@ -1,4 +1,5 @@
 import { Lead, WorkflowMode } from '../types';
+import { TwitterCollector, twitterPostsToLeads } from './twitterService';
 
 // Reddit API interface
 interface RedditPost {
@@ -131,8 +132,9 @@ const OPPORTUNITY_KEYWORDS = [
 export class RealDataCollector {
   private rateLimits = {
     reddit: { lastCall: 0, minInterval: 2000 }, // 2 seconds between calls
-    hackernews: { lastCall: 0, minInterval: 1000 }, // 1 second between calls  
-    github: { lastCall: 0, minInterval: 1000 } // 1 second between calls
+    hackernews: { lastCall: 0, minInterval: 1000 }, // 1 second between calls
+    github: { lastCall: 0, minInterval: 1000 }, // 1 second between calls
+    twitter: { lastCall: 0, minInterval: 2000 } // 2 seconds between calls
   };
 
   // --- STABILITY ENGINE: safeMatch ---
@@ -359,6 +361,35 @@ export class RealDataCollector {
     return leads;
   }
 
+  // Twitter/X API integration
+  async scanTwitterForLeads(query: string, mode: WorkflowMode): Promise<Lead[]> {
+    await this.respectRateLimit('twitter');
+
+    const leads: Lead[] = [];
+
+    try {
+      const twitterCollector = new TwitterCollector();
+
+      console.log(`🐦 Scanning Twitter for: ${query}`);
+
+      // Use different methods based on mode
+      const twitterPosts = mode === WorkflowMode.OPPORTUNITY
+        ? await twitterCollector.searchOpportunities(query, 15)
+        : await twitterCollector.searchPainPoints(query);
+
+      // Convert Twitter posts to leads format
+      const twitterLeads = twitterPostsToLeads(twitterPosts, query);
+
+      leads.push(...twitterLeads);
+
+      console.log(`📊 Found ${leads.length} Twitter leads`);
+    } catch (error) {
+      console.error('Twitter scanning failed:', error);
+    }
+
+    return leads;
+  }
+
   // Main aggregation method
   async findRealLeads(query: string, mode: WorkflowMode): Promise<Lead[]> {
     console.log(`🔍 Starting real data collection for: "${query}" (Mode: ${mode})`);
@@ -366,13 +397,14 @@ export class RealDataCollector {
     const allLeads: Lead[] = [];
 
     // Collect from all sources in parallel
-    const [redditLeads, hnLeads, githubLeads] = await Promise.all([
+    const [redditLeads, hnLeads, githubLeads, twitterLeads] = await Promise.all([
       this.scanRedditForLeads(query, mode),
       this.scanHackerNewsForLeads(query),
-      mode === WorkflowMode.LEAD ? this.scanGitHubForLeads(query) : Promise.resolve([])
+      mode === WorkflowMode.LEAD ? this.scanGitHubForLeads(query) : Promise.resolve([]),
+      this.scanTwitterForLeads(query, mode)
     ]);
 
-    allLeads.push(...redditLeads, ...hnLeads, ...githubLeads);
+    allLeads.push(...redditLeads, ...hnLeads, ...githubLeads, ...twitterLeads);
 
     // Sort by fit score and recency
     allLeads.sort((a, b) => {

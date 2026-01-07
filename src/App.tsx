@@ -126,7 +126,7 @@ const DiagnosticHub: React.FC<{ results: AnalysisResult | null; isSearching: boo
 const SEARCH_STEPS = [
   "Initializing Scopa neural discovery...",
   "Authenticating with Scopa Network nodes...",
-  "Scanning Reddit r/entrepreneur and r/forhire...",
+  "Scanning Twitter, Reddit, HackerNews & GitHub...",
   "Parsing relevant market mentions...",
   "Applying sentiment intensity filters...",
   "Ranking signals by market readiness...",

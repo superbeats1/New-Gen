@@ -15,6 +15,9 @@ View your app in AI Studio: https://ai.studio/apps/drive/18Iwuus9hGpoRSw9RNoyaJw
 
 1. Install dependencies:
    `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+2. Configure environment variables in [.env.local](.env.local):
+   - **Required:** Set `VITE_GEMINI_API_KEY` to your Gemini API key
+   - **Optional:** Set `VITE_TWITTER_BEARER_TOKEN` to enable Twitter data collection (1,500 tweets/month free)
+   - See [.env.example](.env.example) for all configuration options
 3. Run the app:
    `npm run dev`
