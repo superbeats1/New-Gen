@@ -72,6 +72,19 @@ export interface Opportunity {
     confidence: number; // 1-10
     reasoning: string; // Why this timeline
   };
+
+  // Competitor Weakness Map - STRATEGIC ADVANTAGE
+  competitorAnalysis?: {
+    primaryWeakness: string; // Main weakness to exploit (e.g., "Pricing", "UX", "Features")
+    weaknessPercentage: number; // % of complaints about this weakness (e.g., 84)
+    topComplaints: string[]; // 3-5 specific user complaints
+    attackVector: string; // Specific strategy to exploit weakness
+    yourAdvantage: string; // How you can differentiate
+    evidence: {
+      complaint: string;
+      source: string;
+    }[];
+  };
 }
 
 export interface Lead {

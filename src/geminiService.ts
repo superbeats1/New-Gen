@@ -203,6 +203,27 @@ Return ONLY a valid JSON object with the following structure:
         "velocity": "Fast",
         "confidence": 8,
         "reasoning": "Low competition + high demand + simple MVP = fast validation. Similar products reached $1K MRR in 6-10 weeks."
+      },
+      "competitorAnalysis": {
+        "primaryWeakness": "Pricing",
+        "weaknessPercentage": 84,
+        "topComplaints": [
+          "Too expensive for small teams",
+          "Enterprise pricing locks out solo founders",
+          "Hidden fees and confusing pricing tiers"
+        ],
+        "attackVector": "Launch with transparent, founder-friendly pricing: $29/mo flat rate vs competitor's $99+ enterprise-only model",
+        "yourAdvantage": "Target underserved solo founders and small teams who are priced out of existing solutions but desperate for the functionality",
+        "evidence": [
+          {
+            "complaint": "I love [Tool X] but $120/mo is insane for what I need. I'd pay $30 for 80% of the features.",
+            "source": "Reddit r/SaaS - 3 days ago"
+          },
+          {
+            "complaint": "Switched away from [Competitor] purely because of pricing. Their 'starter' plan is a joke.",
+            "source": "Twitter/X - 1 week ago"
+          }
+        ]
       }
     }
   ],
@@ -244,6 +265,55 @@ EXAMPLE GOOD REASONING:
 
 EXAMPLE SLOW REASONING:
 "High competition + complex hardware integration + market education needed = slow ramp. Similar IoT products took 20-24 weeks to reach $1K MRR due to manufacturing and distribution challenges."
+
+COMPETITOR WEAKNESS MAP (CRITICAL - STRATEGIC ADVANTAGE):
+For each opportunity, analyze competitor weaknesses from user complaints to create an "Attack Vector":
+
+1. **Identify Primary Weakness**: What do users complain about MOST?
+   Common categories: Pricing, UX/Complexity, Missing Features, Poor Support, Performance, Reliability, Trust/Privacy
+
+2. **Calculate Percentage**: Out of all complaints, what % mention this weakness?
+   - Look for patterns: "too expensive" (pricing), "confusing UI" (UX), "doesn't have X feature" (features)
+   - Estimate realistically: 60-90% = dominant weakness, 40-60% = significant, <40% = minor
+
+3. **Extract Top Complaints**: 3-5 specific user quotes about this weakness
+   - Must be real complaints from supporting evidence
+   - Show specificity: "$120/mo is insane" not just "expensive"
+
+4. **Attack Vector**: ONE SENTENCE strategy to exploit this weakness
+   Template: "Launch with [your solution] vs competitor's [their problem]"
+   Examples:
+   - "Launch with $29/mo transparent pricing vs competitor's $99+ enterprise-only model"
+   - "Launch with 5-minute setup vs competitor's 2-hour onboarding nightmare"
+   - "Launch with built-in X feature vs competitor's expensive addon"
+
+5. **Your Advantage**: HOW you can differentiate by fixing their weakness
+   - Be specific about the underserved segment
+   - Show the gap: "Target solo founders priced out of $100+ solutions"
+
+6. **Evidence**: 2-3 direct complaints from real users
+   - Pull from supportingEvidence or rawFindings
+   - Anonymize but keep specificity
+
+WEAKNESS DETECTION KEYWORDS:
+- Pricing: "expensive", "overpriced", "costs too much", "pricing tiers", "can't afford"
+- UX: "confusing", "complicated", "hard to use", "terrible UI", "steep learning curve"
+- Features: "missing", "doesn't have", "wish it had", "lacks", "no support for"
+- Support: "no response", "terrible support", "can't get help", "ignored my ticket"
+- Performance: "slow", "buggy", "crashes", "unreliable", "downtime"
+- Privacy/Trust: "don't trust", "data concerns", "privacy issues", "sketchy"
+
+EXAMPLE GOOD ANALYSIS:
+{
+  "primaryWeakness": "Pricing",
+  "weaknessPercentage": 84,
+  "topComplaints": ["$120/mo too expensive", "Enterprise-only pricing", "Hidden fees"],
+  "attackVector": "Launch with $29/mo transparent pricing vs competitor's $99+ enterprise-only model",
+  "yourAdvantage": "Target underserved solo founders priced out of existing solutions",
+  "evidence": [{"complaint": "Love the tool but $120/mo is insane", "source": "Reddit r/SaaS"}]
+}
+
+IMPORTANT: If there's NO clear competitor or insufficient data, SET competitorAnalysis to null.
 `;
 
   try {

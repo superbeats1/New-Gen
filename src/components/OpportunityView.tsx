@@ -258,6 +258,76 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
                 </p>
               </div>
 
+              {/* COMPETITOR WEAKNESS MAP - STRATEGIC ADVANTAGE */}
+              {opportunity.competitorAnalysis && (
+                <div className="p-8 bg-gradient-to-br from-rose-600/10 via-orange-600/5 to-transparent border-2 border-rose-500/30 rounded-[2rem] relative overflow-hidden">
+                  <div className="absolute -top-10 -right-10 w-40 h-40 bg-rose-600/20 rounded-full blur-[80px]"></div>
+
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-6">
+                      <h4 className="flex items-center space-x-2 text-xs font-black text-rose-400 uppercase tracking-[0.3em]">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M6.672 1.911a1 1 0 10-1.932.518l.259.966a1 1 0 001.932-.518l-.26-.966zM2.429 4.74a1 1 0 10-.517 1.932l.966.259a1 1 0 00.517-1.932l-.966-.26zm8.814-.569a1 1 0 00-1.415-1.414l-.707.707a1 1 0 101.415 1.415l.707-.708zm-7.071 7.072l.707-.707A1 1 0 003.465 9.12l-.708.707a1 1 0 001.415 1.415zm3.2-5.171a1 1 0 00-1.3 1.3l4 10a1 1 0 001.823.075l1.38-2.759 3.018 3.02a1 1 0 001.414-1.415l-3.019-3.02 2.76-1.379a1 1 0 00-.076-1.822l-10-4z" clipRule="evenodd" />
+                        </svg>
+                        <span>Attack Vector</span>
+                      </h4>
+                      <div className="px-4 py-2 bg-rose-500/20 border border-rose-500/40 rounded-full">
+                        <span className="text-2xl font-black text-white">{opportunity.competitorAnalysis.weaknessPercentage}%</span>
+                        <span className="text-xs text-rose-300 ml-2">of complaints</span>
+                      </div>
+                    </div>
+
+                    {/* Primary Weakness */}
+                    <div className="mb-6">
+                      <div className="text-[10px] font-black text-rose-400/60 uppercase tracking-widest mb-2">Primary Weakness</div>
+                      <div className="text-3xl font-black text-white tracking-tight">{opportunity.competitorAnalysis.primaryWeakness}</div>
+                    </div>
+
+                    {/* Attack Strategy */}
+                    <div className="mb-6 p-6 bg-rose-500/10 border border-rose-500/20 rounded-2xl">
+                      <div className="text-[10px] font-black text-rose-400 uppercase tracking-widest mb-3">💡 Your Strategy</div>
+                      <div className="text-lg font-bold text-white leading-relaxed">{opportunity.competitorAnalysis.attackVector}</div>
+                    </div>
+
+                    {/* Your Advantage */}
+                    <div className="mb-6">
+                      <div className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-2">✅ Your Advantage</div>
+                      <div className="text-sm text-slate-300 leading-relaxed">{opportunity.competitorAnalysis.yourAdvantage}</div>
+                    </div>
+
+                    {/* Top Complaints */}
+                    <div className="mb-6">
+                      <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Top User Complaints</div>
+                      <div className="space-y-2">
+                        {opportunity.competitorAnalysis.topComplaints.map((complaint, i) => (
+                          <div key={i} className="flex items-start space-x-3 p-3 bg-white/[0.02] rounded-xl border border-white/5">
+                            <div className="w-6 h-6 rounded-full bg-rose-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                              <span className="text-xs font-black text-rose-400">{i + 1}</span>
+                            </div>
+                            <span className="text-sm text-slate-300">{complaint}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Evidence */}
+                    {opportunity.competitorAnalysis.evidence && opportunity.competitorAnalysis.evidence.length > 0 && (
+                      <div>
+                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Evidence from Users</div>
+                        <div className="space-y-3">
+                          {opportunity.competitorAnalysis.evidence.map((ev, i) => (
+                            <div key={i} className="p-4 bg-white/[0.02] rounded-xl border border-white/5">
+                              <p className="text-sm text-slate-300 italic mb-2">"{ev.complaint}"</p>
+                              <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{ev.source}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {opportunity.validationSources && opportunity.validationSources.length > 0 && (
                 <div>
                   <h4 className="flex items-center space-x-2 text-xs font-bold text-emerald-400 mb-4 uppercase tracking-widest">
