@@ -135,6 +135,27 @@ export class RealDataCollector {
     github: { lastCall: 0, minInterval: 1000 } // 1 second between calls
   };
 
+  // --- STABILITY ENGINE: safeMatch ---
+  private safeMatch(text: string | null | undefined, pattern: RegExp): string[] {
+    if (!text || typeof text !== 'string') return [];
+    try {
+      const result = text.match(pattern);
+      return Array.isArray(result) ? result : [];
+    } catch (e) {
+      console.warn("safeMatch failed gracefully:", e);
+      return [];
+    }
+  }
+
+  private safeTest(text: string | null | undefined, pattern: RegExp): boolean {
+    if (!text || typeof text !== 'string') return false;
+    try {
+      return pattern.test(text);
+    } catch (e) {
+      return false;
+    }
+  }
+
   // Rate limiting helper
   private async respectRateLimit(source: keyof typeof this.rateLimits) {
     const now = Date.now();
@@ -403,54 +424,52 @@ export class RealDataCollector {
     ];
 
     for (const pattern of locationPatterns) {
-      if (!text || typeof text !== 'string') continue;
-      const match = text.match(pattern);
-      if (match && match[0]) return match[0];
+      if (!text) continue;
+      const match = this.safeMatch(text, pattern);
+      if (match.length > 0 && match[0]) return match[0];
     }
 
     return undefined;
   }
 
-  private calculateFitScore(text: string, query: string): number {
+  private calculateFitScore(text: string | null | undefined, query: string): number {
+    if (!text || !query) return 5;
     let score = 5; // Base score
 
-    const queryWords = query.toLowerCase().split(' ');
-    const wordMatches = queryWords.filter(word => text.includes(word)).length;
-    score += (wordMatches / queryWords.length) * 3; // Up to +3 for query relevance
+    const queryWords = query.toLowerCase().split(' ').filter(w => w.length > 0);
+    const wordMatches = queryWords.filter(word => text.toLowerCase().includes(word)).length;
+    score += (wordMatches / Math.max(1, queryWords.length)) * 3; // Up to +3 for query relevance
 
     // Boost for budget mentions
-    if (/\$\d+|budget|pay|rate/i.test(text)) score += 1;
+    if (this.safeTest(text, /\$\d+|budget|pay|rate/i)) score += 1;
 
     // Boost for urgency
-    if (/urgent|asap|immediately|quickly/i.test(text)) score += 1;
+    if (this.safeTest(text, /urgent|asap|immediately|quickly/i)) score += 1;
 
     // Boost for professional terms
-    if (/project|professional|experienced|portfolio/i.test(text)) score += 1;
+    if (this.safeTest(text, /project|professional|experienced|portfolio/i)) score += 1;
 
     return Math.min(Math.round(score), 10);
   }
 
-  private extractBudget(text: string): { category: 'High' | 'Medium' | 'Low' | 'Unknown'; amount?: string } {
+  private extractBudget(text: string | null | undefined): { category: 'High' | 'Medium' | 'Low' | 'Unknown'; amount?: string } {
+    if (!text) return { category: 'Unknown' };
+
     // 1. Look for explicit currency values first (most accurate)
-    // Matches: $500, $5k, $5,000, 500 USD, 5k euro, etc.
     const currencyPatterns = [
       /[\$£€](\d+(?:,\d+)*(?:\.\d+)?k?)/gi,                 // $500, $5k
       /(\d+(?:,\d+)*(?:\.\d+)?k?)\s*(?:USD|EUR|GBP|dollars?)/gi, // 500 USD
     ];
 
     for (const pattern of currencyPatterns) {
-      if (!text || typeof text !== 'string') continue;
-      const matches = text.match(pattern);
-      if (matches && matches.length > 0) {
-        // Take the first match that looks like a budget
+      const matches = this.safeMatch(text, pattern);
+      if (matches.length > 0) {
         const rawString = matches[0];
-        if (!rawString || typeof rawString !== 'string') continue;
-        const numberMatch = rawString.match(/(\d+(?:,\d+)*(?:\.\d+)?)/);
-        const numberPart = numberMatch ? numberMatch[0] : null;
+        const numberMatch = this.safeMatch(rawString, /(\d+(?:,\d+)*(?:\.\d+)?)/);
+        const numberPart = numberMatch.length > 0 ? numberMatch[0] : null;
 
         if (numberPart) {
           let value = parseFloat(numberPart.replace(/,/g, ''));
-          // Handle 'k' multiplier
           if (rawString.toLowerCase().includes('k')) value *= 1000;
 
           if (value > 0) {
@@ -460,7 +479,7 @@ export class RealDataCollector {
 
             return {
               category,
-              amount: rawString.startsWith('$') ? rawString : `$${value.toLocaleString()}` // Standardize to $ for display if needed, or keep original
+              amount: rawString.startsWith('$') ? rawString : `$${value.toLocaleString()}`
             };
           }
         }
@@ -468,26 +487,26 @@ export class RealDataCollector {
     }
 
     // 2. Look for keywords if no explicit amount found
-    const lowerText = text ? text.toLowerCase() : '';
+    const lowerText = text.toLowerCase();
 
-    if (lowerText && typeof lowerText === 'string' && lowerText.match(/high budget|well funded|unlimited budget|money is no object|good pay/)) {
+    if (this.safeTest(lowerText, /high budget|well funded|unlimited budget|money is no object|good pay/)) {
       return { category: 'High' };
     }
 
-    if (lowerText && typeof lowerText === 'string' && lowerText.match(/average budget|standard rate|market rate|negotiable/)) {
+    if (this.safeTest(lowerText, /average budget|standard rate|market rate|negotiable/)) {
       return { category: 'Medium' };
     }
 
-    if (lowerText && typeof lowerText === 'string' && lowerText.match(/low budget|tight budget|small budget|cheap|student|volunteer|equity|unpaid/)) {
+    if (this.safeTest(lowerText, /low budget|tight budget|small budget|cheap|student|volunteer|equity|unpaid/)) {
       return { category: 'Low' };
     }
 
     return { category: 'Unknown' };
   }
 
-  private extractUrgency(text: string): 'High' | 'Medium' | 'Low' {
-    if (/urgent|asap|immediately|rush|deadline|quickly/i.test(text)) return 'High';
-    if (/soon|next week|this month|timely/i.test(text)) return 'Medium';
+  private extractUrgency(text: string | null | undefined): 'High' | 'Medium' | 'Low' {
+    if (this.safeTest(text, /urgent|asap|immediately|rush|deadline|quickly/i)) return 'High';
+    if (this.safeTest(text, /soon|next week|this month|timely/i)) return 'Medium';
     return 'Low';
   }
 
