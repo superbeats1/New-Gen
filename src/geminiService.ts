@@ -7,8 +7,8 @@ const apiKey = import.meta.env.VITE_GEMINI_API_KEY ||
   import.meta.env.VITE_GOOGLE_API_KEY ||
   import.meta.env.GEMINI_API_KEY;
 
-// Use gemini-1.5-flash (stable and widely available)
-const GEMINI_MODEL = "gemini-1.5-flash";
+// Use gemini-pro (stable model name for @google/generative-ai v0.24.1)
+const GEMINI_MODEL = "gemini-pro";
 
 let genAIInstance: GoogleGenerativeAI | null = null;
 let realDataCollector: RealDataCollector | null = null;

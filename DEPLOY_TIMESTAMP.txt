@@ -1,0 +1,4 @@
+Deployment timestamp: 2026-01-07 17:45 UTC
+Version: 2.6.5
+Model: gemini-pro
+Purpose: Force Vercel cache clear and rebuild

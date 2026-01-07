@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 
-console.log('%c 🚨 SCOPA AI CORE v2.6.4 - SDK FIX DEPLOYED 🚨 ', 'background: #10b981; color: #000; padding: 10px; border-radius: 8px; font-weight: 900; font-size: 14px; border: 2px solid #000;');
-(window as any).SCOPA_VERSION = '2.6.4';
-(window as any).GEMINI_MODEL = 'gemini-1.5-flash';
+console.log('%c 🚨 SCOPA AI CORE v2.6.5 - GEMINI-PRO STABLE 🚨 ', 'background: #8b5cf6; color: #fff; padding: 10px; border-radius: 8px; font-weight: 900; font-size: 14px; border: 2px solid #fff;');
+(window as any).SCOPA_VERSION = '2.6.5';
+(window as any).GEMINI_MODEL = 'gemini-pro';
 
 // --- NEURAL STABILITY MONITOR v2.1 ---
 window.addEventListener('unhandledrejection', (event) => {
