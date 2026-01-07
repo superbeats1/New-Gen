@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { Component, useState, useEffect, useRef } from 'react';
 import {
   Search,
   Target,
@@ -39,6 +39,87 @@ import { supabase } from './lib/supabase';
 import { Auth } from './components/Auth';
 import { createCheckoutSession } from './lib/stripe';
 import IntelligentBackground from './components/IntelligentBackground';
+
+// --- NEW DIAGNOSTIC LAYER ---
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: any;
+}
+
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  public state: ErrorBoundaryState = { hasError: false, error: null };
+
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: any, errorInfo: any) {
+    console.error("PROTOCOL BREACH DETECTED:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-[#030407] text-white flex flex-col items-center justify-center p-8 text-center" style={{ zIndex: 9999, position: 'relative' }}>
+          <ShieldAlert className="w-16 h-16 text-rose-500 mb-6 animate-pulse" />
+          <h1 className="text-3xl font-black mb-4 uppercase italic">Neural Protocol Breach</h1>
+          <p className="text-slate-400 max-w-md mb-8">A terminal error occured in the UI layer. Protocol v2.2.0 diagnostic data follow:</p>
+          <div className="bg-slate-900/50 p-6 rounded-2xl border border-rose-500/20 text-left font-mono text-xs text-rose-400 max-w-2xl overflow-auto w-full">
+            <div className="font-bold mb-2">Error: {this.state.error?.toString()}</div>
+            <pre className="opacity-70 whitespace-pre-wrap">
+              {this.state.error?.stack?.split('\n').slice(0, 5).join('\n')}
+            </pre>
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-8 px-8 py-3 bg-violet-600 hover:bg-violet-500 rounded-xl font-bold uppercase tracking-widest text-xs transition-colors shadow-lg shadow-violet-600/20"
+          >
+            Reinitialize System
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+const DiagnosticHub: React.FC<{ results: AnalysisResult | null; isSearching: boolean; stats: any }> = ({ results, isSearching, stats }) => {
+  const [show, setShow] = useState(false);
+
+  // Toggle with Shift+D
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.shiftKey && e.key === 'D') setShow(prev => !prev);
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, []);
+
+  if (!show) return null;
+
+  return (
+    <div className="fixed bottom-4 right-4 z-[100] w-96 bg-black/90 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl animate-in slide-in-from-right-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-xs font-black uppercase tracking-widest text-violet-400">Deep Diagnostic Hub</h3>
+        <button onClick={() => setShow(false)} className="text-slate-500 hover:text-white"><X className="w-4 h-4" /></button>
+      </div>
+      <div className="space-y-4 font-mono text-[10px] text-slate-400">
+        <div className="flex justify-between"><span>Status:</span><span className={isSearching ? 'text-amber-400' : 'text-emerald-400'}>{isSearching ? 'Scanning...' : 'Idle'}</span></div>
+        <div className="flex justify-between"><span>Real Data Count:</span><span className="text-white">{stats.realDataCount || 0}</span></div>
+        <div className="flex justify-between"><span>Opportunities Found:</span><span className="text-white">{results?.opportunities?.length || 0}</span></div>
+        <div className="flex justify-between"><span>Engine Version:</span><span className="text-violet-400">v2.2.0</span></div>
+        <div className="pt-2 border-t border-white/5 max-h-40 overflow-auto">
+          <div className="mb-2 text-slate-500 underline uppercase">Last System Log:</div>
+          <div className="text-[8px] leading-tight text-slate-500">{stats.lastLog || 'System ready.'}</div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const SEARCH_STEPS = [
   "Initializing Scopa neural discovery...",
@@ -113,6 +194,7 @@ const App: React.FC = () => {
   const [showSuccessPage, setShowSuccessPage] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [diagStats, setDiagStats] = useState({ realDataCount: 0, lastLog: '' });
 
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -214,14 +296,23 @@ const App: React.FC = () => {
     setSearchStep(0);
 
     try {
+      setDiagStats(prev => ({ ...prev, lastLog: 'Initializing Scopa neural discovery...' }));
       const animationTimer = new Promise(resolve => setTimeout(resolve, 4000));
+
+      // Track real data collection
       const resultPromise = analyzeQuery(query);
 
       const [result] = await Promise.all([resultPromise, animationTimer]);
 
+      setDiagStats({
+        realDataCount: result.totalSourcesAnalyzed || 0,
+        lastLog: `Analysis complete. ${result.opportunities?.length || 0} opportunities identified.`
+      });
+
       await deductCredit();
       setResults(result);
     } catch (error: any) {
+      setDiagStats(prev => ({ ...prev, lastLog: `FAILURE: ${error.message}` }));
       if (error.name === 'AbortError') {
         console.log("Search cancelled by user");
       } else {
@@ -327,270 +418,273 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#030407] text-slate-200 selection:bg-violet-500/30 relative">
-      <IntelligentBackground />
+    <ErrorBoundary>
+      <div className="flex h-screen overflow-hidden bg-[#030407] text-slate-200 selection:bg-violet-500/30 relative">
+        <IntelligentBackground />
+        <DiagnosticHub results={results} isSearching={isSearching} stats={diagStats} />
 
-      {/* Mobile Sidebar Overlay */}
-      {isMobileMenuOpen && (
-        <div
-          className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm lg:hidden animate-in fade-in duration-300"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-      )}
+        {/* Mobile Sidebar Overlay */}
+        {isMobileMenuOpen && (
+          <div
+            className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm lg:hidden animate-in fade-in duration-300"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
 
-      {/* Sidebar */}
-      <aside className={`
+        {/* Sidebar */}
+        <aside className={`
         fixed inset-y-0 left-0 z-[70] w-72 lg:static lg:w-72 
         bg-[#050608]/80 backdrop-blur-2xl border-r border-white/5 flex flex-col p-6 m-4 lg:my-4 lg:ml-4 lg:mr-0 
         rounded-3xl transition-transform duration-300 ease-in-out
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-[calc(100%+2rem)] lg:translate-x-0'}
       `}>
-        <div className="flex items-center justify-between mb-10">
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => { setShowLanding(true); setIsMobileMenuOpen(false); }}>
-            <div className="bg-gradient-to-br from-violet-600 to-indigo-600 p-2 rounded-xl shadow-lg shadow-violet-600/20">
-              <Zap className="w-5 h-5 text-white fill-white" />
+          <div className="flex items-center justify-between mb-10">
+            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => { setShowLanding(true); setIsMobileMenuOpen(false); }}>
+              <div className="bg-gradient-to-br from-violet-600 to-indigo-600 p-2 rounded-xl shadow-lg shadow-violet-600/20">
+                <Zap className="w-5 h-5 text-white fill-white" />
+              </div>
+              <span className="text-xl font-bold tracking-tight text-white uppercase italic">Scopa AI</span>
             </div>
-            <span className="text-xl font-bold tracking-tight text-white uppercase italic">Scopa AI</span>
-          </div>
-          <button className="lg:hidden p-2 text-slate-400 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-
-        <nav className="flex-1 space-y-2">
-          <button
-            className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all ${!results ? 'bg-violet-600/20 text-white font-medium border border-violet-500/30' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
-            onClick={() => { setResults(null); setQuery(''); setIsMobileMenuOpen(false); }}
-          >
-            <Search className={`w-5 h-5 ${!results ? 'text-violet-400' : ''}`} />
-            <span>Discover</span>
-          </button>
-
-          <button
-            onClick={() => { setShowAlerts(true); setIsMobileMenuOpen(false); }}
-            className="w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all hover:bg-white/5 text-slate-400 hover:text-white"
-          >
-            <History className="w-5 h-5" />
-            <span>Alerts</span>
-          </button>
-
-
-          <div className="pt-8 pb-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-widest">
-            Your Plan
-          </div>
-          <div className="glass-card p-4 rounded-2xl mx-1 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-violet-500/10 rounded-full blur-2xl group-hover:bg-violet-500/20 transition-all"></div>
-            <div className="flex items-center justify-between mb-3 relative z-10">
-              <span className="text-xs font-medium text-slate-300">Credits</span>
-              {profile?.is_pro ? (
-                <span className="flex items-center text-[10px] font-bold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
-                  PRO
-                </span>
-              ) : (
-                <span className="text-xs font-bold text-white">{profile?.credits} left</span>
-              )}
-            </div>
-
-            <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden mb-3">
-              <div
-                className="h-full bg-gradient-to-r from-violet-500 to-indigo-600 transition-all duration-500"
-                style={{ width: profile?.is_pro ? '100%' : `${Math.max(0, Math.min(100, (profile?.credits / 10) * 100))}%` }}
-              ></div>
-            </div>
-
-            {!profile?.is_pro && (
-              <button
-                onClick={handleUpgradeClick}
-                className="w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-white transition-all flex items-center justify-center space-x-2"
-              >
-                <Sparkles className="w-3 h-3 text-amber-400" />
-                <span>Upgrade Plan</span>
-              </button>
-            )}
-          </div>
-        </nav>
-
-        <div className="border-t border-white/5 pt-6 space-y-2">
-          <div className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-white/5 border border-white/5">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white border border-white/10 shadow-lg shadow-violet-500/20">
-              {profile?.first_name?.[0] || 'U'}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-xs font-bold text-white truncate">{profile?.first_name} {profile?.last_name}</div>
-              <div className="text-[10px] text-slate-400 truncate">{session?.user?.email}</div>
-            </div>
-          </div>
-
-          {/* TEMPORARY ADMIN BUTTON */}
-          {!profile?.is_pro && (
-            <button onClick={handleManualUpgrade} className="w-full text-[10px] text-slate-600 hover:text-amber-500 p-1 text-center">
-              (Admin: Upgrade)
+            <button className="lg:hidden p-2 text-slate-400 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>
+              <X className="w-6 h-6" />
             </button>
-          )}
+          </div>
 
-          <button
-            onClick={handleSignOut}
-            className="w-full flex items-center space-x-3 px-4 py-2 rounded-xl text-rose-400 hover:bg-rose-500/10 transition-all ml-1"
-          >
-            <LogOut className="w-4 h-4" />
-            <span className="text-sm">Sign Out</span>
-          </button>
-
-          <div className="pt-4 flex items-center justify-between px-4 opacity-50 hover:opacity-100 transition-opacity">
-            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Protocol v{(window as any).SCOPA_VERSION || '2.1.0'}</span>
+          <nav className="flex-1 space-y-2">
             <button
-              onClick={() => window.location.reload()}
-              className="text-[9px] font-black text-violet-400 uppercase tracking-widest hover:text-violet-300 transition-colors"
+              className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all ${!results ? 'bg-violet-600/20 text-white font-medium border border-violet-500/30' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
+              onClick={() => { setResults(null); setQuery(''); setIsMobileMenuOpen(false); }}
             >
-              Force Sync
+              <Search className={`w-5 h-5 ${!results ? 'text-violet-400' : ''}`} />
+              <span>Discover</span>
             </button>
-          </div>
-        </div>
-      </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col h-full relative overflow-y-auto z-10 w-full">
-        <header className="h-20 flex items-center justify-between px-4 lg:px-10 sticky top-0 z-30 bg-[#0a0b0f]/50 backdrop-blur-md lg:bg-transparent">
-          <div className="flex items-center space-x-4">
             <button
-              className="lg:hidden p-2 -ml-2 text-slate-400 hover:text-white transition-colors"
-              onClick={() => setIsMobileMenuOpen(true)}
+              onClick={() => { setShowAlerts(true); setIsMobileMenuOpen(false); }}
+              className="w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all hover:bg-white/5 text-slate-400 hover:text-white"
             >
-              <Menu className="w-6 h-6" />
+              <History className="w-5 h-5" />
+              <span>Alerts</span>
             </button>
-            <h1 className="text-lg lg:text-xl font-bold text-white tracking-tight">
-              {isSearching ? 'Neural Protocol' :
-                !results ? 'Intelligence Hub' : 'Opportunity Analysis'}
-            </h1>
-          </div>
 
-          <div className="flex items-center space-x-4">
-            <div className="glass-panel px-4 py-2 rounded-full flex items-center space-x-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="text-xs font-medium text-slate-300">System Online</span>
+
+            <div className="pt-8 pb-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-widest">
+              Your Plan
             </div>
-          </div>
-        </header>
-
-        <div className="flex-1 px-4 lg:px-10 pb-10">
-          {!results && (
-            <div className="max-w-4xl mx-auto py-16">
-              <div className="text-center mb-12 lg:mb-20 space-y-6">
-                <div className="inline-flex items-center space-x-3 px-4 py-1.5 rounded-full bg-violet-600/10 border border-violet-500/20 mb-4 animate-in fade-in slide-in-from-bottom-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse"></span>
-                  <span className="text-[10px] font-black text-violet-400 uppercase tracking-[0.3em]">Protocol v4.2 Active</span>
-                </div>
-                <h2 className="text-5xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] uppercase italic">
-                  Scopa <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-400 to-violet-500">Intelligence</span>
-                </h2>
-                <p className="text-slate-500 text-lg lg:text-2xl font-medium tracking-tight max-w-2xl mx-auto">
-                  Scan global markets for untapped blue ocean opportunities using high-fidelity neural analysis.
-                </p>
+            <div className="glass-card p-4 rounded-2xl mx-1 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-violet-500/10 rounded-full blur-2xl group-hover:bg-violet-500/20 transition-all"></div>
+              <div className="flex items-center justify-between mb-3 relative z-10">
+                <span className="text-xs font-medium text-slate-300">Credits</span>
+                {profile?.is_pro ? (
+                  <span className="flex items-center text-[10px] font-bold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                    PRO
+                  </span>
+                ) : (
+                  <span className="text-xs font-bold text-white">{profile?.credits} left</span>
+                )}
               </div>
 
-              {isSearching ? (
-                <SearchingModule stepIndex={searchStep} onStop={stopSearch} />
-              ) : (
-                <div className="relative group max-w-3xl mx-auto">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 via-indigo-500 to-violet-600 rounded-[2.5rem] blur opacity-20 group-focus-within:opacity-50 transition duration-1000 animate-pulse-glow"></div>
-                  <form onSubmit={handleSearch} className="relative bg-[#050608]/80 backdrop-blur-xl border border-white/10 rounded-[2.2rem] p-1 shadow-2xl">
-                    <div className="bg-[#050608]/50 rounded-[2rem] p-6 lg:p-8">
-                      <textarea
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            handleSearch(e);
-                          }
-                        }}
-                        placeholder="Describe your target market or ideal lead..."
-                        className="w-full bg-transparent border-none focus:ring-0 text-lg lg:text-xl text-white placeholder-slate-600 resize-none min-h-[120px]"
-                      />
-                      <div className="flex items-center justify-between pt-6 mt-2 border-t border-white/5">
-                        <div className="flex flex-wrap gap-2 lg:gap-3">
-                          <button type="button" className="glass-panel px-3 py-1.5 rounded-full text-[10px] lg:text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors flex items-center space-x-1.5">
-                            <Globe className="w-3 h-3" />
-                            <span>Global</span>
-                          </button>
-                          <button type="button" className="glass-panel px-3 py-1.5 rounded-full text-[10px] lg:text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors flex items-center space-x-1.5">
-                            <Target className="w-3 h-3" />
-                            <span>High Intent</span>
+              <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden mb-3">
+                <div
+                  className="h-full bg-gradient-to-r from-violet-500 to-indigo-600 transition-all duration-500"
+                  style={{ width: profile?.is_pro ? '100%' : `${Math.max(0, Math.min(100, (profile?.credits / 10) * 100))}%` }}
+                ></div>
+              </div>
+
+              {!profile?.is_pro && (
+                <button
+                  onClick={handleUpgradeClick}
+                  className="w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-white transition-all flex items-center justify-center space-x-2"
+                >
+                  <Sparkles className="w-3 h-3 text-amber-400" />
+                  <span>Upgrade Plan</span>
+                </button>
+              )}
+            </div>
+          </nav>
+
+          <div className="border-t border-white/5 pt-6 space-y-2">
+            <div className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-white/5 border border-white/5">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white border border-white/10 shadow-lg shadow-violet-500/20">
+                {profile?.first_name?.[0] || 'U'}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-bold text-white truncate">{profile?.first_name} {profile?.last_name}</div>
+                <div className="text-[10px] text-slate-400 truncate">{session?.user?.email}</div>
+              </div>
+            </div>
+
+            {/* TEMPORARY ADMIN BUTTON */}
+            {!profile?.is_pro && (
+              <button onClick={handleManualUpgrade} className="w-full text-[10px] text-slate-600 hover:text-amber-500 p-1 text-center">
+                (Admin: Upgrade)
+              </button>
+            )}
+
+            <button
+              onClick={handleSignOut}
+              className="w-full flex items-center space-x-3 px-4 py-2 rounded-xl text-rose-400 hover:bg-rose-500/10 transition-all ml-1"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="text-sm">Sign Out</span>
+            </button>
+
+            <div className="pt-4 flex items-center justify-between px-4 opacity-50 hover:opacity-100 transition-opacity">
+              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Protocol v{(window as any).SCOPA_VERSION || '2.2.0'}</span>
+              <button
+                onClick={() => window.location.reload()}
+                className="text-[9px] font-black text-violet-400 uppercase tracking-widest hover:text-violet-300 transition-colors"
+              >
+                Force Sync
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 flex flex-col h-full relative overflow-y-auto z-10 w-full">
+          <header className="h-20 flex items-center justify-between px-4 lg:px-10 sticky top-0 z-30 bg-[#0a0b0f]/50 backdrop-blur-md lg:bg-transparent">
+            <div className="flex items-center space-x-4">
+              <button
+                className="lg:hidden p-2 -ml-2 text-slate-400 hover:text-white transition-colors"
+                onClick={() => setIsMobileMenuOpen(true)}
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+              <h1 className="text-lg lg:text-xl font-bold text-white tracking-tight">
+                {isSearching ? 'Neural Protocol' :
+                  !results ? 'Intelligence Hub' : 'Opportunity Analysis'}
+              </h1>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              <div className="glass-panel px-4 py-2 rounded-full flex items-center space-x-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="text-xs font-medium text-slate-300">System Online</span>
+              </div>
+            </div>
+          </header>
+
+          <div className="flex-1 px-4 lg:px-10 pb-10">
+            {!results && (
+              <div className="max-w-4xl mx-auto py-16">
+                <div className="text-center mb-12 lg:mb-20 space-y-6">
+                  <div className="inline-flex items-center space-x-3 px-4 py-1.5 rounded-full bg-violet-600/10 border border-violet-500/20 mb-4 animate-in fade-in slide-in-from-bottom-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse"></span>
+                    <span className="text-[10px] font-black text-violet-400 uppercase tracking-[0.3em]">Protocol v4.2 Active</span>
+                  </div>
+                  <h2 className="text-5xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] uppercase italic">
+                    Scopa <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-400 to-violet-500">Intelligence</span>
+                  </h2>
+                  <p className="text-slate-500 text-lg lg:text-2xl font-medium tracking-tight max-w-2xl mx-auto">
+                    Scan global markets for untapped blue ocean opportunities using high-fidelity neural analysis.
+                  </p>
+                </div>
+
+                {isSearching ? (
+                  <SearchingModule stepIndex={searchStep} onStop={stopSearch} />
+                ) : (
+                  <div className="relative group max-w-3xl mx-auto">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 via-indigo-500 to-violet-600 rounded-[2.5rem] blur opacity-20 group-focus-within:opacity-50 transition duration-1000 animate-pulse-glow"></div>
+                    <form onSubmit={handleSearch} className="relative bg-[#050608]/80 backdrop-blur-xl border border-white/10 rounded-[2.2rem] p-1 shadow-2xl">
+                      <div className="bg-[#050608]/50 rounded-[2rem] p-6 lg:p-8">
+                        <textarea
+                          value={query}
+                          onChange={(e) => setQuery(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                              e.preventDefault();
+                              handleSearch(e);
+                            }
+                          }}
+                          placeholder="Describe your target market or ideal lead..."
+                          className="w-full bg-transparent border-none focus:ring-0 text-lg lg:text-xl text-white placeholder-slate-600 resize-none min-h-[120px]"
+                        />
+                        <div className="flex items-center justify-between pt-6 mt-2 border-t border-white/5">
+                          <div className="flex flex-wrap gap-2 lg:gap-3">
+                            <button type="button" className="glass-panel px-3 py-1.5 rounded-full text-[10px] lg:text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors flex items-center space-x-1.5">
+                              <Globe className="w-3 h-3" />
+                              <span>Global</span>
+                            </button>
+                            <button type="button" className="glass-panel px-3 py-1.5 rounded-full text-[10px] lg:text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors flex items-center space-x-1.5">
+                              <Target className="w-3 h-3" />
+                              <span>High Intent</span>
+                            </button>
+                          </div>
+                          <button
+                            type="submit"
+                            disabled={!query.trim()}
+                            className="bg-violet-600 text-white hover:bg-violet-500 disabled:bg-slate-700 disabled:text-slate-500 font-black px-8 lg:px-12 py-3 lg:py-4 rounded-2xl transition-all shadow-xl shadow-violet-600/20 flex items-center space-x-3 uppercase tracking-tighter"
+                          >
+                            <Zap className="w-5 h-5 fill-white" />
+                            <span className="hidden sm:inline">Start Neuro-Scan</span>
+                            <span className="sm:hidden">Scan</span>
                           </button>
                         </div>
-                        <button
-                          type="submit"
-                          disabled={!query.trim()}
-                          className="bg-violet-600 text-white hover:bg-violet-500 disabled:bg-slate-700 disabled:text-slate-500 font-black px-8 lg:px-12 py-3 lg:py-4 rounded-2xl transition-all shadow-xl shadow-violet-600/20 flex items-center space-x-3 uppercase tracking-tighter"
-                        >
-                          <Zap className="w-5 h-5 fill-white" />
-                          <span className="hidden sm:inline">Start Neuro-Scan</span>
-                          <span className="sm:hidden">Scan</span>
-                        </button>
                       </div>
-                    </div>
-                  </form>
-                </div>
-              )}
-
-              {!isSearching && (
-                <div className="mt-24 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                  <div
-                    className="group bg-[#050608]/40 backdrop-blur-2xl p-12 rounded-[3.5rem] cursor-pointer hover:bg-white/[0.04] transition-all border border-white/5 hover:border-violet-500/30 w-full text-left relative overflow-hidden"
-                    onClick={() => setQuery("Find emerging opportunities in the AI-powered health-tech space for 2026")}
-                  >
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-violet-600/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
-                    <div className="w-16 h-16 rounded-2xl bg-violet-500/10 flex items-center justify-center mb-10 border border-violet-500/20 group-hover:scale-110 transition-transform">
-                      <Zap className="w-8 h-8 text-violet-400 fill-violet-400/20" />
-                    </div>
-                    <h3 className="text-3xl font-black text-white mb-4 tracking-tighter uppercase italic">Strategic Pulse</h3>
-                    <p className="text-slate-500 text-lg leading-relaxed font-medium">
-                      Identify high-velocity market gaps with predictive intelligence.
-                    </p>
+                    </form>
                   </div>
+                )}
 
-                  <div
-                    className="group bg-[#050608]/40 backdrop-blur-2xl p-12 rounded-[3.5rem] cursor-pointer hover:bg-white/[0.04] transition-all border border-white/5 hover:border-emerald-500/30 w-full text-left relative overflow-hidden"
-                    onClick={() => setShowAlerts(true)}
-                  >
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-600/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
-                    <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-10 border border-emerald-500/20 group-hover:scale-110 transition-transform">
-                      <Bell className="w-8 h-8 text-emerald-400" />
+                {!isSearching && (
+                  <div className="mt-24 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                    <div
+                      className="group bg-[#050608]/40 backdrop-blur-2xl p-12 rounded-[3.5rem] cursor-pointer hover:bg-white/[0.04] transition-all border border-white/5 hover:border-violet-500/30 w-full text-left relative overflow-hidden"
+                      onClick={() => setQuery("Find emerging opportunities in the AI-powered health-tech space for 2026")}
+                    >
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-violet-600/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
+                      <div className="w-16 h-16 rounded-2xl bg-violet-500/10 flex items-center justify-center mb-10 border border-violet-500/20 group-hover:scale-110 transition-transform">
+                        <Zap className="w-8 h-8 text-violet-400 fill-violet-400/20" />
+                      </div>
+                      <h3 className="text-3xl font-black text-white mb-4 tracking-tighter uppercase italic">Strategic Pulse</h3>
+                      <p className="text-slate-500 text-lg leading-relaxed font-medium">
+                        Identify high-velocity market gaps with predictive intelligence.
+                      </p>
                     </div>
-                    <h3 className="text-3xl font-black text-white mb-4 tracking-tighter uppercase italic">Neural Monitors</h3>
-                    <p className="text-slate-500 text-lg leading-relaxed font-medium">
-                      Set automated shadows to track market movements 24/7.
-                    </p>
+
+                    <div
+                      className="group bg-[#050608]/40 backdrop-blur-2xl p-12 rounded-[3.5rem] cursor-pointer hover:bg-white/[0.04] transition-all border border-white/5 hover:border-emerald-500/30 w-full text-left relative overflow-hidden"
+                      onClick={() => setShowAlerts(true)}
+                    >
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-600/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
+                      <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-10 border border-emerald-500/20 group-hover:scale-110 transition-transform">
+                        <Bell className="w-8 h-8 text-emerald-400" />
+                      </div>
+                      <h3 className="text-3xl font-black text-white mb-4 tracking-tighter uppercase italic">Neural Monitors</h3>
+                      <p className="text-slate-500 text-lg leading-relaxed font-medium">
+                        Set automated shadows to track market movements 24/7.
+                      </p>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-          )}
+                )}
+              </div>
+            )}
 
-          {results && !isSearching && (
-            <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <OpportunityView
-                results={results}
-                onNewSearch={() => { setResults(null); setQuery(''); }}
-              />
-            </div>
-          )}
-        </div>
-      </main>
+            {results && !isSearching && (
+              <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <OpportunityView
+                  results={results}
+                  onNewSearch={() => { setResults(null); setQuery(''); }}
+                />
+              </div>
+            )}
+          </div>
+        </main>
 
-      <AuthModal />
-      <UpgradeModal
-        isOpen={showUpgradeModal}
-        onClose={() => setShowUpgradeModal(false)}
-        onUpgrade={handleUpgrade}
-        isUpgrading={isUpgrading}
-      />
-      <AlertsManager
-        userId={profile?.id}
-        isOpen={showAlerts}
-        onClose={() => setShowAlerts(false)}
-      />
-    </div>
+        <AuthModal />
+        <UpgradeModal
+          isOpen={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+          onUpgrade={handleUpgrade}
+          isUpgrading={isUpgrading}
+        />
+        <AlertsManager
+          userId={profile?.id}
+          isOpen={showAlerts}
+          onClose={() => setShowAlerts(false)}
+        />
+      </div>
+    </ErrorBoundary>
   );
 };
 
