@@ -3,9 +3,10 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 
-console.log('%c 🚨 SCOPA AI CORE v2.6.5 - GEMINI-PRO STABLE 🚨 ', 'background: #8b5cf6; color: #fff; padding: 10px; border-radius: 8px; font-weight: 900; font-size: 14px; border: 2px solid #fff;');
-(window as any).SCOPA_VERSION = '2.6.5';
-(window as any).GEMINI_MODEL = 'gemini-pro';
+console.log('%c ✅ SCOPA AI v2.7.0 - RESTORED WORKING SDK! ✅ ', 'background: #10b981; color: #fff; padding: 10px; border-radius: 8px; font-weight: 900; font-size: 14px; border: 2px solid #fff;');
+(window as any).SCOPA_VERSION = '2.7.0';
+(window as any).GEMINI_MODEL = 'gemini-3-pro-preview';
+(window as any).SDK = '@google/genai v1.34.0';
 
 // --- NEURAL STABILITY MONITOR v2.1 ---
 window.addEventListener('unhandledrejection', (event) => {
