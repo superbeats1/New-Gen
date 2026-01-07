@@ -34,8 +34,8 @@ const NeuralBackground: React.FC = () => {
                 this.vx = (Math.random() - 0.5) * 0.5;
                 this.vy = (Math.random() - 0.5) * 0.5;
                 this.size = Math.random() * 2 + 0.5;
-                // Violet/Indigo palette
-                const colors = ['rgba(139, 92, 246, ', 'rgba(99, 102, 241, ', 'rgba(167, 139, 250, '];
+                // Blue/Cyan/Indigo palette
+                const colors = ['rgba(59, 130, 246, ', 'rgba(6, 182, 212, ', 'rgba(99, 102, 241, '];
                 this.color = colors[Math.floor(Math.random() * colors.length)];
             }
 
@@ -108,7 +108,7 @@ const NeuralBackground: React.FC = () => {
                     if (distance < connectionDistance) {
                         const opacity = 1 - (distance / connectionDistance);
                         ctx.beginPath();
-                        ctx.strokeStyle = `rgba(139, 92, 246, ${opacity * 0.15})`; // Low opacity violet lines
+                        ctx.strokeStyle = `rgba(59, 130, 246, ${opacity * 0.15})`; // Low opacity blue lines
                         ctx.lineWidth = 1;
                         ctx.moveTo(a.x, a.y);
                         ctx.lineTo(b.x, b.y);

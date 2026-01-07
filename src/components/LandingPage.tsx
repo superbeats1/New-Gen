@@ -5,7 +5,7 @@ import {
   ChevronDown, Settings, LogOut, Star, CheckCircle, X,
   ArrowRight, Shield, Rocket, Activity, Database
 } from 'lucide-react';
-import FloatingOrbs from './FloatingOrbs';
+import IntelligentBackground from './IntelligentBackground';
 
 interface Props {
   onStart: () => void;
@@ -18,7 +18,7 @@ interface Props {
 }
 
 const GlassCard: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = "" }) => (
-  <div className={`glass-card p-8 rounded-[2.5rem] border border-white/10 hover:border-blue-500/30 transition-all duration-500 ${className}`}>
+  <div className={`glass-card p-8 rounded-[2.5rem] border border-white/5 bg-white/[0.02] backdrop-blur-xl hover:border-violet-500/30 hover:bg-white/[0.04] transition-all duration-500 shadow-2xl ${className}`}>
     {children}
   </div>
 );
@@ -27,6 +27,15 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
   const [showDropdown, setShowDropdown] = useState(false);
   const [showSuccessBanner, setShowSuccessBanner] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setCursorPos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -42,14 +51,20 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#07080a] text-slate-200 overflow-x-hidden selection:bg-blue-500/30">
-      <FloatingOrbs />
+    <div className="min-h-screen bg-[#030407] text-slate-200 overflow-x-hidden selection:bg-violet-500/30">
+      <IntelligentBackground />
+
+      {/* Cursor Glow */}
+      <div
+        className="fixed pointer-events-none z-[1] w-[600px] h-[600px] bg-violet-600/10 blur-[120px] rounded-full -translate-x-1/2 -translate-y-1/2 transition-opacity duration-1000"
+        style={{ left: cursorPos.x, top: cursorPos.y, opacity: scrolled ? 0.3 : 0.6 }}
+      ></div>
 
       {/* Navigation */}
       <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${scrolled ? 'py-4 backdrop-blur-xl bg-black/20 border-b border-white/5' : 'py-8'}`}>
         <div className="max-w-7xl mx-auto px-8 flex items-center justify-between">
           <div className="flex items-center space-x-3 cursor-pointer group" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <div className="bg-gradient-to-br from-blue-600 to-blue-400 p-2.5 rounded-2xl shadow-lg shadow-blue-600/20 group-hover:scale-110 transition-transform">
+            <div className="bg-gradient-to-br from-violet-600 to-indigo-600 p-2.5 rounded-2xl shadow-lg shadow-violet-600/20 group-hover:scale-110 transition-transform">
               <Zap className="w-6 h-6 text-white fill-white" />
             </div>
             <span className="text-2xl font-black tracking-tighter text-white uppercase italic">Scopa AI</span>
@@ -63,7 +78,7 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
                 <button onClick={onOpenAuth} className="hover:text-blue-400 transition-colors">Login</button>
                 <button
                   onClick={onOpenAuth}
-                  className="bg-white text-black px-8 py-3 rounded-full hover:bg-blue-500 hover:text-white transition-all shadow-xl shadow-white/5 font-black uppercase text-xs"
+                  className="bg-white text-black px-8 py-3 rounded-full hover:bg-violet-600 hover:text-white transition-all shadow-xl shadow-white/5 font-black uppercase text-xs"
                 >
                   Join Scopa
                 </button>
@@ -71,7 +86,7 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
             ) : (
               <button
                 onClick={onStart}
-                className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-full transition-all shadow-lg shadow-blue-900/20 font-black uppercase text-xs"
+                className="bg-violet-600 hover:bg-violet-500 text-white px-8 py-3 rounded-full transition-all shadow-lg shadow-violet-900/20 font-black uppercase text-xs"
               >
                 Dashboard
               </button>
@@ -88,22 +103,26 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
             <span>Neural Discovery Protocol Active</span>
           </div>
 
-          <h1 className="text-7xl md:text-9xl font-black text-white leading-[0.9] tracking-tighter mb-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100">
-            Identify Gaps<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-cyan-500">Before They Trend.</span>
+          <h1 className="text-6xl md:text-8xl lg:text-[10rem] font-black text-white leading-[0.85] tracking-tighter mb-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100">
+            Identify<br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-400 to-fuchsia-500">Opportunities.</span>
           </h1>
 
           <p className="max-w-2xl text-slate-400 text-xl md:text-2xl font-medium leading-relaxed mb-12 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
-            Scopa AI scans millions of signals across Reddit, X, and forums to reveal profitable business opportunities in real-time.
+            Scopa AI uses dual-agent intelligence to scan millions of signals across Reddit, X, and forums to reveal business gaps in real-time.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-6 animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-300">
             <button
               onClick={onStart}
-              className="group relative bg-blue-600 hover:bg-blue-500 text-white font-black py-6 px-12 rounded-3xl transition-all shadow-2xl shadow-blue-600/30 flex items-center space-x-4 text-xl uppercase tracking-tighter"
+              className="group relative bg-violet-600 hover:bg-violet-500 text-white font-black py-6 px-12 rounded-3xl transition-all shadow-2xl shadow-violet-600/30 flex items-center space-x-4 text-xl uppercase tracking-tighter overflow-hidden"
             >
-              <span>{session ? 'Enter Platform' : 'Initialize Discovery'}</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+              <span>{session ? 'Enter Platform' : 'Start Discovery'}</span>
               <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+            </button>
+            <button className="px-8 py-6 rounded-3xl border border-white/10 hover:bg-white/5 transition-all text-xl font-bold uppercase tracking-tighter">
+              View Protocol
             </button>
           </div>
         </div>
@@ -142,14 +161,14 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
               </div>
 
               {/* Floating UI Elements */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 glass-card p-6 rounded-2xl border border-blue-500/50 shadow-blue-500/20 shadow-2xl animate-float">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 glass-card p-6 rounded-2xl border border-violet-500/50 shadow-violet-500/20 shadow-2xl animate-float">
                 <div className="flex items-center space-x-4">
-                  <div className="bg-blue-600 p-3 rounded-xl">
+                  <div className="bg-violet-600 p-3 rounded-xl">
                     <Activity className="w-6 h-6 text-white" />
                   </div>
                   <div>
                     <h4 className="text-white font-bold tracking-tight">Intelligence Loop</h4>
-                    <p className="text-xs text-blue-400 font-medium">98.4% Confidence Score</p>
+                    <p className="text-xs text-violet-400 font-medium">98.4% Confidence Score</p>
                   </div>
                 </div>
               </div>

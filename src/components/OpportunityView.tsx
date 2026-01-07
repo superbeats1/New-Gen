@@ -50,48 +50,48 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
   };
 
   return (
-    <div className={`glass-card rounded-3xl overflow-hidden transition-all duration-300 ${isExpanded ? 'border-violet-500/30 shadow-[0_0_30px_rgba(124,58,237,0.1)]' : 'hover:border-white/10'}`}>
+    <div className={`group bg-[#050608]/60 backdrop-blur-xl rounded-[2.5rem] overflow-hidden transition-all duration-500 border border-white/5 hover:border-violet-500/30 ${isExpanded ? 'shadow-[0_0_50px_rgba(139,92,246,0.1)]' : ''}`}>
       <div
-        className="p-8 cursor-pointer flex items-start justify-between"
+        className="p-6 lg:p-10 cursor-pointer flex items-start justify-between relative"
         onClick={() => setIsExpanded(!isExpanded)}
       >
+        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-violet-500/20 to-transparent"></div>
         <div className="flex-1">
-          <div className="flex items-center space-x-3 mb-3">
-            <span className="text-[10px] font-bold bg-blue-600 text-white px-2 py-0.5 rounded uppercase tracking-wider">Signal #{index + 1}</span>
-            <span className={`text-sm font-bold ${getScoreColor(opportunity.overallScore)}`}>
-              Score: {opportunity.overallScore}/10
+          <div className="flex items-center space-x-3 mb-4">
+            <span className="text-[10px] font-black bg-violet-600 text-white px-3 py-1 rounded-full uppercase tracking-widest italic">Signal #{index + 1}</span>
+            <div className="h-1 w-1 rounded-full bg-slate-700"></div>
+            <span className={`text-xs font-black uppercase tracking-widest ${getScoreColor(opportunity.overallScore)}`}>
+              Inertia: {opportunity.overallScore}/10
             </span>
           </div>
-          <h3 className="text-2xl font-bold text-white mb-2 leading-tight">{opportunity.problemStatement}</h3>
+          <h3 className="text-2xl lg:text-4xl font-black text-white mb-6 leading-[1.1] tracking-tighter">{opportunity.problemStatement}</h3>
 
-          <div className="flex flex-wrap gap-4 mt-6">
-            <div className="flex items-center space-x-2 bg-white/5 px-4 py-1.5 rounded-full border border-white/5">
-              <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Demand</span>
-              <span className={`text-sm font-bold ${getScoreColor(opportunity.demandSignal)}`}>{opportunity.demandSignal}/10</span>
+          <div className="flex flex-wrap gap-3">
+            <div className="flex items-center space-x-3 bg-white/5 px-4 py-2 rounded-2xl border border-white/5">
+              <span className="text-[10px] text-slate-500 uppercase tracking-widest font-black">Demand/Flux</span>
+              <span className={`text-sm font-black ${getScoreColor(opportunity.demandSignal)}`}>{opportunity.demandSignal}/10</span>
             </div>
-            <div className="flex items-center space-x-2 bg-white/5 px-4 py-1.5 rounded-full border border-white/5">
-              <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Readiness</span>
-              <span className={`text-sm font-bold ${getScoreColor(opportunity.marketReadiness)}`}>{opportunity.marketReadiness}/10</span>
-            </div>
-            <div className={`px-4 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-wider ${getDifficultyColor(opportunity.entryDifficulty)}`}>
-              Entry: {opportunity.entryDifficulty}
+            <div className="flex items-center space-x-3 bg-white/5 px-4 py-2 rounded-2xl border border-white/5">
+              <span className="text-[10px] text-slate-500 uppercase tracking-widest font-black">Market State</span>
+              <span className={`text-sm font-black ${getScoreColor(opportunity.marketReadiness)}`}>{opportunity.marketReadiness}/10</span>
             </div>
           </div>
         </div>
-        <button className="p-3 bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 transition-all ml-4">
+        <button className="p-2 lg:p-3 bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 transition-all ml-2 lg:ml-4 flex-shrink-0">
           {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
         </button>
       </div>
 
       {isExpanded && (
-        <div className="px-8 pb-10 border-t border-white/5 pt-8 animate-in slide-in-from-top-2 duration-300">
+        <div className="px-5 lg:px-8 pb-8 lg:pb-10 border-t border-white/5 pt-6 lg:pt-8 animate-in slide-in-from-top-2 duration-300">
           {/* Trend Data Banner */}
           {opportunity.trendData && (
-            <div className="mb-6 p-6 rounded-2xl bg-gradient-to-r from-violet-500/10 to-indigo-500/10 border border-violet-500/20">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="mb-10 p-6 lg:p-8 rounded-[2rem] bg-gradient-to-br from-violet-500/10 via-indigo-500/5 to-transparent border border-violet-500/20 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-violet-600/5 rounded-full blur-[60px] translate-x-1/3 -translate-y-1/3"></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
                 <div className="flex items-center space-x-4">
-                  <div className="bg-violet-500/20 p-3 rounded-xl">
-                    <Search className="w-6 h-6 text-violet-400" />
+                  <div className="bg-blue-500/20 p-3 rounded-xl">
+                    <Search className="w-6 h-6 text-blue-400" />
                   </div>
                   <div>
                     <div className="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Search Volume</div>
@@ -100,7 +100,7 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className={`p-3 rounded-xl ${opportunity.trendData.trend === 'rising' ? 'bg-emerald-500/20' :
-                      opportunity.trendData.trend === 'declining' ? 'bg-rose-500/20' : 'bg-slate-500/20'
+                    opportunity.trendData.trend === 'declining' ? 'bg-rose-500/20' : 'bg-slate-500/20'
                     }`}>
                     {opportunity.trendData.trend === 'rising' ? <TrendingUp className="w-6 h-6 text-emerald-400" /> :
                       opportunity.trendData.trend === 'declining' ? <TrendingDown className="w-6 h-6 text-rose-400" /> :
@@ -109,7 +109,7 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
                   <div>
                     <div className="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Growth Rate</div>
                     <div className={`text-lg font-bold ${opportunity.trendData.trend === 'rising' ? 'text-emerald-400' :
-                        opportunity.trendData.trend === 'declining' ? 'text-rose-400' : 'text-slate-400'
+                      opportunity.trendData.trend === 'declining' ? 'text-rose-400' : 'text-slate-400'
                       }`}>
                       {opportunity.trendData.growthRate}
                     </div>
@@ -117,8 +117,8 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider ${opportunity.trendData.trend === 'rising' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
-                      opportunity.trendData.trend === 'declining' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
-                        'bg-slate-500/20 text-slate-400 border border-slate-500/30'
+                    opportunity.trendData.trend === 'declining' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
+                      'bg-slate-500/20 text-slate-400 border border-slate-500/30'
                     }`}>
                     {opportunity.trendData.trend === 'rising' ? '📈 Rising Trend' :
                       opportunity.trendData.trend === 'declining' ? '📉 Declining' : '➡️ Stable'}
@@ -142,33 +142,33 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
 
           {/* Revenue & Market Overview */}
           {(opportunity.revenueEstimate || opportunity.marketSize) && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
               {opportunity.revenueEstimate && (
-                <div className="p-6 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl">
-                  <h5 className="flex items-center space-x-2 text-[10px] font-bold text-emerald-400 mb-3 uppercase tracking-widest">
-                    <DollarSign className="w-3 h-3" />
-                    <span>Revenue Potential (Year 1)</span>
+                <div className="p-8 bg-emerald-500/5 border border-emerald-500/10 rounded-[2rem]">
+                  <h5 className="flex items-center space-x-2 text-[10px] font-black text-emerald-400 mb-4 uppercase tracking-[0.2em]">
+                    <DollarSign className="w-4 h-4" />
+                    <span>Neuro-Revenue Potential</span>
                   </h5>
-                  <div className="text-2xl font-bold text-white mb-2">
+                  <div className="text-3xl font-black text-white mb-2">
                     {opportunity.revenueEstimate.low} - {opportunity.revenueEstimate.high}
                   </div>
-                  <p className="text-xs text-slate-400">{opportunity.revenueEstimate.confidence}</p>
+                  <p className="text-xs text-slate-500 font-medium uppercase tracking-widest">{opportunity.revenueEstimate.confidence}</p>
                 </div>
               )}
               {opportunity.marketSize && (
-                <div className="p-6 bg-blue-500/5 border border-blue-500/10 rounded-2xl">
-                  <h5 className="flex items-center space-x-2 text-[10px] font-bold text-blue-400 mb-3 uppercase tracking-widest">
-                    <BarChart2 className="w-3 h-3" />
-                    <span>Market Size</span>
+                <div className="p-8 bg-violet-500/5 border border-violet-500/10 rounded-[2rem]">
+                  <h5 className="flex items-center space-x-2 text-[10px] font-black text-violet-400 mb-4 uppercase tracking-[0.2em]">
+                    <BarChart2 className="w-4 h-4" />
+                    <span>Market Magnitude</span>
                   </h5>
-                  <div className="text-lg font-bold text-white">
+                  <div className="text-xl font-black text-white uppercase italic">
                     {opportunity.marketSize}
                   </div>
                 </div>
               )}
               {opportunity.targetAudience && (
-                <div className="p-6 bg-violet-500/5 border border-violet-500/10 rounded-2xl">
-                  <h5 className="flex items-center space-x-2 text-[10px] font-bold text-violet-400 mb-3 uppercase tracking-widest">
+                <div className="p-5 lg:p-6 bg-blue-500/5 border border-blue-500/10 rounded-2xl sm:col-span-2 lg:col-span-1">
+                  <h5 className="flex items-center space-x-2 text-[10px] font-bold text-blue-400 mb-3 uppercase tracking-widest">
                     <Users className="w-3 h-3" />
                     <span>Target Audience</span>
                   </h5>
@@ -183,7 +183,7 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-6">
               <div>
-                <h4 className="flex items-center space-x-2 text-xs font-bold text-violet-400 mb-4 uppercase tracking-widest">
+                <h4 className="flex items-center space-x-2 text-xs font-bold text-blue-400 mb-4 uppercase tracking-widest">
                   <Lightbulb className="w-4 h-4" />
                   <span>Why This Matters</span>
                 </h4>
@@ -216,7 +216,7 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
                 </h4>
                 <div className="space-y-3">
                   {opportunity.evidence.map((quote, i) => (
-                    <div key={i} className="p-4 bg-white/[0.02] rounded-2xl border-l-2 border-violet-500 italic text-slate-400 text-sm">
+                    <div key={i} className="p-4 bg-white/[0.02] rounded-2xl border-l-2 border-blue-500 italic text-slate-400 text-sm">
                       "{quote}"
                     </div>
                   ))}
@@ -277,8 +277,8 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
                   </div>
                 )}
                 {opportunity.estimatedStartupCost && (
-                  <div className="p-4 bg-violet-500/5 border border-violet-500/10 rounded-2xl">
-                    <h5 className="flex items-center space-x-2 text-[10px] font-bold text-violet-400 mb-2 uppercase tracking-widest">
+                  <div className="p-4 bg-blue-500/5 border border-blue-500/10 rounded-2xl">
+                    <h5 className="flex items-center space-x-2 text-[10px] font-bold text-blue-400 mb-2 uppercase tracking-widest">
                       <Wallet className="w-3 h-3" />
                       <span>Startup Cost</span>
                     </h5>
@@ -295,16 +295,16 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
                 <p className="text-slate-400 text-sm leading-relaxed">{opportunity.redFlags}</p>
               </div>
 
-              <div className="bg-violet-600/5 border border-violet-600/10 rounded-3xl p-6">
-                <h4 className="flex items-center space-x-2 text-xs font-bold text-violet-400 mb-4 uppercase tracking-widest">
+              <div className="bg-blue-600/5 border border-blue-600/10 rounded-3xl p-6">
+                <h4 className="flex items-center space-x-2 text-xs font-bold text-blue-400 mb-4 uppercase tracking-widest">
                   <Rocket className="w-4 h-4" />
                   <span>Recommended Next Steps</span>
                 </h4>
                 <ul className="space-y-3">
                   {opportunity.nextSteps.map((step, i) => (
                     <li key={i} className="flex items-start space-x-3 text-slate-300 text-sm">
-                      <div className="mt-1 bg-violet-500/20 p-1 rounded-full">
-                        <ArrowRight className="w-3 h-3 text-violet-400" />
+                      <div className="mt-1 bg-blue-500/20 p-1 rounded-full">
+                        <ArrowRight className="w-3 h-3 text-blue-400" />
                       </div>
                       <span>{step}</span>
                     </li>
@@ -321,51 +321,51 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
 
 const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
   return (
-    <div className="space-y-10">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+    <div className="space-y-6 lg:space-y-10">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
-          <div className="flex items-center space-x-2 text-slate-500 text-sm mb-2 font-medium">
+          <div className="flex items-center space-x-2 text-slate-500 text-xs lg:text-sm mb-2 font-medium">
             <Zap className="w-4 h-4 text-amber-400" />
             <span>Analysis Complete</span>
           </div>
-          <div className="flex items-baseline space-x-3">
-            <h2 className="text-3xl font-bold text-white">Market Report</h2>
-            <span className="text-slate-500 text-sm font-medium">for "{results.query}"</span>
+          <div className="flex flex-col sm:flex-row sm:items-baseline sm:space-x-3">
+            <h2 className="text-2xl lg:text-3xl font-bold text-white">Market Report</h2>
+            <span className="text-slate-500 text-xs lg:text-sm font-medium">for "{results.query}"</span>
           </div>
-          <p className="text-slate-400 text-sm max-w-2xl mt-2">{results.summary}</p>
+          <p className="text-slate-400 text-xs lg:text-sm max-w-2xl mt-2">{results.summary}</p>
         </div>
-        <div className="flex items-center space-x-3">
-          <button className="flex items-center space-x-2 bg-white/5 hover:bg-white/10 px-5 py-2.5 rounded-xl text-slate-300 transition-all text-sm font-semibold border border-white/5">
+        <div className="flex items-center space-x-3 w-full lg:w-auto">
+          <button className="flex-1 lg:flex-none flex items-center justify-center space-x-3 bg-white/5 hover:bg-white/10 px-8 py-4 rounded-2xl text-slate-300 transition-all text-xs font-black uppercase tracking-widest border border-white/5">
             <Download className="w-4 h-4" />
-            <span>Export</span>
+            <span>Export Data</span>
           </button>
           <button
             onClick={onNewSearch}
-            className="flex items-center space-x-2 bg-violet-600 hover:bg-violet-500 px-5 py-2.5 rounded-xl text-white transition-all text-sm font-semibold shadow-lg shadow-violet-900/20"
+            className="flex-1 lg:flex-none flex items-center justify-center space-x-3 bg-violet-600 hover:bg-violet-500 px-8 py-4 rounded-2xl text-white transition-all text-xs font-black uppercase tracking-widest shadow-xl shadow-violet-900/30"
           >
             <Target className="w-4 h-4" />
-            <span>New Search</span>
+            <span>New Discovery</span>
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="p-8 glass-card rounded-3xl group hover:border-violet-500/30">
-          <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-2 block">Data Points</span>
-          <div className="text-4xl font-bold text-white mb-2">482</div>
-          <div className="text-xs text-emerald-400 font-medium flex items-center bg-emerald-400/10 w-fit px-2 py-1 rounded">
-            <TrendingUp className="w-3 h-3 mr-1" /> High Confidence
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="p-8 bg-[#050608]/40 backdrop-blur-md rounded-[2.5rem] border border-white/5 group hover:border-violet-500/30 transition-all">
+          <span className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4 block">Intelligence Points</span>
+          <div className="text-5xl font-black text-white mb-4 italic tracking-tighter">482</div>
+          <div className="text-[10px] text-emerald-400 font-black uppercase tracking-widest flex items-center bg-emerald-400/10 w-fit px-3 py-1.5 rounded-full border border-emerald-500/20">
+            <TrendingUp className="w-3 h-3 mr-2" /> High Confidence
           </div>
         </div>
-        <div className="p-8 glass-card rounded-3xl group hover:border-violet-500/30">
-          <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-2 block">Discovery Strength</span>
-          <div className="text-4xl font-bold text-white mb-2">7.8</div>
-          <div className="text-xs text-slate-400 font-medium">/ 10.0 Composite Score</div>
+        <div className="p-8 bg-[#050608]/40 backdrop-blur-md rounded-[2.5rem] border border-white/5 group hover:border-violet-500/30 transition-all">
+          <span className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4 block">Discovery Strength</span>
+          <div className="text-5xl font-black text-white mb-4 italic tracking-tighter">7.8</div>
+          <div className="text-[10px] text-slate-500 font-black uppercase tracking-widest">/ 10.0 Analysis Score</div>
         </div>
-        <div className="p-8 glass-card rounded-3xl group hover:border-violet-500/30">
-          <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-2 block">Market Status</span>
-          <div className="text-4xl font-bold text-white mb-2">Valid</div>
-          <div className="text-xs text-violet-400 font-medium bg-violet-400/10 w-fit px-2 py-1 rounded">
+        <div className="p-8 bg-[#050608]/40 backdrop-blur-md rounded-[2.5rem] border border-white/5 group hover:border-violet-500/30 transition-all sm:col-span-2 lg:col-span-1">
+          <span className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4 block">Protocol Status</span>
+          <div className="text-5xl font-black text-white mb-4 italic tracking-tighter">Active</div>
+          <div className="text-[10px] text-violet-400 font-black uppercase tracking-widest bg-violet-400/10 w-fit px-3 py-1.5 rounded-full border border-violet-500/20">
             92% Consensus
           </div>
         </div>
