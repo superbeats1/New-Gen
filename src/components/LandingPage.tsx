@@ -218,6 +218,16 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
               </p>
             </GlassCard>
           </div>
+
+          <div className="text-center mt-12">
+            <button
+              onClick={onStart}
+              className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-8 rounded-xl transition-all shadow-lg shadow-blue-900/20 inline-flex items-center space-x-2"
+            >
+              <span>Start Discovering Opportunities</span>
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </section>
 

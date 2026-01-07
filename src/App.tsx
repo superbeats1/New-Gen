@@ -11,14 +11,11 @@ import {
   ArrowLeft,
   Briefcase,
   Zap,
-  BookmarkCheck,
-  LayoutDashboard,
   Globe,
   Terminal,
   Activity,
   Cpu,
   XCircle,
-  ShieldAlert,
   LogOut,
   CreditCard,
   User as UserIcon,
@@ -26,7 +23,8 @@ import {
   X,
   Sparkles,
   Menu,
-  Bell
+  Bell,
+  ShieldAlert
 } from 'lucide-react';
 import { WorkflowMode, AnalysisResult } from './types';
 import { analyzeQuery } from './geminiService';
@@ -71,7 +69,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
         <div className="min-h-screen bg-[#030407] text-white flex flex-col items-center justify-center p-8 text-center" style={{ zIndex: 9999, position: 'relative' }}>
           <ShieldAlert className="w-16 h-16 text-rose-500 mb-6 animate-pulse" />
           <h1 className="text-3xl font-black mb-4 uppercase italic">Neural Protocol Breach</h1>
-          <p className="text-slate-400 max-w-md mb-8">A terminal error occured in the UI layer. Protocol v2.6.0 diagnostic data follow:</p>
+          <p className="text-slate-400 max-w-md mb-8">A terminal error occured in the UI layer. Protocol v2.6.1 diagnostic data follow:</p>
           <div className="bg-slate-900/50 p-6 rounded-2xl border border-rose-500/20 text-left font-mono text-xs text-rose-400 max-w-2xl overflow-auto w-full">
             <div className="font-bold mb-2">Error: {error?.toString()}</div>
             <pre className="opacity-70 whitespace-pre-wrap">
@@ -115,7 +113,7 @@ const DiagnosticHub: React.FC<{ results: AnalysisResult | null; isSearching: boo
         <div className="flex justify-between"><span>Status:</span><span className={isSearching ? 'text-amber-400' : 'text-emerald-400'}>{isSearching ? 'Scanning...' : 'Idle'}</span></div>
         <div className="flex justify-between"><span>Real Data Count:</span><span className="text-white">{stats.realDataCount || 0}</span></div>
         <div className="flex justify-between"><span>Opportunities Found:</span><span className="text-white">{results?.opportunities?.length || 0}</span></div>
-        <div className="flex justify-between"><span>Engine Version:</span><span className="text-violet-400">v2.6.0</span></div>
+        <div className="flex justify-between"><span>Engine Version:</span><span className="text-violet-400">v2.6.1</span></div>
         <div className="pt-2 border-t border-white/5 max-h-40 overflow-auto">
           <div className="mb-2 text-slate-500 underline uppercase">Last System Log:</div>
           <div className="text-[8px] leading-tight text-slate-500">{stats.lastLog || 'System ready.'}</div>
@@ -185,9 +183,9 @@ const SearchingModule: React.FC<{ stepIndex: number; onStop: () => void }> = ({ 
 };
 
 const App: React.FC = () => {
-  // --- NUCLEAR PURGE ENGINE v2.5.0 ---
+  // --- NUCLEAR PURGE ENGINE v2.6.1 ---
   useEffect(() => {
-    const PURGE_KEY = 'SCOPA_PURGE_V2_6';
+    const PURGE_KEY = 'SCOPA_PURGE_V2_6_1';
     if (!localStorage.getItem(PURGE_KEY)) {
       console.log('🚨 NUCLEAR OPTION PURGE INITIATED: Clearing stale memory...');
       localStorage.clear();
@@ -245,6 +243,7 @@ const App: React.FC = () => {
   const [searchStep, setSearchStep] = useState(0);
   const [results, setResults] = useState<AnalysisResult | null>(null);
   const [showAlerts, setShowAlerts] = useState(false);
+  const [view, setView] = useState<'home' | 'results'>('home');
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [showSuccessPage, setShowSuccessPage] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -366,13 +365,14 @@ const App: React.FC = () => {
 
       await deductCredit();
       setResults(result);
+      setView('results');
     } catch (error: any) {
       setDiagStats(prev => ({ ...prev, lastLog: `FAILURE: ${error.message}` }));
       if (error.name === 'AbortError') {
         console.log("Search cancelled by user");
       } else {
         console.error("Search failed:", error);
-        alert("Something went wrong with the search. Please check your API key.");
+        alert("Something went wrong with the search. Please resolve the issues in the console.");
       }
     } finally {
       setIsSearching(false);
@@ -507,10 +507,10 @@ const App: React.FC = () => {
 
           <nav className="flex-1 space-y-2">
             <button
-              className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all ${!results ? 'bg-violet-600/20 text-white font-medium border border-violet-500/30' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
-              onClick={() => { setResults(null); setQuery(''); setIsMobileMenuOpen(false); }}
+              className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all ${view === 'home' ? 'bg-violet-600/20 text-white font-medium border border-violet-500/30' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
+              onClick={() => { setView('home'); setResults(null); setQuery(''); setIsMobileMenuOpen(false); }}
             >
-              <Search className={`w-5 h-5 ${!results ? 'text-violet-400' : ''}`} />
+              <Search className={`w-5 h-5 ${view === 'home' ? 'text-violet-400' : ''}`} />
               <span>Discover</span>
             </button>
 
@@ -521,7 +521,6 @@ const App: React.FC = () => {
               <History className="w-5 h-5" />
               <span>Alerts</span>
             </button>
-
 
             <div className="pt-8 pb-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-widest">
               Your Plan
@@ -567,9 +566,9 @@ const App: React.FC = () => {
                 <div className="text-xs font-bold text-white truncate">{profile?.first_name} {profile?.last_name}</div>
                 <div className="text-[10px] text-slate-400 truncate">{session?.user?.email}</div>
               </div>
+              {profile?.is_pro && <Crown className="w-3 h-3 text-amber-400 shrink-0" />}
             </div>
 
-            {/* TEMPORARY ADMIN BUTTON */}
             {!profile?.is_pro && (
               <button onClick={handleManualUpgrade} className="w-full text-[10px] text-slate-600 hover:text-amber-500 p-1 text-center">
                 (Admin: Upgrade)
@@ -585,7 +584,7 @@ const App: React.FC = () => {
             </button>
 
             <div className="pt-4 flex items-center justify-between px-4 opacity-50 hover:opacity-100 transition-opacity">
-              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Protocol v{(window as any).SCOPA_VERSION || '2.6.0'}</span>
+              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Protocol v{(window as any).SCOPA_VERSION || '2.6.1'}</span>
               <button
                 onClick={handleForceSync}
                 className="text-[9px] font-black text-violet-400 uppercase tracking-widest hover:text-violet-300 transition-colors"
@@ -609,7 +608,7 @@ const App: React.FC = () => {
               </button>
               <h1 className="text-lg lg:text-xl font-bold text-white tracking-tight">
                 {isSearching ? 'Neural Protocol' :
-                  !results ? 'Intelligence Hub' : 'Opportunity Analysis'}
+                  view === 'home' ? 'Intelligence Hub' : 'Opportunity Analysis'}
               </h1>
             </div>
 
@@ -622,12 +621,12 @@ const App: React.FC = () => {
           </header>
 
           <div className="flex-1 px-4 lg:px-10 pb-10">
-            {!results && (
+            {view === 'home' && !isSearching && (
               <div className="max-w-4xl mx-auto py-16">
                 <div className="text-center mb-12 lg:mb-20 space-y-6">
                   <div className="inline-flex items-center space-x-3 px-4 py-1.5 rounded-full bg-violet-600/10 border border-violet-500/20 mb-4 animate-in fade-in slide-in-from-bottom-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse"></span>
-                    <span className="text-[10px] font-black text-violet-400 uppercase tracking-[0.3em]">Protocol v2.6.0 Active</span>
+                    <span className="text-[10px] font-black text-violet-400 uppercase tracking-[0.3em]">Protocol v2.6.1 Active</span>
                   </div>
                   <h2 className="text-5xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] uppercase italic">
                     Scopa <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-400 to-violet-500">Intelligence</span>
@@ -637,90 +636,94 @@ const App: React.FC = () => {
                   </p>
                 </div>
 
-                {isSearching ? (
-                  <SearchingModule stepIndex={searchStep} onStop={stopSearch} />
-                ) : (
-                  <div className="relative group max-w-3xl mx-auto">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 via-indigo-500 to-violet-600 rounded-[2.5rem] blur opacity-20 group-focus-within:opacity-50 transition duration-1000 animate-pulse-glow"></div>
-                    <form onSubmit={handleSearch} className="relative bg-[#050608]/80 backdrop-blur-xl border border-white/10 rounded-[2.2rem] p-1 shadow-2xl">
-                      <div className="bg-[#050608]/50 rounded-[2rem] p-6 lg:p-8">
-                        <textarea
-                          value={query}
-                          onChange={(e) => setQuery(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !e.shiftKey) {
-                              e.preventDefault();
-                              handleSearch(e);
-                            }
-                          }}
-                          placeholder="Describe your target market or ideal lead..."
-                          className="w-full bg-transparent border-none focus:ring-0 text-lg lg:text-xl text-white placeholder-slate-600 resize-none min-h-[120px]"
-                        />
-                        <div className="flex items-center justify-between pt-6 mt-2 border-t border-white/5">
-                          <div className="flex flex-wrap gap-2 lg:gap-3">
-                            <button type="button" className="glass-panel px-3 py-1.5 rounded-full text-[10px] lg:text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors flex items-center space-x-1.5">
-                              <Globe className="w-3 h-3" />
-                              <span>Global</span>
-                            </button>
-                            <button type="button" className="glass-panel px-3 py-1.5 rounded-full text-[10px] lg:text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors flex items-center space-x-1.5">
-                              <Target className="w-3 h-3" />
-                              <span>High Intent</span>
-                            </button>
-                          </div>
-                          <button
-                            type="submit"
-                            disabled={!query.trim()}
-                            className="bg-violet-600 text-white hover:bg-violet-500 disabled:bg-slate-700 disabled:text-slate-500 font-black px-8 lg:px-12 py-3 lg:py-4 rounded-2xl transition-all shadow-xl shadow-violet-600/20 flex items-center space-x-3 uppercase tracking-tighter"
-                          >
-                            <Zap className="w-5 h-5 fill-white" />
-                            <span className="hidden sm:inline">Start Neuro-Scan</span>
-                            <span className="sm:hidden">Scan</span>
+                <div className="relative group max-w-3xl mx-auto">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 via-indigo-500 to-violet-600 rounded-[2.5rem] blur opacity-20 group-focus-within:opacity-50 transition duration-1000 animate-pulse-glow"></div>
+                  <form onSubmit={handleSearch} className="relative bg-[#050608]/80 backdrop-blur-xl border border-white/10 rounded-[2.2rem] p-1 shadow-2xl">
+                    <div className="bg-[#050608]/50 rounded-[2rem] p-6 lg:p-8">
+                      <textarea
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSearch(e);
+                          }
+                        }}
+                        placeholder="Describe your target market or ideal lead..."
+                        className="w-full bg-transparent border-none focus:ring-0 text-lg lg:text-xl text-white placeholder-slate-600 resize-none min-h-[120px]"
+                      />
+                      <div className="flex items-center justify-between pt-6 mt-2 border-t border-white/5">
+                        <div className="flex flex-wrap gap-2 lg:gap-3">
+                          <button type="button" className="glass-panel px-3 py-1.5 rounded-full text-[10px] lg:text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors flex items-center space-x-1.5">
+                            <Globe className="w-3 h-3" />
+                            <span>Global</span>
                           </button>
+                          <button type="button" className="glass-panel px-3 py-1.5 rounded-full text-[10px] lg:text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors flex items-center space-x-1.5">
+                            <Target className="w-3 h-3" />
+                            <span>High Intent</span>
+                          </button>
+                          <div className="flex items-center space-x-2 text-xs text-slate-500 font-medium ml-auto hidden sm:flex">
+                            <kbd className="px-2 py-1 text-xs font-mono bg-slate-800/50 border border-slate-700/50 rounded">Enter</kbd>
+                            <span>to scan</span>
+                          </div>
                         </div>
+                        <button
+                          type="submit"
+                          disabled={!query.trim()}
+                          className="bg-violet-600 text-white hover:bg-violet-500 disabled:bg-slate-700 disabled:text-slate-500 font-black px-8 lg:px-12 py-3 lg:py-4 rounded-2xl transition-all shadow-xl shadow-violet-600/20 flex items-center space-x-3 uppercase tracking-tighter"
+                        >
+                          <Zap className="w-5 h-5 fill-white" />
+                          <span className="hidden sm:inline">Start Neuro-Scan</span>
+                          <span className="sm:hidden">Scan</span>
+                        </button>
                       </div>
-                    </form>
-                  </div>
-                )}
-
-                {!isSearching && (
-                  <div className="mt-24 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                    <div
-                      className="group bg-[#050608]/40 backdrop-blur-2xl p-12 rounded-[3.5rem] cursor-pointer hover:bg-white/[0.04] transition-all border border-white/5 hover:border-violet-500/30 w-full text-left relative overflow-hidden"
-                      onClick={() => setQuery("Find emerging opportunities in the AI-powered health-tech space for 2026")}
-                    >
-                      <div className="absolute top-0 right-0 w-64 h-64 bg-violet-600/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
-                      <div className="w-16 h-16 rounded-2xl bg-violet-500/10 flex items-center justify-center mb-10 border border-violet-500/20 group-hover:scale-110 transition-transform">
-                        <Zap className="w-8 h-8 text-violet-400 fill-violet-400/20" />
-                      </div>
-                      <h3 className="text-3xl font-black text-white mb-4 tracking-tighter uppercase italic">Strategic Pulse</h3>
-                      <p className="text-slate-500 text-lg leading-relaxed font-medium">
-                        Identify high-velocity market gaps with predictive intelligence.
-                      </p>
                     </div>
+                  </form>
+                </div>
 
-                    <div
-                      className="group bg-[#050608]/40 backdrop-blur-2xl p-12 rounded-[3.5rem] cursor-pointer hover:bg-white/[0.04] transition-all border border-white/5 hover:border-emerald-500/30 w-full text-left relative overflow-hidden"
-                      onClick={() => setShowAlerts(true)}
-                    >
-                      <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-600/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
-                      <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-10 border border-emerald-500/20 group-hover:scale-110 transition-transform">
-                        <Bell className="w-8 h-8 text-emerald-400" />
-                      </div>
-                      <h3 className="text-3xl font-black text-white mb-4 tracking-tighter uppercase italic">Neural Monitors</h3>
-                      <p className="text-slate-500 text-lg leading-relaxed font-medium">
-                        Set automated shadows to track market movements 24/7.
-                      </p>
+                <div className="mt-24 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                  <div
+                    className="group bg-[#050608]/40 backdrop-blur-2xl p-12 rounded-[3.5rem] cursor-pointer hover:bg-white/[0.04] transition-all border border-white/5 hover:border-violet-500/30 w-full text-left relative overflow-hidden"
+                    onClick={() => { setQuery("Find emerging opportunities in the AI-powered health-tech space for 2026"); setView('home'); }}
+                  >
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-violet-600/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
+                    <div className="w-16 h-16 rounded-2xl bg-violet-500/10 flex items-center justify-center mb-10 border border-violet-500/20 group-hover:scale-110 transition-transform">
+                      <Zap className="w-8 h-8 text-violet-400 fill-violet-400/20" />
                     </div>
+                    <h3 className="text-3xl font-black text-white mb-4 tracking-tighter uppercase italic">Strategic Pulse</h3>
+                    <p className="text-slate-500 text-lg leading-relaxed font-medium">
+                      Identify high-velocity market gaps with predictive intelligence.
+                    </p>
                   </div>
-                )}
+
+                  <div
+                    className="group bg-[#050608]/40 backdrop-blur-2xl p-12 rounded-[3.5rem] cursor-pointer hover:bg-white/[0.04] transition-all border border-white/5 hover:border-emerald-500/30 w-full text-left relative overflow-hidden"
+                    onClick={() => setShowAlerts(true)}
+                  >
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-600/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
+                    <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-10 border border-emerald-500/20 group-hover:scale-110 transition-transform">
+                      <Bell className="w-8 h-8 text-emerald-400" />
+                    </div>
+                    <h3 className="text-3xl font-black text-white mb-4 tracking-tighter uppercase italic">Neural Monitors</h3>
+                    <p className="text-slate-500 text-lg leading-relaxed font-medium">
+                      Set automated shadows to track market movements 24/7.
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
 
-            {results && !isSearching && (
+            {isSearching && (
+              <div className="max-w-4xl mx-auto py-16">
+                <SearchingModule stepIndex={searchStep} onStop={stopSearch} />
+              </div>
+            )}
+
+            {view === 'results' && results && !isSearching && (
               <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <OpportunityView
                   results={results}
-                  onNewSearch={() => { setResults(null); setQuery(''); }}
+                  onNewSearch={() => { setView('home'); setResults(null); setQuery(''); }}
                 />
               </div>
             )}
