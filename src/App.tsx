@@ -437,7 +437,7 @@ const App: React.FC = () => {
           </button>
 
           <div className="pt-4 flex items-center justify-between px-4 opacity-50 hover:opacity-100 transition-opacity">
-            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Protocol v{(window as any).SCOPA_VERSION || '1.9.0'}</span>
+            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Protocol v{(window as any).SCOPA_VERSION || '2.0.0'}</span>
             <button
               onClick={() => window.location.reload()}
               className="text-[9px] font-black text-violet-400 uppercase tracking-widest hover:text-violet-300 transition-colors"
