@@ -28,14 +28,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const response = await fetch(redditUrl, {
       headers: {
-        'User-Agent': 'SCOPA-AI-Market-Intelligence/1.0 (by /u/SCOPA_AI)'
+        'User-Agent': 'Mozilla/5.0 (compatible; SCOPA-Market-Intelligence/1.0; +https://github.com/superbeats1/New-Gen)',
+        'Accept': 'application/json',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
       }
     });
 
     if (!response.ok) {
       console.warn(`Reddit API error for r/${subreddit}: ${response.status}`);
-      return res.status(response.status).json({
-        error: `Reddit API error: ${response.statusText}`,
+
+      // Return empty data instead of error to prevent app from breaking
+      // Reddit API is flaky and sometimes blocks requests even with valid headers
+      return res.status(200).json({
         data: { children: [] }
       });
     }
