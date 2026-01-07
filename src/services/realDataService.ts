@@ -368,13 +368,15 @@ export class RealDataCollector {
 
   // Deprecated naive matcher
   private matchesQuery(text: string, query: string): boolean {
+    if (!text || !query) return false;
     const queryWords = query.toLowerCase().split(' ');
-    return queryWords.some(word => text.includes(word.toLowerCase()));
+    return queryWords.some(word => text.toLowerCase().includes(word.toLowerCase()));
   }
 
   private containsLeadIndicators(text: string, mode: WorkflowMode): boolean {
+    if (!text) return false;
     const keywords = mode === WorkflowMode.LEAD ? LEAD_KEYWORDS : OPPORTUNITY_KEYWORDS;
-    return keywords.some(keyword => text.includes(keyword.toLowerCase()));
+    return keywords.some(keyword => text.toLowerCase().includes(keyword.toLowerCase()));
   }
 
   private extractRequestSummary(title: string, body?: string): string {
