@@ -435,6 +435,16 @@ const App: React.FC = () => {
             <LogOut className="w-4 h-4" />
             <span className="text-sm">Sign Out</span>
           </button>
+
+          <div className="pt-4 flex items-center justify-between px-4 opacity-50 hover:opacity-100 transition-opacity">
+            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Protocol v{(window as any).SCOPA_VERSION || '1.8.0'}</span>
+            <button
+              onClick={() => window.location.reload()}
+              className="text-[9px] font-black text-violet-400 uppercase tracking-widest hover:text-violet-300 transition-colors"
+            >
+              Force Sync
+            </button>
+          </div>
         </div>
       </aside>
 
