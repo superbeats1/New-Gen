@@ -90,8 +90,8 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
               <div className="absolute top-0 right-0 w-64 h-64 bg-violet-600/5 rounded-full blur-[60px] translate-x-1/3 -translate-y-1/3"></div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
                 <div className="flex items-center space-x-4">
-                  <div className="bg-blue-500/20 p-3 rounded-xl">
-                    <Search className="w-6 h-6 text-blue-400" />
+                  <div className="bg-violet-500/20 p-3 rounded-xl">
+                    <Search className="w-6 h-6 text-violet-400" />
                   </div>
                   <div>
                     <div className="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Search Volume</div>
@@ -167,8 +167,8 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
                 </div>
               )}
               {opportunity.targetAudience && (
-                <div className="p-5 lg:p-6 bg-blue-500/5 border border-blue-500/10 rounded-2xl sm:col-span-2 lg:col-span-1">
-                  <h5 className="flex items-center space-x-2 text-[10px] font-bold text-blue-400 mb-3 uppercase tracking-widest">
+                <div className="p-5 lg:p-6 bg-violet-500/5 border border-violet-500/10 rounded-2xl sm:col-span-2 lg:col-span-1">
+                  <h5 className="flex items-center space-x-2 text-[10px] font-bold text-violet-400 mb-3 uppercase tracking-widest">
                     <Users className="w-3 h-3" />
                     <span>Target Audience</span>
                   </h5>
@@ -183,7 +183,7 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-6">
               <div>
-                <h4 className="flex items-center space-x-2 text-xs font-bold text-blue-400 mb-4 uppercase tracking-widest">
+                <h4 className="flex items-center space-x-2 text-xs font-bold text-violet-400 mb-4 uppercase tracking-widest">
                   <Lightbulb className="w-4 h-4" />
                   <span>Why This Matters</span>
                 </h4>
@@ -216,7 +216,7 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
                 </h4>
                 <div className="space-y-3">
                   {opportunity.evidence.map((quote, i) => (
-                    <div key={i} className="p-4 bg-white/[0.02] rounded-2xl border-l-2 border-blue-500 italic text-slate-400 text-sm">
+                    <div key={i} className="p-4 bg-white/[0.02] rounded-2xl border-l-2 border-violet-500 italic text-slate-400 text-sm">
                       "{quote}"
                     </div>
                   ))}
@@ -268,8 +268,8 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
 
               <div className="grid grid-cols-2 gap-4">
                 {opportunity.timeToMarket && (
-                  <div className="p-4 bg-blue-500/5 border border-blue-500/10 rounded-2xl">
-                    <h5 className="flex items-center space-x-2 text-[10px] font-bold text-blue-400 mb-2 uppercase tracking-widest">
+                  <div className="p-4 bg-violet-500/5 border border-violet-500/10 rounded-2xl">
+                    <h5 className="flex items-center space-x-2 text-[10px] font-bold text-violet-400 mb-2 uppercase tracking-widest">
                       <Clock className="w-3 h-3" />
                       <span>Time to Market</span>
                     </h5>
@@ -277,8 +277,8 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
                   </div>
                 )}
                 {opportunity.estimatedStartupCost && (
-                  <div className="p-4 bg-blue-500/5 border border-blue-500/10 rounded-2xl">
-                    <h5 className="flex items-center space-x-2 text-[10px] font-bold text-blue-400 mb-2 uppercase tracking-widest">
+                  <div className="p-4 bg-violet-500/5 border border-violet-500/10 rounded-2xl">
+                    <h5 className="flex items-center space-x-2 text-[10px] font-bold text-violet-400 mb-2 uppercase tracking-widest">
                       <Wallet className="w-3 h-3" />
                       <span>Startup Cost</span>
                     </h5>
@@ -295,16 +295,16 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
                 <p className="text-slate-400 text-sm leading-relaxed">{opportunity.redFlags}</p>
               </div>
 
-              <div className="bg-blue-600/5 border border-blue-600/10 rounded-3xl p-6">
-                <h4 className="flex items-center space-x-2 text-xs font-bold text-blue-400 mb-4 uppercase tracking-widest">
+              <div className="bg-violet-600/5 border border-violet-600/10 rounded-3xl p-6">
+                <h4 className="flex items-center space-x-2 text-xs font-bold text-violet-400 mb-4 uppercase tracking-widest">
                   <Rocket className="w-4 h-4" />
                   <span>Recommended Next Steps</span>
                 </h4>
                 <ul className="space-y-3">
                   {opportunity.nextSteps.map((step, i) => (
                     <li key={i} className="flex items-start space-x-3 text-slate-300 text-sm">
-                      <div className="mt-1 bg-blue-500/20 p-1 rounded-full">
-                        <ArrowRight className="w-3 h-3 text-blue-400" />
+                      <div className="mt-1 bg-violet-500/20 p-1 rounded-full">
+                        <ArrowRight className="w-3 h-3 text-violet-400" />
                       </div>
                       <span>{step}</span>
                     </li>

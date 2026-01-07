@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { WorkflowMode, AnalysisResult } from "./types";
 import { RealDataCollector } from "./services/realDataService";
 
@@ -7,7 +7,7 @@ const apiKey = import.meta.env.VITE_GEMINI_API_KEY ||
   import.meta.env.VITE_GOOGLE_API_KEY ||
   import.meta.env.GEMINI_API_KEY;
 
-let genAIInstance: GoogleGenAI | null = null;
+let genAIInstance: GoogleGenerativeAI | null = null;
 let realDataCollector: RealDataCollector | null = null;
 
 const getGenAI = () => {
@@ -16,7 +16,7 @@ const getGenAI = () => {
       console.error('All environment variables:', import.meta.env);
       throw new Error(`VITE_GEMINI_API_KEY environment variable is not set.`);
     }
-    genAIInstance = new GoogleGenAI({ apiKey });
+    genAIInstance = new GoogleGenerativeAI(apiKey);
   }
   return genAIInstance;
 };
@@ -104,15 +104,16 @@ IMPORTANT:
 `;
 
   try {
-    const response = await getGenAI().models.generateContent({
-      model: "gemini-3-pro-preview",
-      contents: prompt,
-      config: {
+    const result = await getGenAI().getGenerativeModel({ model: "gemini-1.5-pro" }).generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: {
         responseMimeType: "application/json"
       }
     });
 
-    const text = response.text.replace(/```json\n?|\n?```/g, '').trim();
+    const response = await result.response;
+    const responseText = response.text();
+    const text = responseText.replace(/```json\n?|\n?```/g, '').trim();
     const leads = JSON.parse(text);
 
     // Mark as AI-generated for transparency
@@ -154,15 +155,16 @@ Return ONLY valid JSON array:
 `;
 
   try {
-    const response = await getGenAI().models.generateContent({
-      model: "gemini-3-pro-preview",
-      contents: prompt,
-      config: {
+    const result = await getGenAI().getGenerativeModel({ model: "gemini-1.5-pro" }).generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: {
         responseMimeType: "application/json"
       }
     });
 
-    const text = response.text.replace(/```json\n?|\n?```/g, '').trim();
+    const response = await result.response;
+    const responseText = response.text();
+    const text = responseText.replace(/```json\n?|\n?```/g, '').trim();
     return JSON.parse(text);
   } catch (error) {
     console.error('Failed to generate opportunities:', error);
@@ -194,12 +196,9 @@ Requirements:
 Return only the message text, no extra formatting.
 `;
 
-    const response = await getGenAI().models.generateContent({
-      model: "gemini-3-pro-preview",
-      contents: prompt
-    });
-
-    return response.text;
+    const result = await getGenAI().getGenerativeModel({ model: "gemini-1.5-pro" }).generateContent(prompt);
+    const response = await result.response;
+    return response.text();
   } catch (error) {
     console.error('Gemini API Error:', error);
     throw new Error('Failed to generate outreach message.');
@@ -233,16 +232,16 @@ Return ONLY valid JSON in this format:
 }
 `;
 
-    const response = await getGenAI().models.generateContent({
-      model: "gemini-3-pro-preview",
-      contents: prompt,
-      config: {
+    const result = await getGenAI().getGenerativeModel({ model: "gemini-1.5-pro" }).generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: {
         responseMimeType: "application/json"
       }
     });
 
-    // Clean and parse JSON
-    const text = response.text;
+    const response = await result.response;
+    const responseText = response.text();
+    const text = responseText;
     const cleanText = text.replace(/```json\n?|\n?```/g, '').trim();
     return JSON.parse(cleanText);
   } catch (error) {

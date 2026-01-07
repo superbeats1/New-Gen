@@ -53,35 +53,35 @@ const SearchingModule: React.FC<{ stepIndex: number; onStop: () => void }> = ({ 
   return (
     <div className="glass-panel rounded-3xl p-10 relative overflow-hidden animate-in zoom-in-95 duration-500 max-w-2xl mx-auto">
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent shadow-[0_0_20px_rgba(139,92,246,0.5)] animate-scanning-line"></div>
+        <div className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-violet-500 to-transparent shadow-[0_0_20px_rgba(139,92,246,0.5)] animate-scanning-line"></div>
       </div>
 
       <div className="relative z-10 flex flex-col items-center space-y-10">
         <div className="relative">
-          <div className="absolute -inset-8 bg-blue-600/20 blur-3xl rounded-full animate-pulse"></div>
-          <div className="relative glass-card p-6 rounded-full border border-blue-500/30">
-            <Cpu className="w-12 h-12 text-blue-400 animate-spin-slow" />
+          <div className="absolute -inset-8 bg-violet-600/20 blur-3xl rounded-full animate-pulse"></div>
+          <div className="relative glass-card p-6 rounded-full border border-violet-500/30">
+            <Cpu className="w-12 h-12 text-violet-400 animate-spin-slow" />
           </div>
         </div>
 
         <div className="w-full space-y-6">
           <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
             <span className="flex items-center space-x-2">
-              <Activity className="w-4 h-4 text-blue-500" />
+              <Activity className="w-4 h-4 text-violet-500" />
               <span>Neural Processing</span>
             </span>
-            <span className="text-blue-300">{Math.round(((stepIndex + 1) / SEARCH_STEPS.length) * 100)}%</span>
+            <span className="text-violet-300">{Math.round(((stepIndex + 1) / SEARCH_STEPS.length) * 100)}%</span>
           </div>
 
           <div className="h-2 w-full bg-slate-800/50 rounded-full overflow-hidden border border-white/5">
             <div
-              className="h-full bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(139,92,246,0.5)]"
+              className="h-full bg-gradient-to-r from-violet-600 to-indigo-600 transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(139,92,246,0.5)]"
               style={{ width: `${((stepIndex + 1) / SEARCH_STEPS.length) * 100}%` }}
             ></div>
           </div>
 
           <div className="flex items-center justify-center space-x-3 text-slate-400 font-mono text-xs h-6 overflow-hidden">
-            <Terminal className="w-4 h-4 text-blue-500 shrink-0" />
+            <Terminal className="w-4 h-4 text-violet-500 shrink-0" />
             <span className="truncate animate-pulse">{SEARCH_STEPS[stepIndex]}</span>
           </div>
         </div>
