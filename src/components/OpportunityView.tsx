@@ -57,7 +57,7 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
       >
         <div className="flex-1">
           <div className="flex items-center space-x-3 mb-3">
-            <span className="text-[10px] font-bold bg-violet-600 text-white px-2 py-0.5 rounded uppercase tracking-wider">Signal #{index + 1}</span>
+            <span className="text-[10px] font-bold bg-blue-600 text-white px-2 py-0.5 rounded uppercase tracking-wider">Signal #{index + 1}</span>
             <span className={`text-sm font-bold ${getScoreColor(opportunity.overallScore)}`}>
               Score: {opportunity.overallScore}/10
             </span>
@@ -99,32 +99,29 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
                   </div>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <div className={`p-3 rounded-xl ${
-                    opportunity.trendData.trend === 'rising' ? 'bg-emerald-500/20' :
-                    opportunity.trendData.trend === 'declining' ? 'bg-rose-500/20' : 'bg-slate-500/20'
-                  }`}>
+                  <div className={`p-3 rounded-xl ${opportunity.trendData.trend === 'rising' ? 'bg-emerald-500/20' :
+                      opportunity.trendData.trend === 'declining' ? 'bg-rose-500/20' : 'bg-slate-500/20'
+                    }`}>
                     {opportunity.trendData.trend === 'rising' ? <TrendingUp className="w-6 h-6 text-emerald-400" /> :
-                     opportunity.trendData.trend === 'declining' ? <TrendingDown className="w-6 h-6 text-rose-400" /> :
-                     <Minus className="w-6 h-6 text-slate-400" />}
+                      opportunity.trendData.trend === 'declining' ? <TrendingDown className="w-6 h-6 text-rose-400" /> :
+                        <Minus className="w-6 h-6 text-slate-400" />}
                   </div>
                   <div>
                     <div className="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Growth Rate</div>
-                    <div className={`text-lg font-bold ${
-                      opportunity.trendData.trend === 'rising' ? 'text-emerald-400' :
-                      opportunity.trendData.trend === 'declining' ? 'text-rose-400' : 'text-slate-400'
-                    }`}>
+                    <div className={`text-lg font-bold ${opportunity.trendData.trend === 'rising' ? 'text-emerald-400' :
+                        opportunity.trendData.trend === 'declining' ? 'text-rose-400' : 'text-slate-400'
+                      }`}>
                       {opportunity.trendData.growthRate}
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <div className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider ${
-                    opportunity.trendData.trend === 'rising' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
-                    opportunity.trendData.trend === 'declining' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
-                    'bg-slate-500/20 text-slate-400 border border-slate-500/30'
-                  }`}>
+                  <div className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider ${opportunity.trendData.trend === 'rising' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                      opportunity.trendData.trend === 'declining' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
+                        'bg-slate-500/20 text-slate-400 border border-slate-500/30'
+                    }`}>
                     {opportunity.trendData.trend === 'rising' ? '📈 Rising Trend' :
-                     opportunity.trendData.trend === 'declining' ? '📉 Declining' : '➡️ Stable'}
+                      opportunity.trendData.trend === 'declining' ? '📉 Declining' : '➡️ Stable'}
                   </div>
                 </div>
               </div>
@@ -361,7 +358,7 @@ const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
           </div>
         </div>
         <div className="p-8 glass-card rounded-3xl group hover:border-violet-500/30">
-          <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-2 block">Signal Strength</span>
+          <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-2 block">Discovery Strength</span>
           <div className="text-4xl font-bold text-white mb-2">7.8</div>
           <div className="text-xs text-slate-400 font-medium">/ 10.0 Composite Score</div>
         </div>
