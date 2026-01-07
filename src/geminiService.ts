@@ -113,7 +113,7 @@ async function generateSupplementalLeads(query: string, count: number): Promise<
 Generate ${count} realistic leads...`; // Prompt truncated for clarity in replacement chunk
 
   try {
-    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1' });
+    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash-latest" }, { apiVersion: 'v1' });
     const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }]
     });
@@ -221,7 +221,7 @@ IMPORTANT:
 `;
 
   try {
-    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1' });
+    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash-latest" }, { apiVersion: 'v1' });
     const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }]
     });
@@ -293,7 +293,7 @@ Requirements:
 Return only the message text, no extra formatting.
 `;
 
-    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1' });
+    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash-latest" }, { apiVersion: 'v1' });
     const result = await model.generateContent(prompt);
     const response = await result.response;
     return response.text() || '';
@@ -330,7 +330,7 @@ Return ONLY valid JSON in this format:
 }
 `;
 
-    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1' });
+    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash-latest" }, { apiVersion: 'v1' });
     const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }]
     });

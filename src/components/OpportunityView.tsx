@@ -397,7 +397,9 @@ const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
             <div className="w-[1px] h-8 bg-white/10"></div>
             <div className="flex flex-col">
               <span className="text-[9px] text-slate-500 uppercase tracking-widest font-black mb-1">Query Resolution</span>
-              <span className="text-2xl font-black text-emerald-400">Stable</span>
+              <span className={`text-2xl font-black ${(results.opportunities?.length || 0) > 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                {(results.opportunities?.length || 0) > 0 ? 'Stable' : 'Degraded'}
+              </span>
             </div>
             <div className="w-[1px] h-8 bg-white/10"></div>
             <div className="flex flex-col">

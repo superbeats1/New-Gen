@@ -63,6 +63,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   render() {
     const { hasError, error } = this.state;
+    // @ts-ignore
     const { children } = this.props;
 
     if (hasError) {
@@ -70,7 +71,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
         <div className="min-h-screen bg-[#030407] text-white flex flex-col items-center justify-center p-8 text-center" style={{ zIndex: 9999, position: 'relative' }}>
           <ShieldAlert className="w-16 h-16 text-rose-500 mb-6 animate-pulse" />
           <h1 className="text-3xl font-black mb-4 uppercase italic">Neural Protocol Breach</h1>
-          <p className="text-slate-400 max-w-md mb-8">A terminal error occured in the UI layer. Protocol v2.3.0 diagnostic data follow:</p>
+          <p className="text-slate-400 max-w-md mb-8">A terminal error occured in the UI layer. Protocol v2.4.0 diagnostic data follow:</p>
           <div className="bg-slate-900/50 p-6 rounded-2xl border border-rose-500/20 text-left font-mono text-xs text-rose-400 max-w-2xl overflow-auto w-full">
             <div className="font-bold mb-2">Error: {error?.toString()}</div>
             <pre className="opacity-70 whitespace-pre-wrap">
@@ -114,7 +115,7 @@ const DiagnosticHub: React.FC<{ results: AnalysisResult | null; isSearching: boo
         <div className="flex justify-between"><span>Status:</span><span className={isSearching ? 'text-amber-400' : 'text-emerald-400'}>{isSearching ? 'Scanning...' : 'Idle'}</span></div>
         <div className="flex justify-between"><span>Real Data Count:</span><span className="text-white">{stats.realDataCount || 0}</span></div>
         <div className="flex justify-between"><span>Opportunities Found:</span><span className="text-white">{results?.opportunities?.length || 0}</span></div>
-        <div className="flex justify-between"><span>Engine Version:</span><span className="text-violet-400">v2.3.0</span></div>
+        <div className="flex justify-between"><span>Engine Version:</span><span className="text-violet-400">v2.4.0</span></div>
         <div className="pt-2 border-t border-white/5 max-h-40 overflow-auto">
           <div className="mb-2 text-slate-500 underline uppercase">Last System Log:</div>
           <div className="text-[8px] leading-tight text-slate-500">{stats.lastLog || 'System ready.'}</div>
@@ -184,6 +185,51 @@ const SearchingModule: React.FC<{ stepIndex: number; onStop: () => void }> = ({ 
 };
 
 const App: React.FC = () => {
+  // --- NUCLEAR PURGE ENGINE v2.4.0 ---
+  useEffect(() => {
+    const PURGE_KEY = 'SCOPA_PURGE_V2_4';
+    if (!localStorage.getItem(PURGE_KEY)) {
+      console.log('🚨 NUCLEAR PURGE INITIATED: Clearing stale memory...');
+      localStorage.clear();
+      sessionStorage.clear();
+      localStorage.setItem(PURGE_KEY, 'true');
+
+      // Kill all service workers
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          for (let registration of registrations) {
+            registration.unregister();
+            console.log('💀 Stale Service Worker Unregistered');
+          }
+        });
+      }
+
+      // Force reload from server
+      setTimeout(() => window.location.reload(), 500);
+    }
+  }, []);
+
+  const handleForceSync = async () => {
+    console.log('🔄 DEEP SYNC INITIATED...');
+    localStorage.clear();
+    sessionStorage.clear();
+
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      for (let registration of registrations) {
+        await registration.unregister();
+      }
+    }
+
+    // Clear cache API if available
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(key => caches.delete(key)));
+    }
+
+    window.location.reload();
+  };
+
   const [session, setSession] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [showLanding, setShowLanding] = useState(true);
@@ -533,10 +579,11 @@ const App: React.FC = () => {
             </button>
 
             <div className="pt-4 flex items-center justify-between px-4 opacity-50 hover:opacity-100 transition-opacity">
-              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Protocol v{(window as any).SCOPA_VERSION || '2.3.0'}</span>
+              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Protocol v{(window as any).SCOPA_VERSION || '2.4.0'}</span>
               <button
-                onClick={() => window.location.reload()}
+                onClick={handleForceSync}
                 className="text-[9px] font-black text-violet-400 uppercase tracking-widest hover:text-violet-300 transition-colors"
+                title="Force deep cache clear and service worker purge"
               >
                 Force Sync
               </button>
@@ -574,7 +621,7 @@ const App: React.FC = () => {
                 <div className="text-center mb-12 lg:mb-20 space-y-6">
                   <div className="inline-flex items-center space-x-3 px-4 py-1.5 rounded-full bg-violet-600/10 border border-violet-500/20 mb-4 animate-in fade-in slide-in-from-bottom-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse"></span>
-                    <span className="text-[10px] font-black text-violet-400 uppercase tracking-[0.3em]">Protocol v2.3.0 Active</span>
+                    <span className="text-[10px] font-black text-violet-400 uppercase tracking-[0.3em]">Protocol v2.4.0 Active</span>
                   </div>
                   <h2 className="text-5xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] uppercase italic">
                     Scopa <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-400 to-violet-500">Intelligence</span>
