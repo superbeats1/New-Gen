@@ -182,18 +182,22 @@ export class RealDataCollector {
 
     try {
       for (const subreddit of subreddits.slice(0, 6)) { // Increased to 6 subreddits per query
-        const url = `${DATA_SOURCES.reddit.baseUrl}/${subreddit}/new.json?limit=25`;
-
         console.log(`Scanning Reddit r/${subreddit} for: ${query}`);
 
-        const response = await fetch(url, {
+        // Call our server-side Reddit API proxy
+        const response = await fetch('/api/reddit', {
+          method: 'POST',
           headers: {
-            'User-Agent': 'SIGNAL-LeadDiscovery/1.0'
-          }
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            subreddit: subreddit,
+            limit: 25
+          })
         });
 
         if (!response.ok) {
-          console.warn(`Reddit API error for r/${subreddit}: ${response.status}`);
+          console.warn(`Reddit API proxy error for r/${subreddit}: ${response.status}`);
           continue;
         }
 

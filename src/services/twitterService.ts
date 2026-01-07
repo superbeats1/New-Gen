@@ -21,42 +21,32 @@ export interface TwitterPost {
 }
 
 export class TwitterCollector {
-  private bearerToken: string | undefined;
-  private baseUrl = 'https://api.twitter.com/2';
+  private apiUrl = '/api/twitter'; // Use local API proxy
 
   constructor() {
-    this.bearerToken = import.meta.env.VITE_TWITTER_BEARER_TOKEN;
+    // No need to access bearer token in browser - handled server-side
   }
 
   /**
    * Search recent tweets for pain points and opportunities
    */
   async searchOpportunities(query: string, maxResults: number = 10): Promise<TwitterPost[]> {
-    if (!this.bearerToken) {
-      console.warn('⚠️ Twitter Bearer Token not configured. Skipping Twitter data collection.');
-      console.log('💡 Add VITE_TWITTER_BEARER_TOKEN to your .env.local to enable Twitter integration');
-      return [];
-    }
-
     try {
       console.log(`🐦 Searching Twitter for: "${query}"`);
 
       // Build search query with pain point indicators
       const searchQuery = this.buildSearchQuery(query);
 
-      const params = new URLSearchParams({
-        query: searchQuery,
-        max_results: Math.min(maxResults, 100).toString(),
-        'tweet.fields': 'created_at,public_metrics,author_id',
-        'user.fields': 'name,username',
-        expansions: 'author_id'
-      });
-
-      const response = await fetch(`${this.baseUrl}/tweets/search/recent?${params}`, {
+      // Call our server-side API proxy instead of Twitter directly
+      const response = await fetch(this.apiUrl, {
+        method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.bearerToken}`,
-          'User-Agent': 'SCOPA-AI-Market-Intelligence/1.0'
-        }
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          query: searchQuery,
+          maxResults: Math.min(maxResults, 100)
+        })
       });
 
       if (!response.ok) {
@@ -64,7 +54,8 @@ export class TwitterCollector {
           console.warn('⚠️ Twitter API rate limit reached. Waiting before retry...');
           return [];
         }
-        throw new Error(`Twitter API error: ${response.status} ${response.statusText}`);
+        console.warn(`⚠️ Twitter API proxy error: ${response.status}`);
+        return [];
       }
 
       const data = await response.json();
@@ -148,26 +139,19 @@ export class TwitterCollector {
    * Search for specific pain points mentioned in tweets
    */
   async searchPainPoints(topic: string): Promise<TwitterPost[]> {
-    if (!this.bearerToken) {
-      return [];
-    }
-
     const painQuery = `("${topic}" OR #${topic.replace(/\s+/g, '')}) (problem OR issue OR frustrated OR "doesn't work" OR broken OR terrible) -is:retweet lang:en`;
 
     try {
-      const params = new URLSearchParams({
-        query: painQuery,
-        max_results: '20',
-        'tweet.fields': 'created_at,public_metrics,author_id',
-        'user.fields': 'name,username',
-        expansions: 'author_id'
-      });
-
-      const response = await fetch(`${this.baseUrl}/tweets/search/recent?${params}`, {
+      // Call our server-side API proxy
+      const response = await fetch(this.apiUrl, {
+        method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.bearerToken}`,
-          'User-Agent': 'SCOPA-AI-Market-Intelligence/1.0'
-        }
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          query: painQuery,
+          maxResults: 20
+        })
       });
 
       if (!response.ok) return [];
