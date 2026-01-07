@@ -25,7 +25,7 @@ const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue, userId }) => {
         // Update user to Pro status
         const { error } = await supabase
           .from('profiles')
-          .update({ 
+          .update({
             is_pro: true,
             updated_at: new Date().toISOString()
           })
@@ -72,12 +72,12 @@ const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue, userId }) => {
             <div className="flex items-center justify-center space-x-2">
               <Crown className="w-6 h-6 text-amber-400" />
               <h1 className="text-2xl font-bold text-white">
-                {isUpgrading ? 'Activating Pro...' : 'Welcome to SIGNAL Pro!'}
+                {isUpgrading ? 'Activating Pro...' : 'Welcome to Scopa AI Pro!'}
               </h1>
             </div>
-            
+
             <p className="text-slate-400">
-              {isUpgrading 
+              {isUpgrading
                 ? 'Setting up your unlimited access...'
                 : 'Your payment was successful and your account has been upgraded!'
               }
@@ -86,7 +86,7 @@ const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue, userId }) => {
             <div className="bg-slate-800/50 rounded-xl p-4 space-y-2 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-slate-400">Plan:</span>
-                <span className="text-amber-400 font-bold">SIGNAL Pro</span>
+                <span className="text-amber-400 font-bold">Scopa AI Pro</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-400">Credits:</span>

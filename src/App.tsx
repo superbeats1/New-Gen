@@ -38,13 +38,13 @@ import { Auth } from './components/Auth';
 import { createCheckoutSession } from './lib/stripe';
 
 const SEARCH_STEPS = [
-  "Initializing neural discovery agents...",
-  "Authenticating with Signal Network nodes...",
+  "Initializing Scopa neural discovery...",
+  "Authenticating with Scopa Network nodes...",
   "Scanning Reddit r/entrepreneur and r/forhire...",
-  "Parsing 247 recent forum mentions...",
+  "Parsing relevant market mentions...",
   "Applying sentiment intensity filters...",
   "Ranking signals by market readiness...",
-  "Finalizing intelligence report..."
+  "Finalizing Scopa intelligence report..."
 ];
 
 const SearchingModule: React.FC<{ stepIndex: number; onStop: () => void }> = ({ stepIndex, onStop }) => {
@@ -335,7 +335,7 @@ const App: React.FC = () => {
           <div className="bg-gradient-to-br from-blue-600 to-blue-500 p-2 rounded-xl shadow-lg shadow-blue-600/20">
             <Zap className="w-5 h-5 text-white fill-white" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-white">Signal</span>
+          <span className="text-xl font-bold tracking-tight text-white">Scopa AI</span>
         </div>
 
         <nav className="flex-1 space-y-2">

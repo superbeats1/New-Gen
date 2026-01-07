@@ -53,8 +53,8 @@ export const Auth: React.FC = () => {
         <div className="inline-flex items-center justify-center bg-gradient-to-br from-blue-600 to-blue-500 p-4 rounded-2xl shadow-xl shadow-blue-600/30 mb-6 transform hover:scale-105 transition-transform duration-500">
           <Zap className="w-10 h-10 text-white fill-white" />
         </div>
-        <h1 className="text-4xl font-bold text-white tracking-tight mb-2">Signal</h1>
-        <p className="text-slate-400 font-medium text-lg">Market Intelligence Protocol</p>
+        <h1 className="text-4xl font-bold text-white tracking-tight mb-2">Scopa AI</h1>
+        <p className="text-slate-400 font-medium text-lg">Market Discovery & Intelligence</p>
       </div>
 
       <div className="glass-card p-1 rounded-3xl relative group">
