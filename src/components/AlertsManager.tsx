@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, Plus, Trash2, Clock, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Bell, Plus, Trash2, Clock, CheckCircle, AlertCircle, Loader2, Zap } from 'lucide-react';
 import { Alert } from '../types';
 import { alertsService } from '../services/alertsService';
 
@@ -15,6 +15,7 @@ export const AlertsManager: React.FC<AlertsManagerProps> = ({ userId, isOpen, on
     const [newKeyword, setNewKeyword] = useState('');
     const [frequency, setFrequency] = useState<'daily' | 'weekly'>('daily');
     const [adding, setAdding] = useState(false);
+    const [isLocalMode, setIsLocalMode] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -27,8 +28,10 @@ export const AlertsManager: React.FC<AlertsManagerProps> = ({ userId, isOpen, on
         try {
             const data = await alertsService.getAlerts(userId);
             setAlerts(data);
+            setIsLocalMode(false);
         } catch (error) {
             console.error('Failed to load alerts', error);
+            setIsLocalMode(true);
         } finally {
             setLoading(false);
         }
@@ -70,22 +73,30 @@ export const AlertsManager: React.FC<AlertsManagerProps> = ({ userId, isOpen, on
                 <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-blue-500 via-fuchsia-500 to-blue-500"></div>
 
                 {/* Header */}
-                <div className="p-8 border-b border-white/5 flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                            <Bell className="w-6 h-6 text-blue-400" />
+                <div className="p-8 border-b border-white/5 flex items-center justify-between bg-gradient-to-br from-violet-600/5 to-transparent">
+                    <div className="flex items-center space-x-5">
+                        <div className="w-14 h-14 rounded-2xl bg-violet-600/20 flex items-center justify-center border border-violet-500/30 shadow-lg shadow-violet-600/10 transition-transform hover:scale-105">
+                            <Bell className="w-7 h-7 text-violet-400" />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-bold text-white tracking-tight">Opportunity Alerts</h2>
-                            <p className="text-slate-400 text-sm">Monitor markets for new signals automatically.</p>
+                            <h2 className="text-3xl font-black text-white tracking-tighter uppercase italic leading-none">Neural Protocol</h2>
+                            <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mt-2">Autonomous Market Shadowing</p>
                         </div>
                     </div>
-                    <button
-                        onClick={onClose}
-                        className="p-2 hover:bg-white/5 rounded-full transition-colors text-slate-400 hover:text-white"
-                    >
-                        <AlertCircle className="w-6 h-6 rotate-45" />
-                    </button>
+                    <div className="flex items-center space-x-4">
+                        {isLocalMode && (
+                            <div className="px-4 py-1.5 rounded-full bg-amber-400/10 border border-amber-400/20 flex items-center space-x-2 animate-in slide-in-from-right-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                                <span className="text-[9px] font-black text-amber-400 uppercase tracking-widest leading-none">Local Protocol</span>
+                            </div>
+                        )}
+                        <button
+                            onClick={onClose}
+                            className="p-3 hover:bg-white/5 rounded-2xl transition-all text-slate-500 hover:text-white border border-transparent hover:border-white/10"
+                        >
+                            <AlertCircle className="w-6 h-6 rotate-45" />
+                        </button>
+                    </div>
                 </div>
 
                 {/* Content */}
@@ -113,20 +124,20 @@ export const AlertsManager: React.FC<AlertsManagerProps> = ({ userId, isOpen, on
                                 <select
                                     value={frequency}
                                     onChange={(e) => setFrequency(e.target.value as 'daily' | 'weekly')}
-                                    className="w-full bg-[#0A0A0C] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all appearance-none cursor-pointer"
+                                    className="w-full bg-[#0A0A0C] border border-white/10 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/50 transition-all appearance-none cursor-pointer text-xs font-bold uppercase tracking-widest"
                                 >
-                                    <option value="daily">Daily Scan</option>
-                                    <option value="weekly">Weekly Report</option>
+                                    <option value="daily">Daily Pulse</option>
+                                    <option value="weekly">Weekly Summary</option>
                                 </select>
                             </div>
                             <div className="flex items-end">
                                 <button
                                     type="submit"
                                     disabled={!newKeyword.trim() || adding}
-                                    className="bg-blue-600 hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg shadow-blue-600/20 flex items-center space-x-2"
+                                    className="bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black py-4 px-8 rounded-2xl transition-all shadow-xl shadow-violet-600/20 flex items-center space-x-3 uppercase tracking-tighter italic"
                                 >
                                     {adding ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
-                                    <span>Add Alert</span>
+                                    <span>Initiate Protocol</span>
                                 </button>
                             </div>
                         </form>
@@ -149,20 +160,20 @@ export const AlertsManager: React.FC<AlertsManagerProps> = ({ userId, isOpen, on
                         ) : (
                             <div className="space-y-3">
                                 {alerts.map((alert) => (
-                                    <div key={alert.id} className="group flex items-center justify-between p-4 glass-card rounded-xl border border-white/5 hover:border-blue-500/30 transition-all">
-                                        <div className="flex items-center space-x-4">
-                                            <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 border border-blue-500/20">
-                                                <CheckCircle className="w-5 h-5" />
+                                    <div key={alert.id} className="group flex items-center justify-between p-6 bg-[#0A0A0C]/50 backdrop-blur-md rounded-2xl border border-white/5 hover:border-violet-500/30 transition-all hover:translate-x-1">
+                                        <div className="flex items-center space-x-5">
+                                            <div className="w-12 h-12 rounded-full bg-violet-500/10 flex items-center justify-center text-violet-400 border border-violet-500/20 shadow-inner">
+                                                <Zap className="w-5 h-5 fill-violet-400/20" />
                                             </div>
                                             <div>
-                                                <h4 className="text-white font-bold">{alert.keyword}</h4>
-                                                <div className="flex items-center space-x-3 text-xs text-slate-500 mt-1">
-                                                    <span className="flex items-center space-x-1">
-                                                        <Clock className="w-3 h-3" />
-                                                        <span className="capitalize">{alert.frequency}</span>
+                                                <h4 className="text-white font-black uppercase tracking-tight text-lg italic">{alert.keyword}</h4>
+                                                <div className="flex items-center space-x-3 text-[10px] text-slate-500 mt-2 font-bold uppercase tracking-widest">
+                                                    <span className="flex items-center space-x-1.5">
+                                                        <Clock className="w-3 h-3 text-violet-500" />
+                                                        <span>{alert.frequency}</span>
                                                     </span>
-                                                    <span>•</span>
-                                                    <span>Create {new Date(alert.createdAt).toLocaleDateString()}</span>
+                                                    <span className="text-slate-700">•</span>
+                                                    <span>Active since {new Date(alert.createdAt).toLocaleDateString()}</span>
                                                 </div>
                                             </div>
                                         </div>

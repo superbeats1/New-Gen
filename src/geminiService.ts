@@ -149,7 +149,11 @@ Return ONLY valid JSON array:
     "evidence": ["Market indicator 1", "Market indicator 2"],
     "whyItMatters": "Why this opportunity matters now",
     "redFlags": "Potential risks or concerns",
-    "nextSteps": ["Actionable step 1", "Actionable step 2"]
+    "nextSteps": ["Actionable step 1", "Actionable step 2"],
+    "marketSentiment": 82,
+    "growthVelocity": 75,
+    "competitionIntensity": 45,
+    "marketMaturity": "Emerging"
   }
 ]
 `;

@@ -40,6 +40,12 @@ export interface Opportunity {
     trend: 'rising' | 'stable' | 'declining';
     relatedQueries?: string[];
   };
+
+  // Premium Intelligence Fields
+  marketSentiment?: number; // 0-100 (Fear/Greed/Intensity)
+  growthVelocity?: number; // 0-100
+  competitionIntensity?: number; // 0-100
+  marketMaturity?: 'Emerging' | 'Scaling' | 'Mature';
 }
 
 export interface Lead {

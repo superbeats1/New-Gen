@@ -23,13 +23,35 @@ import {
   XCircle,
   TrendingDown,
   Minus,
-  Search
+  Search,
+  Activity
 } from 'lucide-react';
 
 interface Props {
   results: AnalysisResult;
   onNewSearch: () => void;
 }
+
+const SentimentGauge: React.FC<{ value: number; label: string }> = ({ value, label }) => {
+  const rotation = (value / 100) * 180 - 90;
+  return (
+    <div className="relative w-48 h-24 overflow-hidden mb-4">
+      <div className="absolute inset-0 border-[12px] border-slate-800 rounded-t-full"></div>
+      <div
+        className="absolute inset-0 border-[12px] border-violet-500 rounded-t-full transition-all duration-1000 ease-out"
+        style={{ clipPath: `polygon(50% 100%, 0% 100%, 0% 0%, ${value}% 0%, ${value}% 100%)` }}
+      ></div>
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center">
+        <div className="text-2xl font-black text-white">{value}</div>
+        <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">{label}</div>
+      </div>
+      <div
+        className="absolute bottom-4 left-1/2 w-1 h-12 bg-white/80 origin-bottom transform transition-transform duration-1000"
+        style={{ transform: `translateX(-50%) rotate(${rotation}deg)` }}
+      ></div>
+    </div>
+  );
+};
 
 const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = ({ opportunity, index }) => {
   const [isExpanded, setIsExpanded] = useState(index === 0);
@@ -50,93 +72,83 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
   };
 
   return (
-    <div className={`group bg-[#050608]/60 backdrop-blur-xl rounded-[2.5rem] overflow-hidden transition-all duration-500 border border-white/5 hover:border-violet-500/30 ${isExpanded ? 'shadow-[0_0_50px_rgba(139,92,246,0.1)]' : ''}`}>
+    <div className={`group bg-[#050608]/40 backdrop-blur-2xl rounded-[3rem] overflow-hidden transition-all duration-700 border border-white/10 hover:border-violet-500/50 ${isExpanded ? 'shadow-[0_0_80px_rgba(139,92,246,0.15)] ring-1 ring-violet-500/20' : ''} relative`}>
+      <div className="absolute -inset-0.5 bg-gradient-to-br from-violet-600/20 via-transparent to-indigo-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+
       <div
-        className="p-6 lg:p-10 cursor-pointer flex items-start justify-between relative"
+        className="p-8 lg:p-12 cursor-pointer flex items-start justify-between relative z-10"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-violet-500/20 to-transparent"></div>
         <div className="flex-1">
-          <div className="flex items-center space-x-3 mb-4">
-            <span className="text-[10px] font-black bg-violet-600 text-white px-3 py-1 rounded-full uppercase tracking-widest italic">Signal #{index + 1}</span>
-            <div className="h-1 w-1 rounded-full bg-slate-700"></div>
-            <span className={`text-xs font-black uppercase tracking-widest ${getScoreColor(opportunity.overallScore)}`}>
-              Inertia: {opportunity.overallScore}/10
+          <div className="flex items-center space-x-4 mb-6">
+            <div className="bg-violet-600/20 border border-violet-500/30 px-4 py-1.5 rounded-full flex items-center space-x-2">
+              <Zap className="w-3 h-3 text-violet-400 fill-violet-400" />
+              <span className="text-[10px] font-black text-white uppercase tracking-widest italic">Signal Alpha-{index + 1}</span>
+            </div>
+            <div className="h-1.5 w-1.5 rounded-full bg-slate-700"></div>
+            <span className={`text-[11px] font-black uppercase tracking-widest ${getScoreColor(opportunity.overallScore)}`}>
+              Integrity: {opportunity.overallScore * 10}% match
             </span>
           </div>
-          <h3 className="text-2xl lg:text-4xl font-black text-white mb-6 leading-[1.1] tracking-tighter">{opportunity.problemStatement}</h3>
 
-          <div className="flex flex-wrap gap-3">
-            <div className="flex items-center space-x-3 bg-white/5 px-4 py-2 rounded-2xl border border-white/5">
-              <span className="text-[10px] text-slate-500 uppercase tracking-widest font-black">Demand/Flux</span>
-              <span className={`text-sm font-black ${getScoreColor(opportunity.demandSignal)}`}>{opportunity.demandSignal}/10</span>
+          <h3 className="text-3xl lg:text-5xl font-black text-white mb-8 leading-[1] tracking-tighter group-hover:text-violet-100 transition-colors">
+            {opportunity.problemStatement}
+          </h3>
+
+          <div className="flex flex-wrap gap-4">
+            <div className="flex flex-col bg-white/[0.03] px-6 py-3 rounded-2xl border border-white/5 backdrop-blur-md">
+              <span className="text-[9px] text-slate-500 uppercase tracking-widest font-black mb-1">Market Flux</span>
+              <span className={`text-lg font-black ${getScoreColor(opportunity.demandSignal)}`}>{opportunity.demandSignal}/10</span>
             </div>
-            <div className="flex items-center space-x-3 bg-white/5 px-4 py-2 rounded-2xl border border-white/5">
-              <span className="text-[10px] text-slate-500 uppercase tracking-widest font-black">Market State</span>
-              <span className={`text-sm font-black ${getScoreColor(opportunity.marketReadiness)}`}>{opportunity.marketReadiness}/10</span>
+            <div className="flex flex-col bg-white/[0.03] px-6 py-3 rounded-2xl border border-white/5 backdrop-blur-md">
+              <span className="text-[9px] text-slate-500 uppercase tracking-widest font-black mb-1">Entry Status</span>
+              <span className={`text-lg font-black ${getScoreColor(opportunity.marketReadiness)}`}>{opportunity.marketReadiness}/10</span>
+            </div>
+            <div className="flex flex-col bg-white/[0.03] px-6 py-3 rounded-2xl border border-white/5 backdrop-blur-md">
+              <span className="text-[9px] text-slate-500 uppercase tracking-widest font-black mb-1">Intensity</span>
+              <span className="text-lg font-black text-indigo-400">{opportunity.marketSentiment || 75}%</span>
             </div>
           </div>
         </div>
-        <button className="p-2 lg:p-3 bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 transition-all ml-2 lg:ml-4 flex-shrink-0">
-          {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-        </button>
+        <div className="flex flex-col items-center space-y-4">
+          <div className={`w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-violet-500/50 transition-all ${isExpanded ? 'bg-violet-600/10' : ''}`}>
+            {isExpanded ? <ChevronUp className="w-6 h-6 text-white" /> : <ChevronDown className="w-6 h-6 text-slate-400" />}
+          </div>
+        </div>
       </div>
 
       {isExpanded && (
         <div className="px-5 lg:px-8 pb-8 lg:pb-10 border-t border-white/5 pt-6 lg:pt-8 animate-in slide-in-from-top-2 duration-300">
-          {/* Trend Data Banner */}
           {opportunity.trendData && (
-            <div className="mb-10 p-6 lg:p-8 rounded-[2rem] bg-gradient-to-br from-violet-500/10 via-indigo-500/5 to-transparent border border-violet-500/20 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-violet-600/5 rounded-full blur-[60px] translate-x-1/3 -translate-y-1/3"></div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
-                <div className="flex items-center space-x-4">
-                  <div className="bg-violet-500/20 p-3 rounded-xl">
-                    <Search className="w-6 h-6 text-violet-400" />
-                  </div>
-                  <div>
-                    <div className="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Search Volume</div>
-                    <div className="text-lg font-bold text-white">{opportunity.trendData.searchVolume}</div>
+            <div className="mb-10 p-10 rounded-[2.5rem] bg-gradient-to-br from-violet-600/10 via-indigo-600/5 to-transparent border border-violet-500/20 relative overflow-hidden group/trend">
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-violet-600/20 rounded-full blur-[80px]"></div>
+
+              <div className="flex items-center justify-between mb-8">
+                <h4 className="text-xs font-black text-violet-400 uppercase tracking-[0.3em]">Neural Trend Analysis</h4>
+                <div className="flex items-center space-x-2 text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+                  <Activity className="w-3 h-3" />
+                  <span>Real-time Flux</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 relative z-10">
+                <div className="space-y-2">
+                  <div className="text-[10px] text-slate-500 uppercase tracking-widest font-black">Search Intensity</div>
+                  <div className="text-3xl font-black text-white group-hover/trend:text-violet-200 transition-colors uppercase italic tracking-tighter">{opportunity.trendData.searchVolume}</div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-[10px] text-slate-500 uppercase tracking-widest font-black">Growth Momentum</div>
+                  <div className={`text-3xl font-black flex items-center ${opportunity.trendData.trend === 'rising' ? 'text-emerald-400' : 'text-slate-400'} italic tracking-tighter`}>
+                    {opportunity.trendData.growthRate}
+                    {opportunity.trendData.trend === 'rising' && <TrendingUp className="w-5 h-5 ml-2" />}
                   </div>
                 </div>
-                <div className="flex items-center space-x-4">
-                  <div className={`p-3 rounded-xl ${opportunity.trendData.trend === 'rising' ? 'bg-emerald-500/20' :
-                    opportunity.trendData.trend === 'declining' ? 'bg-rose-500/20' : 'bg-slate-500/20'
-                    }`}>
-                    {opportunity.trendData.trend === 'rising' ? <TrendingUp className="w-6 h-6 text-emerald-400" /> :
-                      opportunity.trendData.trend === 'declining' ? <TrendingDown className="w-6 h-6 text-rose-400" /> :
-                        <Minus className="w-6 h-6 text-slate-400" />}
-                  </div>
-                  <div>
-                    <div className="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Growth Rate</div>
-                    <div className={`text-lg font-bold ${opportunity.trendData.trend === 'rising' ? 'text-emerald-400' :
-                      opportunity.trendData.trend === 'declining' ? 'text-rose-400' : 'text-slate-400'
-                      }`}>
-                      {opportunity.trendData.growthRate}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider ${opportunity.trendData.trend === 'rising' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
-                    opportunity.trendData.trend === 'declining' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
-                      'bg-slate-500/20 text-slate-400 border border-slate-500/30'
-                    }`}>
-                    {opportunity.trendData.trend === 'rising' ? '📈 Rising Trend' :
-                      opportunity.trendData.trend === 'declining' ? '📉 Declining' : '➡️ Stable'}
+                <div className="flex items-center">
+                  <div className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg ${opportunity.trendData.trend === 'rising' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-500/20 text-slate-400 border border-slate-500/30'}`}>
+                    {opportunity.trendData.trend === 'rising' ? 'Protocol: Scaling' : 'Protocol: Stable'}
                   </div>
                 </div>
               </div>
-              {opportunity.trendData.relatedQueries && opportunity.trendData.relatedQueries.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-white/10">
-                  <div className="text-xs text-slate-400 uppercase tracking-wider font-bold mb-2">Related Searches</div>
-                  <div className="flex flex-wrap gap-2">
-                    {opportunity.trendData.relatedQueries.map((query, i) => (
-                      <span key={i} className="px-3 py-1 bg-white/5 rounded-full text-xs text-slate-300 border border-white/10">
-                        {query}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           )}
 
@@ -325,48 +337,90 @@ const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
           <div className="flex items-center space-x-2 text-slate-500 text-xs lg:text-sm mb-2 font-medium">
-            <Zap className="w-4 h-4 text-amber-400" />
-            <span>Analysis Complete</span>
+            <Zap className="w-4 h-4 text-emerald-400 fill-emerald-400" />
+            <span className="uppercase tracking-[0.2em] text-[10px] font-black text-emerald-400/80">Analysis Protocol Active</span>
           </div>
           <div className="flex flex-col sm:flex-row sm:items-baseline sm:space-x-3">
-            <h2 className="text-2xl lg:text-3xl font-bold text-white">Market Report</h2>
-            <span className="text-slate-500 text-xs lg:text-sm font-medium">for "{results.query}"</span>
+            <h2 className="text-4xl lg:text-6xl font-black text-white tracking-tighter uppercase italic">Market Report</h2>
           </div>
-          <p className="text-slate-400 text-xs lg:text-sm max-w-2xl mt-2">{results.summary}</p>
+          <p className="text-slate-500 text-xs lg:text-sm max-w-2xl mt-4 font-medium italic">"{results.query}" — {results.summary}</p>
         </div>
         <div className="flex items-center space-x-3 w-full lg:w-auto">
-          <button className="flex-1 lg:flex-none flex items-center justify-center space-x-3 bg-white/5 hover:bg-white/10 px-8 py-4 rounded-2xl text-slate-300 transition-all text-xs font-black uppercase tracking-widest border border-white/5">
-            <Download className="w-4 h-4" />
-            <span>Export Data</span>
+          <button className="flex-1 lg:flex-none flex items-center justify-center space-x-3 bg-white/5 hover:bg-white/10 px-8 py-5 rounded-[1.5rem] text-slate-400 transition-all text-[10px] font-black uppercase tracking-widest border border-white/5 group">
+            <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+            <span>Export Intelligence</span>
           </button>
           <button
             onClick={onNewSearch}
-            className="flex-1 lg:flex-none flex items-center justify-center space-x-3 bg-violet-600 hover:bg-violet-500 px-8 py-4 rounded-2xl text-white transition-all text-xs font-black uppercase tracking-widest shadow-xl shadow-violet-900/30"
+            className="flex-1 lg:flex-none flex items-center justify-center space-x-3 bg-violet-600 hover:bg-violet-500 px-10 py-5 rounded-[1.5rem] text-white transition-all text-[10px] font-black uppercase tracking-widest shadow-2xl shadow-violet-600/30 group"
           >
-            <Target className="w-4 h-4" />
-            <span>New Discovery</span>
+            <Target className="w-4 h-4 group-hover:scale-110 transition-transform" />
+            <span>New Neuro-Scan</span>
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="p-8 bg-[#050608]/40 backdrop-blur-md rounded-[2.5rem] border border-white/5 group hover:border-violet-500/30 transition-all">
-          <span className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4 block">Intelligence Points</span>
-          <div className="text-5xl font-black text-white mb-4 italic tracking-tighter">482</div>
+      {/* Market Pulse Ticker */}
+      <div className="w-full h-11 bg-white/[0.02] border-y border-white/5 overflow-hidden flex items-center whitespace-nowrap relative">
+        <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-[#030407] to-transparent z-10"></div>
+        <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-[#030407] to-transparent z-10"></div>
+        <div className="animate-ticker flex items-center space-x-12 px-12">
+          {[1, 2, 3].map(i => (
+            <React.Fragment key={i}>
+              <span className="flex items-center space-x-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                <Activity className="w-3 h-3 text-violet-500" />
+                <span>Protocol 17.4x Intensity</span>
+              </span>
+              <span className="flex items-center space-x-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                <TrendingUp className="w-3 h-3 text-emerald-500" />
+                <span>Global Demand +12.4%</span>
+              </span>
+              <span className="flex items-center space-x-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                <Zap className="w-3 h-3 text-amber-500" />
+                <span>New Signal Alpha-{Math.floor(Math.random() * 900) + 100}</span>
+              </span>
+              <span className="flex items-center space-x-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                <Activity className="w-3 h-3 text-violet-500" />
+                <span>Market Maturity: Emerging</span>
+              </span>
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="p-8 bg-[#050608]/40 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 group hover:border-violet-500/30 transition-all relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-violet-600/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+          <span className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4 block">Intelligence Index</span>
+          <div className="text-6xl font-black text-white mb-4 italic tracking-tighter">48.2</div>
           <div className="text-[10px] text-emerald-400 font-black uppercase tracking-widest flex items-center bg-emerald-400/10 w-fit px-3 py-1.5 rounded-full border border-emerald-500/20">
-            <TrendingUp className="w-3 h-3 mr-2" /> High Confidence
+            <TrendingUp className="w-3 h-3 mr-2" /> High Efficiency
           </div>
         </div>
-        <div className="p-8 bg-[#050608]/40 backdrop-blur-md rounded-[2.5rem] border border-white/5 group hover:border-violet-500/30 transition-all">
-          <span className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4 block">Discovery Strength</span>
-          <div className="text-5xl font-black text-white mb-4 italic tracking-tighter">7.8</div>
-          <div className="text-[10px] text-slate-500 font-black uppercase tracking-widest">/ 10.0 Analysis Score</div>
+
+        <div className="p-8 bg-[#050608]/40 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 group hover:border-violet-500/30 transition-all flex flex-col items-center justify-center">
+          <SentimentGauge value={results.opportunities?.[0]?.marketSentiment || 72} label="Market Intensity" />
         </div>
-        <div className="p-8 bg-[#050608]/40 backdrop-blur-md rounded-[2.5rem] border border-white/5 group hover:border-violet-500/30 transition-all sm:col-span-2 lg:col-span-1">
-          <span className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4 block">Protocol Status</span>
-          <div className="text-5xl font-black text-white mb-4 italic tracking-tighter">Active</div>
+
+        <div className="p-8 bg-[#050608]/40 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 group hover:border-violet-500/30 transition-all">
+          <span className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4 block">Growth Velocity</span>
+          <div className="text-5xl font-black text-white mb-4 italic tracking-tighter">
+            {results.opportunities?.[0]?.growthVelocity || 84}%
+          </div>
+          <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-violet-600 to-indigo-600 shadow-[0_0_15px_rgba(139,92,246,0.5)] transition-all duration-1000"
+              style={{ width: `${results.opportunities?.[0]?.growthVelocity || 84}%` }}
+            ></div>
+          </div>
+        </div>
+
+        <div className="p-8 bg-[#050608]/40 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 group hover:border-violet-500/30 transition-all relative overflow-hidden">
+          <div className="absolute bottom-0 right-0 w-32 h-32 bg-indigo-600/10 rounded-full blur-3xl translate-y-1/2 translate-x-1/2"></div>
+          <span className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4 block">Protocol State</span>
+          <div className="text-4xl font-black text-white mb-4 italic tracking-tighter uppercase italic">Optimized</div>
           <div className="text-[10px] text-violet-400 font-black uppercase tracking-widest bg-violet-400/10 w-fit px-3 py-1.5 rounded-full border border-violet-500/20">
-            92% Consensus
+            {results.opportunities?.[0]?.marketMaturity || 'Emerging'} Stage
           </div>
         </div>
       </div>

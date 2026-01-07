@@ -464,12 +464,16 @@ const App: React.FC = () => {
         <div className="flex-1 px-4 lg:px-10 pb-10">
           {!results && (
             <div className="max-w-4xl mx-auto py-16">
-              <div className="text-center mb-10 lg:mb-16 space-y-4 lg:space-y-6">
-                <h2 className="text-4xl lg:text-6xl font-black text-white tracking-tighter leading-tight">
-                  Welcome, <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400">{profile?.first_name || 'Agent'}</span>.
+              <div className="text-center mb-12 lg:mb-20 space-y-6">
+                <div className="inline-flex items-center space-x-3 px-4 py-1.5 rounded-full bg-violet-600/10 border border-violet-500/20 mb-4 animate-in fade-in slide-in-from-bottom-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse"></span>
+                  <span className="text-[10px] font-black text-violet-400 uppercase tracking-[0.3em]">Protocol v4.2 Active</span>
+                </div>
+                <h2 className="text-5xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] uppercase italic">
+                  Scopa <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-400 to-violet-500">Intelligence</span>
                 </h2>
-                <p className="text-slate-400 text-lg lg:text-2xl font-medium">
-                  What market gaps are we scanning for?
+                <p className="text-slate-500 text-lg lg:text-2xl font-medium tracking-tight max-w-2xl mx-auto">
+                  Scan global markets for untapped blue ocean opportunities using high-fidelity neural analysis.
                 </p>
               </div>
 
@@ -519,18 +523,32 @@ const App: React.FC = () => {
               )}
 
               {!isSearching && (
-                <div className="mt-20 max-w-3xl mx-auto">
+                <div className="mt-24 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
                   <div
-                    className="group bg-[#050608]/40 backdrop-blur-md p-10 rounded-[2.5rem] cursor-pointer hover:bg-white/[0.04] transition-all border border-white/5 hover:border-violet-500/30 w-full text-left relative overflow-hidden"
-                    onClick={() => setQuery("Find business opportunities in the remote team collaboration space")}
+                    className="group bg-[#050608]/40 backdrop-blur-2xl p-12 rounded-[3.5rem] cursor-pointer hover:bg-white/[0.04] transition-all border border-white/5 hover:border-violet-500/30 w-full text-left relative overflow-hidden"
+                    onClick={() => setQuery("Find emerging opportunities in the AI-powered health-tech space for 2026")}
                   >
                     <div className="absolute top-0 right-0 w-64 h-64 bg-violet-600/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
-                    <div className="w-16 h-16 rounded-2xl bg-violet-500/10 flex items-center justify-center mb-8 border border-violet-500/20 group-hover:scale-110 transition-transform">
-                      <Briefcase className="w-8 h-8 text-violet-400" />
+                    <div className="w-16 h-16 rounded-2xl bg-violet-500/10 flex items-center justify-center mb-10 border border-violet-500/20 group-hover:scale-110 transition-transform">
+                      <Zap className="w-8 h-8 text-violet-400 fill-violet-400/20" />
                     </div>
-                    <h3 className="text-3xl font-black text-white mb-4 tracking-tighter uppercase italic">Strategy Mode</h3>
-                    <p className="text-slate-400 text-lg leading-relaxed max-w-xl">
-                      Find blue ocean opportunities and validate market gaps with deep intelligence.
+                    <h3 className="text-3xl font-black text-white mb-4 tracking-tighter uppercase italic">Strategic Pulse</h3>
+                    <p className="text-slate-500 text-lg leading-relaxed font-medium">
+                      Identify high-velocity market gaps with predictive intelligence.
+                    </p>
+                  </div>
+
+                  <div
+                    className="group bg-[#050608]/40 backdrop-blur-2xl p-12 rounded-[3.5rem] cursor-pointer hover:bg-white/[0.04] transition-all border border-white/5 hover:border-emerald-500/30 w-full text-left relative overflow-hidden"
+                    onClick={() => setShowAlerts(true)}
+                  >
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-600/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
+                    <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-10 border border-emerald-500/20 group-hover:scale-110 transition-transform">
+                      <Bell className="w-8 h-8 text-emerald-400" />
+                    </div>
+                    <h3 className="text-3xl font-black text-white mb-4 tracking-tighter uppercase italic">Neural Monitors</h3>
+                    <p className="text-slate-500 text-lg leading-relaxed font-medium">
+                      Set automated shadows to track market movements 24/7.
                     </p>
                   </div>
                 </div>
