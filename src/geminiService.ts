@@ -197,7 +197,13 @@ Return ONLY a valid JSON object with the following structure:
       "marketSentiment": 82,
       "growthVelocity": 75,
       "competitionIntensity": 45,
-      "marketMaturity": "Emerging"
+      "marketMaturity": "Emerging",
+      "speedToMRR": {
+        "estimatedWeeks": 8,
+        "velocity": "Fast",
+        "confidence": 8,
+        "reasoning": "Low competition + high demand + simple MVP = fast validation. Similar products reached $1K MRR in 6-10 weeks."
+      }
     }
   ],
   "rawFindings": [
@@ -217,6 +223,27 @@ IMPORTANT:
 - Demand Intensity should reflect "desperation indicators" in the language used.
 - Readiness should look for mentions of "workarounds", "hacks", or "failed solutions".
 - Supporting Evidence must be 3-5 real, high-impact quotes per top opportunity.
+
+SPEED TO $1K MRR CALCULATION (CRITICAL - UNIQUE COMPETITIVE ADVANTAGE):
+For each opportunity, calculate "speedToMRR" based on:
+1. **Competition Level**: Underserved = faster, Saturated = slower
+2. **Entry Difficulty**: Low = faster (weeks 4-8), Medium = medium (weeks 8-16), High = slower (weeks 16-24+)
+3. **Market Readiness**: Are people already paying for bad solutions? (faster) or just complaining? (slower)
+4. **MVP Complexity**: Simple SaaS/Chrome Extension = fast, Hardware/Complex platform = slow
+
+VELOCITY CLASSIFICATION:
+- "Fast": 4-8 weeks (low competition, high demand, simple MVP, proven willingness to pay)
+- "Medium": 8-16 weeks (moderate competition, moderate complexity, some validation needed)
+- "Slow": 16-24+ weeks (high competition, complex build, market education needed, unproven monetization)
+
+REASONING TEMPLATE:
+"[Competition level] + [Demand indicator] + [MVP complexity] = [timeline]. Similar products in [category] reached $1K MRR in [X-Y] weeks."
+
+EXAMPLE GOOD REASONING:
+"Low competition + desperate demand + simple Chrome extension MVP = fast validation. Similar browser tools (Grammarly, Loom) reached $1K MRR in 6-8 weeks with basic feature set."
+
+EXAMPLE SLOW REASONING:
+"High competition + complex hardware integration + market education needed = slow ramp. Similar IoT products took 20-24 weeks to reach $1K MRR due to manufacturing and distribution challenges."
 `;
 
   try {

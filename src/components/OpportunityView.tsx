@@ -94,6 +94,53 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
             </span>
           </div>
 
+          {/* SPEED TO $1K MRR - UNIQUE COMPETITIVE ADVANTAGE */}
+          {opportunity.speedToMRR && (
+            <div className={`mb-6 px-6 py-4 rounded-2xl border-2 backdrop-blur-md inline-flex items-center space-x-4 ${
+              opportunity.speedToMRR.velocity === 'Fast'
+                ? 'bg-emerald-600/10 border-emerald-500/40'
+                : opportunity.speedToMRR.velocity === 'Medium'
+                ? 'bg-amber-600/10 border-amber-500/40'
+                : 'bg-slate-600/10 border-slate-500/40'
+            }`}>
+              <div className="flex items-center space-x-2">
+                {opportunity.speedToMRR.velocity === 'Fast' && (
+                  <svg className="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clipRule="evenodd" />
+                  </svg>
+                )}
+                {opportunity.speedToMRR.velocity === 'Medium' && (
+                  <svg className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clipRule="evenodd" />
+                  </svg>
+                )}
+                {opportunity.speedToMRR.velocity === 'Slow' && (
+                  <svg className="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clipRule="evenodd" />
+                  </svg>
+                )}
+                <div>
+                  <div className={`text-[10px] font-black uppercase tracking-widest ${
+                    opportunity.speedToMRR.velocity === 'Fast'
+                      ? 'text-emerald-400'
+                      : opportunity.speedToMRR.velocity === 'Medium'
+                      ? 'text-amber-400'
+                      : 'text-slate-400'
+                  }`}>
+                    {opportunity.speedToMRR.velocity} Track
+                  </div>
+                  <div className="text-xl font-black text-white tracking-tight">
+                    {opportunity.speedToMRR.estimatedWeeks} weeks to $1K MRR
+                  </div>
+                </div>
+              </div>
+              <div className="h-10 w-px bg-white/10"></div>
+              <div className="text-xs text-slate-400 max-w-xs font-medium leading-tight">
+                {opportunity.speedToMRR.reasoning}
+              </div>
+            </div>
+          )}
+
           <h3 className="text-3xl lg:text-5xl font-black text-white mb-8 leading-[1] tracking-tighter group-hover:text-violet-100 transition-colors">
             {opportunity.problemStatement}
           </h3>

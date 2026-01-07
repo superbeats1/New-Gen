@@ -64,6 +64,14 @@ export interface Opportunity {
     context: string;
     sourceUrl: string;
   }[];
+
+  // Speed to $1K MRR - UNIQUE COMPETITIVE ADVANTAGE
+  speedToMRR?: {
+    estimatedWeeks: number; // Weeks to reach $1K monthly recurring revenue
+    velocity: 'Fast' | 'Medium' | 'Slow'; // Visual indicator
+    confidence: number; // 1-10
+    reasoning: string; // Why this timeline
+  };
 }
 
 export interface Lead {
