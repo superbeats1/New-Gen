@@ -104,7 +104,7 @@ IMPORTANT:
 `;
 
   try {
-    const result = await getGenAI().getGenerativeModel({ model: "gemini-1.5-pro" }).generateContent({
+    const result = await getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" }).generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
         responseMimeType: "application/json"
@@ -159,7 +159,7 @@ Return ONLY valid JSON array:
 `;
 
   try {
-    const result = await getGenAI().getGenerativeModel({ model: "gemini-1.5-pro" }).generateContent({
+    const result = await getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" }).generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
         responseMimeType: "application/json"
@@ -167,7 +167,7 @@ Return ONLY valid JSON array:
     });
 
     const response = await result.response;
-    const responseText = response.text();
+    const responseText = response.text() || '';
     const text = responseText.replace(/```json\n?|\n?```/g, '').trim();
     return JSON.parse(text);
   } catch (error) {
@@ -200,9 +200,9 @@ Requirements:
 Return only the message text, no extra formatting.
 `;
 
-    const result = await getGenAI().getGenerativeModel({ model: "gemini-1.5-pro" }).generateContent(prompt);
+    const result = await getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" }).generateContent(prompt);
     const response = await result.response;
-    return response.text();
+    return response.text() || '';
   } catch (error) {
     console.error('Gemini API Error:', error);
     throw new Error('Failed to generate outreach message.');
@@ -236,7 +236,7 @@ Return ONLY valid JSON in this format:
 }
 `;
 
-    const result = await getGenAI().getGenerativeModel({ model: "gemini-1.5-pro" }).generateContent({
+    const result = await getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" }).generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
         responseMimeType: "application/json"
@@ -244,7 +244,7 @@ Return ONLY valid JSON in this format:
     });
 
     const response = await result.response;
-    const responseText = response.text();
+    const responseText = response.text() || '';
     const text = responseText;
     const cleanText = text.replace(/```json\n?|\n?```/g, '').trim();
     return JSON.parse(cleanText);
