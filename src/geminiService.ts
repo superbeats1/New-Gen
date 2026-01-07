@@ -58,7 +58,8 @@ export const analyzeQuery = async (query: string): Promise<AnalysisResult> => {
       rawFindings: analysisResponse.rawFindings
     };
 
-    console.log(`✅ Analysis complete: ${detectedMode} mode with ${analysisResponse.opportunities.length} results`);
+    const opportunitiesCount = analysisResponse.opportunities?.length || 0;
+    console.log(`✅ Analysis complete: ${detectedMode} mode with ${opportunitiesCount} results`);
     return result;
 
   } catch (error: any) {
@@ -113,10 +114,7 @@ IMPORTANT:
   try {
     const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1' });
     const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: {
-        responseMimeType: "application/json"
-      }
+      contents: [{ role: 'user', parts: [{ text: prompt }] }]
     });
 
     const response = await result.response;
@@ -225,10 +223,7 @@ IMPORTANT:
   try {
     const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1' });
     const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: {
-        responseMimeType: "application/json"
-      }
+      contents: [{ role: 'user', parts: [{ text: prompt }] }]
     });
 
     const response = await result.response;
@@ -247,11 +242,11 @@ IMPORTANT:
       };
     } catch (e) {
       console.error("JSON Parse Error in opportunities analysis:", e);
-      return { opportunities: [], totalSourcesAnalyzed: 0 };
+      return { opportunities: [], totalSourcesAnalyzed: 0, summary: "Analysis failed due to malformed response" };
     }
   } catch (error) {
     console.error('Failed to generate opportunities:', error);
-    return [];
+    return { opportunities: [], totalSourcesAnalyzed: 0, summary: "Analysis failed due to API error" };
   }
 }
 
@@ -318,10 +313,7 @@ Return ONLY valid JSON in this format:
 
     const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1' });
     const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: {
-        responseMimeType: "application/json"
-      }
+      contents: [{ role: 'user', parts: [{ text: prompt }] }]
     });
 
     const response = await result.response;
