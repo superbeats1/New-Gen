@@ -50,7 +50,7 @@ export const Auth: React.FC = () => {
   return (
     <div className="w-full">
       <div className="text-center mb-10">
-        <div className="inline-flex items-center justify-center bg-gradient-to-br from-violet-600 to-indigo-600 p-4 rounded-2xl shadow-xl shadow-violet-600/30 mb-6 transform hover:scale-105 transition-transform duration-500">
+        <div className="inline-flex items-center justify-center bg-gradient-to-br from-blue-600 to-blue-500 p-4 rounded-2xl shadow-xl shadow-blue-600/30 mb-6 transform hover:scale-105 transition-transform duration-500">
           <Zap className="w-10 h-10 text-white fill-white" />
         </div>
         <h1 className="text-4xl font-bold text-white tracking-tight mb-2">Signal</h1>
@@ -58,7 +58,7 @@ export const Auth: React.FC = () => {
       </div>
 
       <div className="glass-card p-1 rounded-3xl relative group">
-        <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-[2rem] blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+        <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-500 rounded-[2rem] blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
         <div className="bg-[#050507]/90 p-8 rounded-[1.8rem] relative">
           <h2 className="text-2xl font-bold text-white mb-8 text-center">
             {isSignUp ? 'Join the Network' : 'Welcome Back'}
@@ -70,12 +70,12 @@ export const Auth: React.FC = () => {
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">First Name</label>
                   <div className="relative group/input">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within/input:text-violet-400 transition-colors" />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within/input:text-blue-400 transition-colors" />
                     <input
                       type="text"
                       required
                       placeholder="Jane"
-                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:ring-1 focus:ring-violet-500 focus:border-violet-500 outline-none transition-all"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
                     />
@@ -84,12 +84,12 @@ export const Auth: React.FC = () => {
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">Last Name</label>
                   <div className="relative group/input">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within/input:text-violet-400 transition-colors" />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within/input:text-blue-400 transition-colors" />
                     <input
                       type="text"
                       required
                       placeholder="Doe"
-                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:ring-1 focus:ring-violet-500 focus:border-violet-500 outline-none transition-all"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
                     />
@@ -101,12 +101,12 @@ export const Auth: React.FC = () => {
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">Email Address</label>
               <div className="relative group/input">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within/input:text-violet-400 transition-colors" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within/input:text-blue-400 transition-colors" />
                 <input
                   type="email"
                   required
                   placeholder="name@company.com"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:ring-1 focus:ring-violet-500 focus:border-violet-500 outline-none transition-all"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -116,12 +116,12 @@ export const Auth: React.FC = () => {
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">Password</label>
               <div className="relative group/input">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within/input:text-violet-400 transition-colors" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within/input:text-blue-400 transition-colors" />
                 <input
                   type="password"
                   required
                   placeholder="••••••••"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:ring-1 focus:ring-violet-500 focus:border-violet-500 outline-none transition-all"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />

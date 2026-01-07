@@ -323,16 +323,16 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#050507] text-slate-200 selection:bg-violet-500/30">
+    <div className="flex h-screen overflow-hidden bg-[#0a0b0f] text-slate-200 selection:bg-blue-500/30">
       {/* Background Gradients */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-violet-900/10 via-[#050507] to-[#050507]"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-blue-900/10 via-[#0a0b0f] to-[#0a0b0f]"></div>
       </div>
 
       {/* Sidebar */}
       <aside className="w-72 glass-panel border-r-0 border-r-white/5 flex flex-col p-6 m-4 mr-0 rounded-3xl relative z-20">
         <div className="flex items-center space-x-3 mb-10 cursor-pointer" onClick={() => setShowLanding(true)}>
-          <div className="bg-gradient-to-br from-violet-600 to-indigo-600 p-2 rounded-xl shadow-lg shadow-violet-600/20">
+          <div className="bg-gradient-to-br from-blue-600 to-blue-500 p-2 rounded-xl shadow-lg shadow-blue-600/20">
             <Zap className="w-5 h-5 text-white fill-white" />
           </div>
           <span className="text-xl font-bold tracking-tight text-white">Signal</span>
@@ -340,10 +340,10 @@ const App: React.FC = () => {
 
         <nav className="flex-1 space-y-2">
           <button
-            className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all ${!results ? 'bg-white/10 text-white font-medium border border-white/5 shadow-inner' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
+            className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all ${!results ? 'bg-blue-600/20 text-white font-medium border border-blue-500/30 shadow-inner' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
             onClick={() => { setResults(null); setQuery(''); }}
           >
-            <Search className={`w-5 h-5 ${!results ? 'text-violet-400' : ''}`} />
+            <Search className={`w-5 h-5 ${!results ? 'text-blue-400' : ''}`} />
             <span>Discover</span>
           </button>
 
@@ -360,7 +360,7 @@ const App: React.FC = () => {
             Your Plan
           </div>
           <div className="glass-card p-4 rounded-2xl mx-1 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-violet-500/10 rounded-full blur-2xl group-hover:bg-violet-500/20 transition-all"></div>
+            <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all"></div>
             <div className="flex items-center justify-between mb-3 relative z-10">
               <span className="text-xs font-medium text-slate-300">Credits</span>
               {profile?.is_pro ? (
@@ -374,7 +374,7 @@ const App: React.FC = () => {
 
             <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden mb-3">
               <div
-                className="h-full bg-gradient-to-r from-violet-500 to-indigo-500 transition-all duration-500"
+                className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500"
                 style={{ width: profile?.is_pro ? '100%' : `${Math.max(0, Math.min(100, (profile?.credits / 10) * 100))}%` }}
               ></div>
             </div>
@@ -393,7 +393,7 @@ const App: React.FC = () => {
 
         <div className="border-t border-white/5 pt-6 space-y-2">
           <div className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-white/5 border border-white/5">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white border border-white/10">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-xs font-bold text-white border border-white/10">
               {profile?.first_name?.[0] || 'U'}
             </div>
             <div className="flex-1 min-w-0">
@@ -442,7 +442,7 @@ const App: React.FC = () => {
             <div className="max-w-4xl mx-auto py-16">
               <div className="text-center mb-16 space-y-6">
                 <h2 className="text-5xl font-bold text-white tracking-tight">
-                  Hello, <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400">{profile?.first_name || 'Agent'}</span>.
+                  Hello, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">{profile?.first_name || 'Agent'}</span>.
                 </h2>
                 <p className="text-slate-400 text-xl font-light">
                   What are we discovering today?
@@ -453,7 +453,7 @@ const App: React.FC = () => {
                 <SearchingModule stepIndex={searchStep} onStop={stopSearch} />
               ) : (
                 <div className="relative group max-w-3xl mx-auto">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 via-indigo-600 to-violet-600 rounded-[2rem] blur opacity-40 group-focus-within:opacity-75 transition duration-1000 animate-pulse-glow"></div>
+                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 rounded-[2rem] blur opacity-40 group-focus-within:opacity-75 transition duration-1000 animate-pulse-glow"></div>
                   <form onSubmit={handleSearch} className="relative glass-card p-1 rounded-[2rem]">
                     <div className="bg-[#050507]/80 rounded-[1.8rem] p-6">
                       <textarea
@@ -496,11 +496,11 @@ const App: React.FC = () => {
               {!isSearching && (
                 <div className="mt-20 max-w-3xl mx-auto">
                   <div
-                    className="group glass-card p-8 rounded-3xl cursor-pointer hover:bg-white/[0.02] transition-all border border-white/5 hover:border-violet-500/30 w-full"
+                    className="group glass-card p-8 rounded-3xl cursor-pointer hover:bg-white/[0.02] transition-all border border-white/5 hover:border-blue-500/30 w-full"
                     onClick={() => setQuery("Find business opportunities in the remote team collaboration space")}
                   >
-                    <div className="w-12 h-12 rounded-2xl bg-violet-500/10 flex items-center justify-center mb-6 border border-violet-500/20 group-hover:scale-110 transition-transform">
-                      <Briefcase className="w-6 h-6 text-violet-400" />
+                    <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center mb-6 border border-blue-500/20 group-hover:scale-110 transition-transform">
+                      <Briefcase className="w-6 h-6 text-blue-400" />
                     </div>
                     <h3 className="text-xl font-bold text-white mb-2">Strategy Mode</h3>
                     <p className="text-slate-400 text-sm leading-relaxed">
