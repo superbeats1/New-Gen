@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AnalysisResult, Opportunity } from '../types';
+import { exportService } from '../services/exportService';
 import {
   TrendingUp,
   AlertTriangle,
@@ -24,7 +25,9 @@ import {
   TrendingDown,
   Minus,
   Search,
-  Activity
+  Activity,
+  FileText,
+  FileJson
 } from 'lucide-react';
 
 interface Props {
@@ -367,6 +370,41 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
 };
 
 const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const exportMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close export menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(event.target as Node)) {
+        setShowExportMenu(false);
+      }
+    };
+
+    if (showExportMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showExportMenu]);
+
+  const handleExport = (format: 'csv' | 'json' | 'txt') => {
+    switch (format) {
+      case 'csv':
+        exportService.exportToCSV(results);
+        break;
+      case 'json':
+        exportService.exportToJSON(results);
+        break;
+      case 'txt':
+        exportService.exportToText(results);
+        break;
+    }
+    setShowExportMenu(false);
+  };
+
   return (
     <div className="space-y-6 lg:space-y-10">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -409,10 +447,61 @@ const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
           </div>
         </div>
         <div className="flex items-center space-x-3 w-full lg:w-auto">
-          <button className="flex-1 lg:flex-none flex items-center justify-center space-x-3 bg-white/5 hover:bg-white/10 px-8 py-5 rounded-[1.5rem] text-slate-400 transition-all text-[10px] font-black uppercase tracking-widest border border-white/5 group">
-            <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
-            <span>Export Intelligence</span>
-          </button>
+          <div ref={exportMenuRef} className="relative flex-1 lg:flex-none">
+            <button
+              onClick={() => setShowExportMenu(!showExportMenu)}
+              className="w-full flex items-center justify-center space-x-3 bg-white/5 hover:bg-white/10 px-8 py-5 rounded-[1.5rem] text-slate-400 transition-all text-[10px] font-black uppercase tracking-widest border border-white/5 group"
+            >
+              <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+              <span>Export Intelligence</span>
+              <ChevronDown className={`w-3 h-3 transition-transform ${showExportMenu ? 'rotate-180' : ''}`} />
+            </button>
+
+            {showExportMenu && (
+              <div className="absolute top-full right-0 mt-2 w-64 bg-[#0A0A0C] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 animate-in slide-in-from-top-2 duration-200">
+                <div className="p-2 space-y-1">
+                  <button
+                    onClick={() => handleExport('csv')}
+                    className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-left group"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors">
+                      <FileText className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-white font-bold text-sm">Export as CSV</div>
+                      <div className="text-slate-500 text-xs">Spreadsheet format</div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => handleExport('json')}
+                    className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-left group"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
+                      <FileJson className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-white font-bold text-sm">Export as JSON</div>
+                      <div className="text-slate-500 text-xs">Developer format</div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => handleExport('txt')}
+                    className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-left group"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center group-hover:bg-violet-500/20 transition-colors">
+                      <FileText className="w-5 h-5 text-violet-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-white font-bold text-sm">Export as Report</div>
+                      <div className="text-slate-500 text-xs">Formatted text</div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
           <button
             onClick={onNewSearch}
             className="flex-1 lg:flex-none flex items-center justify-center space-x-3 bg-violet-600 hover:bg-violet-500 px-10 py-5 rounded-[1.5rem] text-white transition-all text-[10px] font-black uppercase tracking-widest shadow-2xl shadow-violet-600/30 group"
