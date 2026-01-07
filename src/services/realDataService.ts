@@ -464,15 +464,15 @@ export class RealDataCollector {
     // 2. Look for keywords if no explicit amount found
     const lowerText = text ? text.toLowerCase() : '';
 
-    if (lowerText && lowerText.match(/high budget|well funded|unlimited budget|money is no object|good pay/)) {
+    if (lowerText && typeof lowerText === 'string' && lowerText.match(/high budget|well funded|unlimited budget|money is no object|good pay/)) {
       return { category: 'High' };
     }
 
-    if (lowerText && lowerText.match(/average budget|standard rate|market rate|negotiable/)) {
+    if (lowerText && typeof lowerText === 'string' && lowerText.match(/average budget|standard rate|market rate|negotiable/)) {
       return { category: 'Medium' };
     }
 
-    if (lowerText && lowerText.match(/low budget|tight budget|small budget|cheap|student|volunteer|equity|unpaid/)) {
+    if (lowerText && typeof lowerText === 'string' && lowerText.match(/low budget|tight budget|small budget|cheap|student|volunteer|equity|unpaid/)) {
       return { category: 'Low' };
     }
 

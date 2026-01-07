@@ -104,7 +104,7 @@ IMPORTANT:
 `;
 
   try {
-    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1' });
     const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
@@ -167,7 +167,7 @@ Return ONLY valid JSON array:
 `;
 
   try {
-    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1' });
     const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
@@ -216,7 +216,8 @@ Requirements:
 Return only the message text, no extra formatting.
 `;
 
-    const result = await getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" }).generateContent(prompt);
+    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1' });
+    const result = await model.generateContent(prompt);
     const response = await result.response;
     return response.text() || '';
   } catch (error) {
@@ -252,7 +253,8 @@ Return ONLY valid JSON in this format:
 }
 `;
 
-    const result = await getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" }).generateContent({
+    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1' });
+    const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
         responseMimeType: "application/json"
