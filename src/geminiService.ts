@@ -104,7 +104,8 @@ IMPORTANT:
 `;
 
   try {
-    const result = await getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" }).generateContent({
+    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
         responseMimeType: "application/json"
@@ -112,16 +113,23 @@ IMPORTANT:
     });
 
     const response = await result.response;
-    const responseText = response.text() || '';
+    const responseText = response.text() || '{}';
     const text = responseText.replace(/```json\n?|\n?```/g, '').trim();
-    const leads = JSON.parse(text);
+    if (!text) return [];
+    try {
+      const leads = JSON.parse(text);
+      if (!Array.isArray(leads)) return [];
 
-    // Mark as AI-generated for transparency
-    return leads.map((lead: any) => ({
-      ...lead,
-      status: 'New',
-      notes: 'AI-generated lead'
-    }));
+      // Mark as AI-generated for transparency
+      return leads.map((lead: any) => ({
+        ...lead,
+        status: 'New',
+        notes: 'AI-generated lead'
+      }));
+    } catch (e) {
+      console.error("JSON Parse Error in supplemental leads:", e);
+      return [];
+    }
   } catch (error) {
     console.error('Failed to generate supplemental leads:', error);
     return [];
@@ -159,7 +167,8 @@ Return ONLY valid JSON array:
 `;
 
   try {
-    const result = await getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" }).generateContent({
+    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
         responseMimeType: "application/json"
@@ -167,9 +176,16 @@ Return ONLY valid JSON array:
     });
 
     const response = await result.response;
-    const responseText = response.text() || '';
+    const responseText = response.text() || '[]';
     const text = responseText.replace(/```json\n?|\n?```/g, '').trim();
-    return JSON.parse(text);
+    if (!text) return [];
+    try {
+      const parsed = JSON.parse(text);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      console.error("JSON Parse Error in opportunities analysis:", e);
+      return [];
+    }
   } catch (error) {
     console.error('Failed to generate opportunities:', error);
     return [];

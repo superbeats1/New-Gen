@@ -397,9 +397,9 @@ export class RealDataCollector {
     ];
 
     for (const pattern of locationPatterns) {
-      if (!text) continue;
+      if (!text || typeof text !== 'string') continue;
       const match = text.match(pattern);
-      if (match) return match[0];
+      if (match && match[0]) return match[0];
     }
 
     return undefined;
@@ -433,11 +433,12 @@ export class RealDataCollector {
     ];
 
     for (const pattern of currencyPatterns) {
-      if (!text) continue;
+      if (!text || typeof text !== 'string') continue;
       const matches = text.match(pattern);
       if (matches && matches.length > 0) {
         // Take the first match that looks like a budget
         const rawString = matches[0];
+        if (!rawString || typeof rawString !== 'string') continue;
         const numberMatch = rawString.match(/(\d+(?:,\d+)*(?:\.\d+)?)/);
         const numberPart = numberMatch ? numberMatch[0] : null;
 
