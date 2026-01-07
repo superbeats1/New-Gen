@@ -395,6 +395,7 @@ export class RealDataCollector {
     ];
 
     for (const pattern of locationPatterns) {
+      if (!text) continue;
       const match = text.match(pattern);
       if (match) return match[0];
     }
@@ -430,11 +431,13 @@ export class RealDataCollector {
     ];
 
     for (const pattern of currencyPatterns) {
+      if (!text) continue;
       const matches = text.match(pattern);
       if (matches && matches.length > 0) {
         // Take the first match that looks like a budget
         const rawString = matches[0];
-        const numberPart = rawString.match(/(\d+(?:,\d+)*(?:\.\d+)?)/)?.[0];
+        const numberMatch = rawString.match(/(\d+(?:,\d+)*(?:\.\d+)?)/);
+        const numberPart = numberMatch ? numberMatch[0] : null;
 
         if (numberPart) {
           let value = parseFloat(numberPart.replace(/,/g, ''));
@@ -456,17 +459,17 @@ export class RealDataCollector {
     }
 
     // 2. Look for keywords if no explicit amount found
-    const lowerText = text.toLowerCase();
+    const lowerText = text ? text.toLowerCase() : '';
 
-    if (lowerText.match(/high budget|well funded|unlimited budget|money is no object|good pay/)) {
+    if (lowerText && lowerText.match(/high budget|well funded|unlimited budget|money is no object|good pay/)) {
       return { category: 'High' };
     }
 
-    if (lowerText.match(/average budget|standard rate|market rate|negotiable/)) {
+    if (lowerText && lowerText.match(/average budget|standard rate|market rate|negotiable/)) {
       return { category: 'Medium' };
     }
 
-    if (lowerText.match(/low budget|tight budget|small budget|cheap|student|volunteer|equity|unpaid/)) {
+    if (lowerText && lowerText.match(/low budget|tight budget|small budget|cheap|student|volunteer|equity|unpaid/)) {
       return { category: 'Low' };
     }
 

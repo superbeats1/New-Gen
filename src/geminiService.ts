@@ -112,7 +112,7 @@ IMPORTANT:
     });
 
     const response = await result.response;
-    const responseText = response.text();
+    const responseText = response.text() || '';
     const text = responseText.replace(/```json\n?|\n?```/g, '').trim();
     const leads = JSON.parse(text);
 

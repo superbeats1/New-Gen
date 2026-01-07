@@ -25,7 +25,8 @@ import {
   Crown,
   X,
   Sparkles,
-  Menu
+  Menu,
+  Bell
 } from 'lucide-react';
 import { WorkflowMode, AnalysisResult } from './types';
 import { analyzeQuery } from './geminiService';
