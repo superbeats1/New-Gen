@@ -36,22 +36,29 @@ export const analyzeQuery = async (query: string): Promise<AnalysisResult> => {
     const detectedMode = WorkflowMode.OPPORTUNITY;
     console.log(`🎯 Mode set to: ${detectedMode}`);
 
-    // Step 2: Get real data/analysis
-    console.log(`💡 Generating opportunities analysis...`);
-    const realOpportunities = await generateOpportunitiesAnalysis(query);
+    // Step 2: Get real data from active sources
+    console.log(`📡 Collecting real-time market data...`);
+    const realData = await getRealDataCollector().findRealLeads(query, detectedMode);
 
-    // Step 3: Create summary
-    const summary = `Identified ${realOpportunities.length} potential opportunities through market analysis`;
+    // Step 3: Generate high-fidelity analysis using real data
+    console.log(`💡 Generating high-fidelity opportunities analysis...`);
+    const analysisResponse = await generateOpportunitiesAnalysis(query, realData);
 
+    // Step 4: Create summary
+    const summary = analysisResponse.summary;
     const result: AnalysisResult = {
       mode: detectedMode,
       query,
       summary,
       timestamp: new Date().toISOString(),
-      opportunities: realOpportunities
+      opportunities: analysisResponse.opportunities,
+      totalSourcesAnalyzed: analysisResponse.totalSourcesAnalyzed,
+      dateRange: analysisResponse.dateRange,
+      queryInterpretation: analysisResponse.queryInterpretation,
+      rawFindings: analysisResponse.rawFindings
     };
 
-    console.log(`✅ Analysis complete: ${detectedMode} mode with ${realOpportunities.length} results`);
+    console.log(`✅ Analysis complete: ${detectedMode} mode with ${analysisResponse.opportunities.length} results`);
     return result;
 
   } catch (error: any) {
@@ -137,33 +144,82 @@ IMPORTANT:
 }
 
 // Generate opportunities analysis
-async function generateOpportunitiesAnalysis(query: string): Promise<any[]> {
+async function generateOpportunitiesAnalysis(query: string, realData: any[] = []): Promise<any> {
+  const dataContext = realData.length > 0
+    ? `\nREAL-TIME MARKET DATA:\n${JSON.stringify(realData.map(d => ({
+      source: d.source,
+      text: d.requestSummary,
+      url: d.sourceUrl
+    })), null, 2)}`
+    : "\n(No real-time data found for this specific query. Use your internal knowledge to predict market gaps based on recent trends.)";
+
   const prompt = `
 Analyze market opportunities for: "${query}"
+${dataContext}
 
-Generate 3-5 realistic business opportunities based on market research.
-Focus on underserved markets and real problems people face.
+Perform a deep-dive analysis across professional forums, Reddit (r/entrepreneur, industry subs), and communities.
+Extract high-fidelity signals based on real user pain points and desperation.
 
-Return ONLY valid JSON array:
-[
-  {
-    "id": "opp-1",
-    "problemStatement": "Clear description of the problem",
-    "overallScore": 8,
-    "demandSignal": 9,
-    "marketReadiness": 7,
-    "competition": "Underserved",
-    "entryDifficulty": "Medium",
-    "evidence": ["Market indicator 1", "Market indicator 2"],
-    "whyItMatters": "Why this opportunity matters now",
-    "redFlags": "Potential risks or concerns",
-    "nextSteps": ["Actionable step 1", "Actionable step 2"],
-    "marketSentiment": 82,
-    "growthVelocity": 75,
-    "competitionIntensity": 45,
-    "marketMaturity": "Emerging"
-  }
-]
+Return ONLY a valid JSON object with the following structure:
+{
+  "totalSourcesAnalyzed": 156,
+  "dateRange": "Past 90 days",
+  "queryInterpretation": "Briefly explain how you interpreted the query and what specific market segment was analyzed",
+  "summary": "High-level overview of findings",
+  "opportunities": [
+    {
+      "id": "opp-1",
+      "problemStatement": "One sentence description of the problem",
+      "overallScore": 8,
+      "demandSignal": 9,
+      "demandSubMetrics": {
+        "frequency": 8,
+        "intensity": 9,
+        "uniqueVoices": 12
+      },
+      "marketReadiness": 7,
+      "readinessSubMetrics": {
+        "workarounds": true,
+        "failedSolutions": true,
+        "timeMoneySpent": true
+      },
+      "competition": "Underserved",
+      "entryDifficulty": "Medium",
+      "evidence": ["Market indicator 1", "Market indicator 2"],
+      "whyItMatters": "Why this is a genuine opportunity now",
+      "redFlags": "Potential risks or concerns",
+      "nextSteps": ["Actionable step 1", "Actionable step 2"],
+      "confidenceLevel": 9,
+      "supportingEvidence": [
+        {
+          "quote": "Direct anonymized quote from a real user",
+          "context": "Reddit r/entrepreneur - 2 days ago",
+          "sourceUrl": "https://reddit.com/..."
+        }
+      ],
+      "marketSentiment": 82,
+      "growthVelocity": 75,
+      "competitionIntensity": 45,
+      "marketMaturity": "Emerging"
+    }
+  ],
+  "rawFindings": [
+    {
+      "id": "find-1",
+      "title": "Post/Comment Title",
+      "text": "Snippet of finding",
+      "source": "Reddit",
+      "url": "URL",
+      "date": "2026-01-05",
+      "sentiment": "Negative"
+    }
+  ]
+}
+
+IMPORTANT:
+- Demand Intensity should reflect "desperation indicators" in the language used.
+- Readiness should look for mentions of "workarounds", "hacks", or "failed solutions".
+- Supporting Evidence must be 3-5 real, high-impact quotes per top opportunity.
 `;
 
   try {
@@ -176,15 +232,22 @@ Return ONLY valid JSON array:
     });
 
     const response = await result.response;
-    const responseText = response.text() || '[]';
+    const responseText = response.text() || '{}';
     const text = responseText.replace(/```json\n?|\n?```/g, '').trim();
-    if (!text) return [];
+    if (!text) return { opportunities: [], totalSourcesAnalyzed: 0 };
     try {
       const parsed = JSON.parse(text);
-      return Array.isArray(parsed) ? parsed : [];
+      return {
+        totalSourcesAnalyzed: parsed.totalSourcesAnalyzed || 0,
+        dateRange: parsed.dateRange || 'Recent',
+        queryInterpretation: parsed.queryInterpretation || '',
+        summary: parsed.summary || 'Analysis complete',
+        opportunities: Array.isArray(parsed.opportunities) ? parsed.opportunities : [],
+        rawFindings: Array.isArray(parsed.rawFindings) ? parsed.rawFindings : []
+      };
     } catch (e) {
       console.error("JSON Parse Error in opportunities analysis:", e);
-      return [];
+      return { opportunities: [], totalSourcesAnalyzed: 0 };
     }
   } catch (error) {
     console.error('Failed to generate opportunities:', error);

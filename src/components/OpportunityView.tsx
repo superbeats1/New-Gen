@@ -98,16 +98,20 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
           <div className="flex flex-wrap gap-4">
             <div className="flex flex-col bg-white/[0.03] px-6 py-3 rounded-2xl border border-white/5 backdrop-blur-md">
               <span className="text-[9px] text-slate-500 uppercase tracking-widest font-black mb-1">Market Flux</span>
-              <span className={`text-lg font-black ${getScoreColor(opportunity.demandSignal)}`}>{opportunity.demandSignal}/10</span>
+              <span className={`text-lg font-black ${getScoreColor(opportunity.overallScore)}`}>{opportunity.overallScore}/10</span>
             </div>
-            <div className="flex flex-col bg-white/[0.03] px-6 py-3 rounded-2xl border border-white/5 backdrop-blur-md">
-              <span className="text-[9px] text-slate-500 uppercase tracking-widest font-black mb-1">Entry Status</span>
-              <span className={`text-lg font-black ${getScoreColor(opportunity.marketReadiness)}`}>{opportunity.marketReadiness}/10</span>
-            </div>
-            <div className="flex flex-col bg-white/[0.03] px-6 py-3 rounded-2xl border border-white/5 backdrop-blur-md">
-              <span className="text-[9px] text-slate-500 uppercase tracking-widest font-black mb-1">Intensity</span>
-              <span className="text-lg font-black text-indigo-400">{opportunity.marketSentiment || 75}%</span>
-            </div>
+            {opportunity.confidenceLevel && (
+              <div className="flex flex-col bg-violet-600/10 px-6 py-3 rounded-2xl border border-violet-500/20 backdrop-blur-md">
+                <span className="text-[9px] text-violet-400 uppercase tracking-widest font-black mb-1">Confidence</span>
+                <span className="text-lg font-black text-white">{opportunity.confidenceLevel}/10</span>
+              </div>
+            )}
+            {opportunity.demandSubMetrics && (
+              <div className="flex flex-col bg-white/[0.03] px-6 py-3 rounded-2xl border border-white/5 backdrop-blur-md">
+                <span className="text-[9px] text-slate-500 uppercase tracking-widest font-black mb-1">Intensity</span>
+                <span className="text-lg font-black text-indigo-400">{opportunity.demandSubMetrics.intensity}/10</span>
+              </div>
+            )}
           </div>
         </div>
         <div className="flex flex-col items-center space-y-4">
@@ -221,19 +225,50 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
                 </div>
               )}
 
-              <div>
-                <h4 className="flex items-center space-x-2 text-xs font-bold text-slate-500 mb-4 uppercase tracking-widest">
-                  <Quote className="w-4 h-4" />
-                  <span>Market Evidence</span>
-                </h4>
-                <div className="space-y-3">
-                  {opportunity.evidence.map((quote, i) => (
-                    <div key={i} className="p-4 bg-white/[0.02] rounded-2xl border-l-2 border-violet-500 italic text-slate-400 text-sm">
-                      "{quote}"
-                    </div>
-                  ))}
+              {opportunity.supportingEvidence && opportunity.supportingEvidence.length > 0 && (
+                <div>
+                  <h4 className="flex items-center space-x-2 text-xs font-bold text-slate-500 mb-4 uppercase tracking-widest">
+                    <Quote className="w-4 h-4" />
+                    <span>Supporting Evidence</span>
+                  </h4>
+                  <div className="space-y-4">
+                    {opportunity.supportingEvidence.map((ev, i) => (
+                      <div key={i} className="group/quote relative p-6 bg-white/[0.02] rounded-[2rem] border border-white/5 hover:border-violet-500/30 transition-all">
+                        <Quote className="absolute top-4 right-6 w-8 h-8 text-white/5 group-hover/quote:text-violet-500/10 transition-colors" />
+                        <p className="text-slate-300 italic mb-4 relative z-10">"{ev.quote}"</p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{ev.context}</span>
+                          <a
+                            href={ev.sourceUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] font-black uppercase tracking-widest text-violet-400 hover:text-violet-300 transition-colors flex items-center"
+                          >
+                            <span>Source</span>
+                            <ArrowRight className="w-3 h-3 ml-1" />
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {(!opportunity.supportingEvidence || opportunity.supportingEvidence.length === 0) && (
+                <div>
+                  <h4 className="flex items-center space-x-2 text-xs font-bold text-slate-500 mb-4 uppercase tracking-widest">
+                    <Quote className="w-4 h-4" />
+                    <span>Market Evidence</span>
+                  </h4>
+                  <div className="space-y-3">
+                    {opportunity.evidence.map((quote, i) => (
+                      <div key={i} className="p-4 bg-white/[0.02] rounded-2xl border-l-2 border-violet-500 italic text-slate-400 text-sm">
+                        "{quote}"
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {opportunity.existingCompetitors && opportunity.existingCompetitors.length > 0 && (
                 <div>
@@ -340,10 +375,36 @@ const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
             <Zap className="w-4 h-4 text-emerald-400 fill-emerald-400" />
             <span className="uppercase tracking-[0.2em] text-[10px] font-black text-emerald-400/80">Analysis Protocol Active</span>
           </div>
-          <div className="flex flex-col sm:flex-row sm:items-baseline sm:space-x-3">
-            <h2 className="text-4xl lg:text-6xl font-black text-white tracking-tighter uppercase italic">Market Report</h2>
+          <div className="flex flex-col sm:flex-row sm:items-baseline sm:space-x-4">
+            <h2 className="text-4xl lg:text-7xl font-black text-white tracking-tighter uppercase italic">Market Report</h2>
+            {results.dateRange && (
+              <span className="text-xs font-black text-slate-500 uppercase tracking-widest bg-white/5 px-3 py-1 rounded-full border border-white/10">
+                {results.dateRange}
+              </span>
+            )}
           </div>
-          <p className="text-slate-500 text-xs lg:text-sm max-w-2xl mt-4 font-medium italic">"{results.query}" — {results.summary}</p>
+          {results.queryInterpretation && (
+            <div className="mt-4 p-4 bg-violet-600/5 border border-violet-500/10 rounded-2xl max-w-3xl">
+              <span className="text-[9px] font-black text-violet-400 uppercase tracking-widest block mb-1">Intelligence Context</span>
+              <p className="text-slate-400 text-sm italic">"{results.queryInterpretation}"</p>
+            </div>
+          )}
+          <div className="flex items-center space-x-6 mt-6">
+            <div className="flex flex-col">
+              <span className="text-[9px] text-slate-500 uppercase tracking-widest font-black mb-1">Sources Scanned</span>
+              <span className="text-2xl font-black text-white">{results.totalSourcesAnalyzed || 0}</span>
+            </div>
+            <div className="w-[1px] h-8 bg-white/10"></div>
+            <div className="flex flex-col">
+              <span className="text-[9px] text-slate-500 uppercase tracking-widest font-black mb-1">Query Resolution</span>
+              <span className="text-2xl font-black text-emerald-400">Stable</span>
+            </div>
+            <div className="w-[1px] h-8 bg-white/10"></div>
+            <div className="flex flex-col">
+              <span className="text-[9px] text-slate-500 uppercase tracking-widest font-black mb-1">Signal Alpha</span>
+              <span className="text-2xl font-black text-violet-400">{results.opportunities?.length || 0}</span>
+            </div>
+          </div>
         </div>
         <div className="flex items-center space-x-3 w-full lg:w-auto">
           <button className="flex-1 lg:flex-none flex items-center justify-center space-x-3 bg-white/5 hover:bg-white/10 px-8 py-5 rounded-[1.5rem] text-slate-400 transition-all text-[10px] font-black uppercase tracking-widest border border-white/5 group">
@@ -442,6 +503,48 @@ const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
           ))}
         </div>
       </div>
+
+      {/* Raw Data Section */}
+      {results.rawFindings && results.rawFindings.length > 0 && (
+        <div className="mt-20 pt-12 border-t border-white/5">
+          <div className="flex items-center justify-between mb-8 px-2">
+            <div>
+              <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic flex items-center space-x-3">
+                <Search className="w-6 h-6 text-violet-500" />
+                <span>Raw Neural Findings</span>
+              </h3>
+              <p className="text-slate-500 text-xs font-medium uppercase tracking-widest mt-2 font-mono">Archive: {results.totalSourcesAnalyzed} data points processed</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {results.rawFindings.map((finding) => (
+              <div key={finding.id} className="glass-panel p-6 rounded-3xl border border-white/5 hover:border-violet-500/20 transition-all group/find">
+                <div className="flex items-center justify-between mb-4">
+                  <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${finding.sentiment === 'Positive' ? 'bg-emerald-500/10 text-emerald-400' :
+                    finding.sentiment === 'Negative' ? 'bg-rose-500/10 text-rose-400' :
+                      'bg-slate-500/10 text-slate-400'
+                    }`}>
+                    {finding.sentiment}
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-500 tracking-tighter">{finding.date}</span>
+                </div>
+                <h4 className="text-white font-bold mb-3 line-clamp-2 leading-tight group-hover/find:text-violet-200 transition-colors">{finding.title}</h4>
+                <p className="text-slate-400 text-xs line-clamp-3 leading-relaxed mb-6 italic">"{finding.text}"</p>
+                <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse"></div>
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{finding.source}</span>
+                  </div>
+                  <a href={finding.url} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-xl text-slate-500 hover:text-white transition-all">
+                    <ArrowRight className="w-4 h-4" />
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

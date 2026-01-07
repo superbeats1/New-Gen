@@ -46,6 +46,24 @@ export interface Opportunity {
   growthVelocity?: number; // 0-100
   competitionIntensity?: number; // 0-100
   marketMaturity?: 'Emerging' | 'Scaling' | 'Mature';
+
+  // High-Fidelity Metrics
+  demandSubMetrics?: {
+    frequency: number; // 1-10
+    intensity: number; // 1-10 (desperation indicators)
+    uniqueVoices: number; // raw count
+  };
+  readinessSubMetrics?: {
+    workarounds: boolean;
+    failedSolutions: boolean;
+    timeMoneySpent: boolean;
+  };
+  confidenceLevel: number; // 1-10
+  supportingEvidence?: {
+    quote: string;
+    context: string;
+    sourceUrl: string;
+  }[];
 }
 
 export interface Lead {
@@ -73,6 +91,20 @@ export interface AnalysisResult {
   timestamp: string;
   opportunities?: Opportunity[];
   leads?: Lead[];
+
+  // Summary Metadata
+  totalSourcesAnalyzed?: number;
+  dateRange?: string;
+  queryInterpretation?: string;
+  rawFindings?: {
+    id: string;
+    title: string;
+    text: string;
+    source: string;
+    url: string;
+    date: string;
+    sentiment: 'Positive' | 'Neutral' | 'Negative';
+  }[];
 }
 
 
