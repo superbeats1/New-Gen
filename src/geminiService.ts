@@ -75,15 +75,35 @@ export const analyzeQuery = async (query: string): Promise<AnalysisResult> => {
 function extractJsonFromText(text: string): string {
   if (!text || typeof text !== 'string') return '';
 
-  // Look for the first '[' or '{' and the last ']' or '}'
-  const start = text.search(/[\[\{]/);
-  const end = text.lastIndexOf(text[start] === '[' ? ']' : '}');
+  try {
+    // 1. Try to find the first '{' and corresponding last '}'
+    const firstBrace = text.indexOf('{');
+    const lastBrace = text.lastIndexOf('}');
 
-  if (start !== -1 && end !== -1 && end > start) {
-    return text.substring(start, end + 1);
+    // 2. Try to find the first '[' and corresponding last ']'
+    const firstBracket = text.indexOf('[');
+    const lastBracket = text.lastIndexOf(']');
+
+    // Determine which start/end pair encapsulates the primary structure
+    let start = -1;
+    let end = -1;
+
+    // If we find both, prioritize the one that starts first (handles mixtures)
+    if (firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) {
+      start = firstBrace;
+      end = lastBrace;
+    } else if (firstBracket !== -1) {
+      start = firstBracket;
+      end = lastBracket;
+    }
+
+    if (start !== -1 && end !== -1 && end > start) {
+      return text.substring(start, end + 1);
+    }
+  } catch (e) {
+    console.warn("Manual JSON extraction failed, falling back to regex", e);
   }
 
-  // Fallback to basic cleaning
   return text.replace(/```json\n?|\n?```/g, '').trim();
 }
 
@@ -208,9 +228,12 @@ IMPORTANT:
 
     const response = await result.response;
     const rawText = response.text() || '';
+    console.log("%c 🧠 RAW NEURAL RESPONSE ", "background: #1e293b; color: #8b5cf6; font-weight: bold; padding: 2px 4px;", rawText);
+
     const text = extractJsonFromText(rawText);
 
     if (!text) {
+      console.warn("⚠️ NO VALID JSON EXTRACTED FROM NEURAL RESPONSE");
       return {
         opportunities: [],
         totalSourcesAnalyzed: realData.length,
