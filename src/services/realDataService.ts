@@ -197,9 +197,15 @@ export class RealDataCollector {
 
         const data: RedditResponse = await response.json();
 
+        if (!data || !data.data || !Array.isArray(data.data.children)) {
+          console.warn(`⚠️ Reddit API returned unexpected format for ${subreddit}`);
+          continue;
+        }
+
         for (const post of data.data.children) {
+          if (!post || !post.data) continue;
           const postData = post.data;
-          const fullText = `${postData.title} ${postData.selftext}`.toLowerCase();
+          const fullText = `${postData.title || ''} ${postData.selftext || ''}`.toLowerCase();
 
           // Check if post matches query and contains lead indicators
           if (this.matchesQuery(fullText, query) && this.containsLeadIndicators(fullText, mode)) {
@@ -316,8 +322,14 @@ export class RealDataCollector {
 
       const data = await response.json();
 
-      for (const issue of data.items || []) {
-        const fullText = `${issue.title} ${issue.body || ''}`.toLowerCase();
+      if (!data || !Array.isArray(data.items)) {
+        console.warn(`⚠️ GitHub API returned unexpected format`);
+        return [];
+      }
+
+      for (const issue of data.items) {
+        if (!issue) continue;
+        const fullText = `${issue.title || ''} ${issue.body || ''}`.toLowerCase();
 
         if (this.matchesQuery(fullText, query)) {
           const budgetInfo = this.extractBudget(fullText);
@@ -377,12 +389,13 @@ export class RealDataCollector {
 
   // Helper methods
   // Strict matching: Ensures the post is actually relevant to the SEARCH TERMS
-  private matchesQueryStrict(text: string, cleanQuery: string): boolean {
+  private matchesQueryStrict(text: string | null | undefined, cleanQuery: string | null | undefined): boolean {
+    if (!text || !cleanQuery || typeof text !== 'string' || typeof cleanQuery !== 'string') return false;
     const queryWords = cleanQuery.toLowerCase().split(' ').filter(w => w.length > 2);
     if (queryWords.length === 0) return true; // Fallback
 
     // Count how many query words appear in the text
-    const matches = queryWords.filter(word => text.includes(word));
+    const matches = queryWords.filter(word => text.toLowerCase().includes(word.toLowerCase()));
 
     // For short queries (1-2 words), require ALL of them
     if (queryWords.length <= 2) {
@@ -394,25 +407,27 @@ export class RealDataCollector {
   }
 
   // Deprecated naive matcher
-  private matchesQuery(text: string, query: string): boolean {
-    if (!text || !query) return false;
-    const queryWords = query.toLowerCase().split(' ');
+  private matchesQuery(text: string | null | undefined, query: string | null | undefined): boolean {
+    if (!text || !query || typeof text !== 'string' || typeof query !== 'string') return false;
+    const queryWords = query.toLowerCase().split(' ').filter(w => w.length > 0);
+    if (queryWords.length === 0) return false;
     return queryWords.some(word => text.toLowerCase().includes(word.toLowerCase()));
   }
 
-  private containsLeadIndicators(text: string, mode: WorkflowMode): boolean {
-    if (!text) return false;
+  private containsLeadIndicators(text: string | null | undefined, mode: WorkflowMode): boolean {
+    if (!text || typeof text !== 'string') return false;
     const keywords = mode === WorkflowMode.LEAD ? LEAD_KEYWORDS : OPPORTUNITY_KEYWORDS;
     return keywords.some(keyword => text.toLowerCase().includes(keyword.toLowerCase()));
   }
 
-  private extractRequestSummary(title: string, body?: string): string {
-    const combined = `${title} ${body || ''}`;
+  private extractRequestSummary(title: string | null | undefined, body?: string | null | undefined): string {
+    const combined = `${title || ''} ${body || ''}`.trim();
+    if (!combined) return "No description provided";
     // Return first 150 characters, ending at word boundary
     if (combined.length <= 150) return combined;
-    const truncated = combined.substr(0, 150);
+    const truncated = combined.slice(0, 150);
     const lastSpace = truncated.lastIndexOf(' ');
-    return lastSpace > 0 ? truncated.substr(0, lastSpace) + '...' : truncated + '...';
+    return lastSpace > 0 ? truncated.slice(0, lastSpace) + '...' : truncated + '...';
   }
 
   private extractLocation(text: string): string | undefined {

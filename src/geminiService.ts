@@ -7,6 +7,9 @@ const apiKey = import.meta.env.VITE_GEMINI_API_KEY ||
   import.meta.env.VITE_GOOGLE_API_KEY ||
   import.meta.env.GEMINI_API_KEY;
 
+const GEMINI_MODEL = "gemini-1.5-pro";
+const GEMINI_API_VERSION = "v1";
+
 let genAIInstance: GoogleGenerativeAI | null = null;
 let realDataCollector: RealDataCollector | null = null;
 
@@ -113,7 +116,7 @@ async function generateSupplementalLeads(query: string, count: number): Promise<
 Generate ${count} realistic leads...`; // Prompt truncated for clarity in replacement chunk
 
   try {
-    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash-latest" }, { apiVersion: 'v1' });
+    const model = getGenAI().getGenerativeModel({ model: GEMINI_MODEL }, { apiVersion: GEMINI_API_VERSION });
     const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }]
     });
@@ -221,7 +224,7 @@ IMPORTANT:
 `;
 
   try {
-    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash-latest" }, { apiVersion: 'v1' });
+    const model = getGenAI().getGenerativeModel({ model: GEMINI_MODEL }, { apiVersion: GEMINI_API_VERSION });
     const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }]
     });
@@ -293,7 +296,7 @@ Requirements:
 Return only the message text, no extra formatting.
 `;
 
-    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash-latest" }, { apiVersion: 'v1' });
+    const model = getGenAI().getGenerativeModel({ model: GEMINI_MODEL }, { apiVersion: GEMINI_API_VERSION });
     const result = await model.generateContent(prompt);
     const response = await result.response;
     return response.text() || '';
@@ -330,7 +333,7 @@ Return ONLY valid JSON in this format:
 }
 `;
 
-    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash-latest" }, { apiVersion: 'v1' });
+    const model = getGenAI().getGenerativeModel({ model: GEMINI_MODEL }, { apiVersion: GEMINI_API_VERSION });
     const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }]
     });
