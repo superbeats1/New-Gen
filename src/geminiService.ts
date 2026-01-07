@@ -7,8 +7,8 @@ const apiKey = import.meta.env.VITE_GEMINI_API_KEY ||
   import.meta.env.VITE_GOOGLE_API_KEY ||
   import.meta.env.GEMINI_API_KEY;
 
-const GEMINI_MODEL = "gemini-1.5-pro";
-// Use stable v1 API instead of v1beta (gemini-1.5-pro not available in v1beta)
+// Use gemini-1.5-flash (stable and available in all API versions)
+const GEMINI_MODEL = "gemini-1.5-flash-latest";
 const GEMINI_API_VERSION = "v1";
 
 let genAIInstance: GoogleGenerativeAI | null = null;
