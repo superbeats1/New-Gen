@@ -57,6 +57,10 @@ const DATA_SOURCES = {
         // Idea & problem discussion
         'entrepreneur', 'startups', 'SomebodyMakeThis', 'AppIdeas', 'Startup_Ideas',
         'Business_Ideas', 'EntrepreneurRideAlong', 'SideProject',
+        // AI & Future Tech
+        'ArtificialIntelligent', 'Futurology', 'Singularity', 'MachineLearning',
+        // Health & Bio Tech
+        'HealthTech', 'MedicalTechnology', 'biotech', 'digitalhealth',
         // Pain point & complaint subreddits
         'mildlyinfuriating', 'assholedesign', 'CrappyDesign',
         // Domain-specific pain points
@@ -119,7 +123,9 @@ const OPPORTUNITY_KEYWORDS = [
   'would you pay', 'is there demand', 'who would use',
   // Unmet needs
   'no one is solving', 'nobody focuses on', 'underserved', 'neglected',
-  'needs improvement', 'could be so much better', 'why don\'t they'
+  'needs improvement', 'could be so much better', 'why don\'t they',
+  // Future focus
+  '2026', 'future of', 'next decade', 'emerging', 'predictive', 'upcoming'
 ];
 
 export class RealDataCollector {
@@ -152,7 +158,7 @@ export class RealDataCollector {
       : DATA_SOURCES.reddit.subreddits.opportunities;
 
     try {
-      for (const subreddit of subreddits.slice(0, 2)) { // Limit to 2 subreddits per query
+      for (const subreddit of subreddits.slice(0, 6)) { // Increased to 6 subreddits per query
         const url = `${DATA_SOURCES.reddit.baseUrl}/${subreddit}/new.json?limit=25`;
 
         console.log(`Scanning Reddit r/${subreddit} for: ${query}`);
@@ -196,7 +202,7 @@ export class RealDataCollector {
 
             leads.push(lead);
 
-            if (leads.length >= 5) break; // Limit results per subreddit
+            if (leads.length >= 10) break; // Increased to 10 results per subreddit
           }
         }
 
@@ -345,7 +351,7 @@ export class RealDataCollector {
     });
 
     console.log(`📊 Found ${allLeads.length} real leads from live sources`);
-    return allLeads.slice(0, 8); // Return top 8 results
+    return allLeads.slice(0, 20); // Return top 20 results for Gemini to filter
   }
 
   // Helper methods
