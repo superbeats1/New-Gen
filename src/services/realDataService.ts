@@ -271,7 +271,7 @@ export class RealDataCollector {
         const itemResponse = await fetch(`${DATA_SOURCES.hackernews.baseUrl}/item/${storyId}.json`);
         const item: HNItem = await itemResponse.json();
 
-        if (!item.title) continue;
+        if (!item || !item.title) continue;
 
         const fullText = `${item.title} ${item.text || ''}`.toLowerCase();
 
