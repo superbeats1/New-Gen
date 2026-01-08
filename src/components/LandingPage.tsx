@@ -234,44 +234,44 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
       </section>
 
       {/* Dashboard Preview Section */}
-      <section className="px-4 md:px-8 pb-32">
+      <section className="px-8 pb-32">
         <div className="max-w-6xl mx-auto relative group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/30 to-indigo-600/30 rounded-[2rem] md:rounded-[3rem] blur-2xl opacity-50 group-hover:opacity-100 transition duration-1000 animate-pulse-glow"></div>
-          <div className="relative glass-card rounded-[1.5rem] md:rounded-[2.8rem] border border-white/10 overflow-hidden shadow-2xl bg-[#0a0b0f]/80 backdrop-blur-3xl animate-in fade-in zoom-in-95 duration-1000 delay-500">
-            <div className="h-8 md:h-10 border-b border-white/5 bg-white/5 flex items-center px-4 md:px-6 space-x-2">
-              <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-rose-500/50"></div>
-              <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-amber-500/50"></div>
-              <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-emerald-500/50"></div>
+          <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/30 to-indigo-600/30 rounded-[3rem] blur-2xl opacity-50 group-hover:opacity-100 transition duration-1000 animate-pulse-glow"></div>
+          <div className="relative glass-card rounded-[2.8rem] border border-white/10 overflow-hidden shadow-2xl bg-[#0a0b0f]/80 backdrop-blur-3xl animate-in fade-in zoom-in-95 duration-1000 delay-500">
+            <div className="h-10 border-b border-white/5 bg-white/5 flex items-center px-6 space-x-2">
+              <div className="w-3 h-3 rounded-full bg-rose-500/50"></div>
+              <div className="w-3 h-3 rounded-full bg-amber-500/50"></div>
+              <div className="w-3 h-3 rounded-full bg-emerald-500/50"></div>
             </div>
-            <div className="p-3 md:p-8 min-h-[600px] md:min-h-0 md:aspect-[21/9] bg-gradient-to-br from-[#0a0b0f] via-[#0f1116] to-blue-950/20 relative overflow-hidden">
+            <div className="p-4 md:p-8 aspect-video md:aspect-[21/9] bg-gradient-to-br from-[#0a0b0f] via-[#0f1116] to-blue-950/20 relative overflow-hidden">
               {/* Animated Dashboard Preview - REAL DASHBOARD TEASER */}
 
               {/* Background glow effects */}
               <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-[100px] animate-pulse"></div>
               <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }}></div>
 
-              <div className="absolute inset-2 md:inset-4 flex flex-col md:flex-row gap-3 md:gap-4 overflow-y-auto md:overflow-visible">
+              <div className="absolute top-4 left-4 right-4 bottom-4 flex flex-col md:flex-row gap-4">
                 {/* Left Sidebar - Stats Panel */}
-                <div className="w-full md:w-1/3 space-y-2.5 md:space-y-3 flex-shrink-0">
+                <div className="w-full md:w-1/3 space-y-3">
                   {/* Market Report Header */}
-                  <div className="bg-gradient-to-br from-white/5 to-white/[0.02] rounded-xl md:rounded-2xl border border-white/10 p-3 md:p-4 backdrop-blur-xl">
-                    <div className="flex items-center space-x-2 mb-2 md:mb-3">
+                  <div className="bg-gradient-to-br from-white/5 to-white/[0.02] rounded-2xl border border-white/10 p-4 backdrop-blur-xl animate-in fade-in slide-in-from-left duration-700">
+                    <div className="flex items-center space-x-2 mb-3">
                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
-                      <span className="text-[9px] md:text-[10px] font-black text-emerald-400 uppercase tracking-widest">Analysis Active</span>
+                      <span className="text-[8px] md:text-[10px] font-black text-emerald-400 uppercase tracking-widest">Analysis Active</span>
                     </div>
-                    <div className="text-xl md:text-2xl font-black text-white italic tracking-tight">MARKET REPORT</div>
-                    <div className="text-[9px] md:text-xs text-slate-500 font-bold">PAST 90 DAYS</div>
+                    <div className="text-lg md:text-2xl font-black text-white italic tracking-tight">MARKET REPORT</div>
+                    <div className="text-[8px] md:text-xs text-slate-500 font-bold">PAST 90 DAYS</div>
                   </div>
 
                   {/* Intelligence Stats */}
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-gradient-to-br from-violet-600/10 to-transparent rounded-lg md:rounded-xl border border-violet-500/20 p-2.5 md:p-3 backdrop-blur-xl">
-                      <div className="text-[9px] font-black text-violet-400 uppercase tracking-wider mb-1">Intelligence</div>
+                  <div className="grid grid-cols-2 gap-2 animate-in fade-in slide-in-from-left duration-700 delay-100">
+                    <div className="bg-gradient-to-br from-violet-600/10 to-transparent rounded-xl border border-violet-500/20 p-3 backdrop-blur-xl">
+                      <div className="text-[8px] font-black text-violet-400 uppercase tracking-wider mb-1">Intelligence</div>
                       <div className="text-2xl md:text-3xl font-black text-white">48.2</div>
-                      <div className="text-[9px] text-emerald-400 font-bold mt-1">↗ HIGH EFFICIENCY</div>
+                      <div className="text-[8px] text-emerald-400 font-bold mt-1">↗ HIGH EFFICIENCY</div>
                     </div>
-                    <div className="bg-gradient-to-br from-blue-600/10 to-transparent rounded-lg md:rounded-xl border border-blue-500/20 p-2.5 md:p-3 backdrop-blur-xl">
-                      <div className="text-[9px] font-black text-blue-400 uppercase tracking-wider mb-1">Growth</div>
+                    <div className="bg-gradient-to-br from-blue-600/10 to-transparent rounded-xl border border-blue-500/20 p-3 backdrop-blur-xl">
+                      <div className="text-[8px] font-black text-blue-400 uppercase tracking-wider mb-1">Growth</div>
                       <div className="text-2xl md:text-3xl font-black text-white">88%</div>
                       <div className="h-1 w-full bg-blue-950 rounded-full mt-2">
                         <div className="h-full w-[88%] bg-gradient-to-r from-blue-600 to-violet-500 rounded-full animate-pulse"></div>
@@ -280,17 +280,17 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
                   </div>
 
                   {/* Sources Scanned */}
-                  <div className="bg-gradient-to-br from-white/5 to-white/[0.02] rounded-lg md:rounded-xl border border-white/10 p-2.5 md:p-3 backdrop-blur-xl">
-                    <div className="text-[9px] font-black text-slate-500 uppercase tracking-wider mb-2">Sources Scanned</div>
+                  <div className="bg-gradient-to-br from-white/5 to-white/[0.02] rounded-xl border border-white/10 p-3 backdrop-blur-xl animate-in fade-in slide-in-from-left duration-700 delay-200">
+                    <div className="text-[8px] font-black text-slate-500 uppercase tracking-wider mb-2">Sources Scanned</div>
                     <div className="text-3xl md:text-4xl font-black text-white">156</div>
                     <div className="text-[10px] text-emerald-400 font-bold mt-1">Stable Resolution</div>
                   </div>
                 </div>
 
                 {/* Right Main Content */}
-                <div className="flex-1 space-y-2.5 md:space-y-3 flex-shrink-0">
+                <div className="flex-1 space-y-3 overflow-hidden">
                   {/* Fast Track Badge - HERO FEATURE */}
-                  <div className="bg-gradient-to-br from-emerald-600/15 to-transparent rounded-xl md:rounded-2xl border-2 border-emerald-500/40 p-3 md:p-5 backdrop-blur-xl">
+                  <div className="bg-gradient-to-br from-emerald-600/15 to-transparent rounded-2xl border-2 border-emerald-500/40 p-4 md:p-5 backdrop-blur-xl animate-in fade-in slide-in-from-top duration-700 delay-300">
                     <div className="flex items-center space-x-3">
                       <div className="bg-emerald-500/20 rounded-full p-2">
                         <svg className="w-4 h-4 md:w-6 md:h-6 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
@@ -298,58 +298,58 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
                         </svg>
                       </div>
                       <div>
-                        <div className="text-[9px] md:text-[10px] font-black text-emerald-400 uppercase tracking-widest">Fast Track</div>
-                        <div className="text-lg md:text-xl font-black text-white">6 weeks to $1K MRR</div>
+                        <div className="text-[8px] md:text-[10px] font-black text-emerald-400 uppercase tracking-widest">Fast Track</div>
+                        <div className="text-base md:text-xl font-black text-white">6 weeks to $1K MRR</div>
                       </div>
                     </div>
-                    <p className="text-[9px] md:text-xs text-slate-400 mt-2 line-clamp-2">Low competition + desperate demand + simple MVP = fast validation</p>
+                    <p className="text-[8px] md:text-xs text-slate-400 mt-2 line-clamp-2">Low competition + desperate demand + simple MVP = fast validation</p>
                   </div>
 
                   {/* Opportunity Card Preview */}
-                  <div className="bg-gradient-to-br from-white/[0.08] to-white/[0.02] rounded-xl md:rounded-2xl border border-white/10 p-3 md:p-5 backdrop-blur-xl">
-                    <div className="flex items-center justify-between mb-2.5 md:mb-3">
+                  <div className="bg-gradient-to-br from-white/[0.08] to-white/[0.02] rounded-2xl border border-white/10 p-4 md:p-5 backdrop-blur-xl animate-in fade-in slide-in-from-bottom duration-700 delay-400">
+                    <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center space-x-2">
                         <div className="bg-violet-600/20 border border-violet-500/30 px-2 md:px-3 py-1 rounded-full flex items-center space-x-1">
                           <div className="w-1 h-1 md:w-1.5 md:h-1.5 bg-violet-400 rounded-full"></div>
-                          <span className="text-[8px] md:text-[9px] font-black text-white uppercase tracking-wider">Signal Alpha-1</span>
+                          <span className="text-[7px] md:text-[9px] font-black text-white uppercase tracking-wider">Signal Alpha-1</span>
                         </div>
                       </div>
-                      <span className="text-[9px] md:text-[10px] font-black text-emerald-400 uppercase tracking-widest">90% Match</span>
+                      <span className="text-[8px] md:text-[10px] font-black text-emerald-400 uppercase tracking-widest">90% Match</span>
                     </div>
-                    <div className="text-base md:text-lg font-black text-white leading-tight mb-2.5 md:mb-3 line-clamp-2">
+                    <div className="text-sm md:text-lg font-black text-white leading-tight mb-3 line-clamp-2">
                       LLM users need context management tools for workflow optimization
                     </div>
-                    <div className="grid grid-cols-3 gap-1.5 md:gap-2">
-                      <div className="bg-white/5 rounded-lg p-1.5 md:p-2 border border-white/5">
-                        <div className="text-[8px] md:text-[8px] text-slate-500 uppercase tracking-wider font-black mb-0.5">Market Flux</div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="bg-white/5 rounded-lg p-2 border border-white/5">
+                        <div className="text-[7px] md:text-[8px] text-slate-500 uppercase tracking-wider font-black mb-0.5">Market Flux</div>
                         <div className="text-xs md:text-sm font-black text-emerald-400">9/10</div>
                       </div>
-                      <div className="bg-violet-600/10 rounded-lg p-1.5 md:p-2 border border-violet-500/20">
-                        <div className="text-[8px] md:text-[8px] text-violet-400 uppercase tracking-wider font-black mb-0.5">Confidence</div>
+                      <div className="bg-violet-600/10 rounded-lg p-2 border border-violet-500/20">
+                        <div className="text-[7px] md:text-[8px] text-violet-400 uppercase tracking-wider font-black mb-0.5">Confidence</div>
                         <div className="text-xs md:text-sm font-black text-white">9/10</div>
                       </div>
-                      <div className="bg-white/5 rounded-lg p-1.5 md:p-2 border border-white/5">
-                        <div className="text-[8px] md:text-[8px] text-slate-500 uppercase tracking-wider font-black mb-0.5">Intensity</div>
+                      <div className="bg-white/5 rounded-lg p-2 border border-white/5">
+                        <div className="text-[7px] md:text-[8px] text-slate-500 uppercase tracking-wider font-black mb-0.5">Intensity</div>
                         <div className="text-xs md:text-sm font-black text-indigo-400">8/10</div>
                       </div>
                     </div>
                   </div>
 
                   {/* Attack Vector Badge */}
-                  <div className="bg-gradient-to-br from-rose-600/15 to-transparent rounded-lg md:rounded-xl border border-rose-500/30 p-2.5 md:p-4 backdrop-blur-xl">
+                  <div className="bg-gradient-to-br from-rose-600/15 to-transparent rounded-xl border border-rose-500/30 p-3 md:p-4 backdrop-blur-xl animate-in fade-in slide-in-from-bottom duration-700 delay-500">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <svg className="w-3 h-3 md:w-4 md:h-4 text-rose-400" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M6.672 1.911a1 1 0 10-1.932.518l.259.966a1 1 0 001.932-.518l-.26-.966zM2.429 4.74a1 1 0 10-.517 1.932l.966.259a1 1 0 00.517-1.932l-.966-.26zm8.814-.569a1 1 0 00-1.415-1.414l-.707.707a1 1 0 101.415 1.415l.707-.708zm-7.071 7.072l.707-.707A1 1 0 003.465 9.12l-.708.707a1 1 0 001.415 1.415zm3.2-5.171a1 1 0 00-1.3 1.3l4 10a1 1 0 001.823.075l1.38-2.759 3.018 3.02a1 1 0 001.414-1.415l-3.019-3.02 2.76-1.379a1 1 0 00-.076-1.822l-10-4z" clipRule="evenodd" />
                         </svg>
-                        <span className="text-[9px] md:text-[10px] font-black text-rose-400 uppercase tracking-wider">Attack Vector</span>
+                        <span className="text-[8px] md:text-[10px] font-black text-rose-400 uppercase tracking-wider">Attack Vector</span>
                       </div>
                       <div className="px-2 md:px-3 py-1 bg-rose-500/20 border border-rose-500/40 rounded-full">
                         <span className="text-xs md:text-sm font-black text-white">75%</span>
-                        <span className="text-[8px] md:text-[8px] text-rose-300 ml-1">complaints</span>
+                        <span className="text-[7px] md:text-[8px] text-rose-300 ml-1">complaints</span>
                       </div>
                     </div>
-                    <div className="text-[9px] md:text-xs text-white font-bold mt-2 line-clamp-2">
+                    <div className="text-[8px] md:text-xs text-white font-bold mt-2 line-clamp-2">
                       Primary Weakness: <span className="text-rose-300">UX/Complexity</span>
                     </div>
                   </div>
