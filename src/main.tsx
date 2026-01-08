@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 
-console.log('%c 🎯 SCOPA AI v2.15.1 - DIRECT TO INTELLIGENCE HUB! 🎯 ', 'background: #3b82f6; color: #fff; padding: 10px; border-radius: 8px; font-weight: 900; font-size: 14px; border: 2px solid #fff;');
-(window as any).SCOPA_VERSION = '2.15.1';
+console.log('%c 🎯 SCOPA AI v2.16.0 - STUNNING MOBILE DASHBOARD! 🎯 ', 'background: #06b6d4; color: #fff; padding: 10px; border-radius: 8px; font-weight: 900; font-size: 14px; border: 2px solid #fff;');
+(window as any).SCOPA_VERSION = '2.16.0';
 (window as any).GEMINI_MODEL = 'gemini-3-pro-preview';
 (window as any).SDK = '@google/genai v1.34.0';
 (window as any).DATA_SOURCES = 'Twitter + Reddit + HackerNews + GitHub';
