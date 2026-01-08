@@ -139,7 +139,11 @@ export class RealDataCollector {
 
   // --- STABILITY ENGINE: safeMatch ---
   private safeMatch(text: string | null | undefined, pattern: RegExp): string[] {
-    if (!text || typeof text !== 'string') return [];
+    // Extra defensive checks
+    if (text === null || text === undefined) return [];
+    if (typeof text !== 'string') return [];
+    if (!text || text.length === 0) return [];
+
     try {
       const result = text.match(pattern);
       return Array.isArray(result) ? result : [];
@@ -514,8 +518,9 @@ export class RealDataCollector {
 
     for (const pattern of currencyPatterns) {
       const matches = this.safeMatch(text, pattern);
-      if (matches.length > 0) {
+      if (matches.length > 0 && matches[0]) {
         const rawString = matches[0];
+        if (!rawString || typeof rawString !== 'string') continue;
         const numberMatch = this.safeMatch(rawString, /(\d+(?:,\d+)*(?:\.\d+)?)/);
         const numberPart = numberMatch.length > 0 ? numberMatch[0] : null;
 

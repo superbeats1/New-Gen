@@ -120,7 +120,7 @@ Generate ${count} realistic leads...`; // Prompt truncated for clarity in replac
 
   try {
     const result = await getGenAI().models.generateContent({
-      model: "gemini-3-pro-preview",
+      model: "gemini-1.5-pro-latest",
       contents: prompt
     });
 
@@ -324,7 +324,7 @@ IMPORTANT: If there's NO clear competitor or insufficient data, SET competitorAn
 
   try {
     const result = await getGenAI().models.generateContent({
-      model: "gemini-3-pro-preview",
+      model: "gemini-1.5-pro-latest",
       contents: prompt
     });
 
@@ -406,7 +406,7 @@ Return only the message text, no extra formatting.
 `;
 
     const result = await getGenAI().models.generateContent({
-      model: "gemini-3-pro-preview",
+      model: "gemini-1.5-pro-latest",
       contents: prompt
     });
     return result.text || '';
@@ -444,7 +444,7 @@ Return ONLY valid JSON in this format:
 `;
 
     const result = await getGenAI().models.generateContent({
-      model: "gemini-3-pro-preview",
+      model: "gemini-1.5-pro-latest",
       contents: prompt
     });
 
