@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import { WorkflowMode, AnalysisResult } from "./types";
 import { RealDataCollector } from "./services/realDataService";
 
@@ -7,15 +7,7 @@ const apiKey = import.meta.env.VITE_GEMINI_API_KEY ||
   import.meta.env.VITE_GOOGLE_API_KEY ||
   import.meta.env.GEMINI_API_KEY;
 
-// Debug: Log API key status (safe partial)
-if (apiKey) {
-  console.log(`🔑 API Key loaded: ${apiKey.substring(0, 8)}...${apiKey.substring(apiKey.length - 4)} (${apiKey.length} chars)`);
-} else {
-  console.error('❌ NO API KEY FOUND! Check environment variables.');
-  console.error('Available env vars:', Object.keys(import.meta.env));
-}
-
-let genAIInstance: GoogleGenerativeAI | null = null;
+let genAIInstance: GoogleGenAI | null = null;
 let realDataCollector: RealDataCollector | null = null;
 
 const getGenAI = () => {
@@ -24,7 +16,7 @@ const getGenAI = () => {
       console.error('All environment variables:', import.meta.env);
       throw new Error(`VITE_GEMINI_API_KEY environment variable is not set.`);
     }
-    genAIInstance = new GoogleGenerativeAI(apiKey);
+    genAIInstance = new GoogleGenAI({ apiKey });
   }
   return genAIInstance;
 };
@@ -80,7 +72,7 @@ export const analyzeQuery = async (query: string): Promise<AnalysisResult> => {
 };
 
 // Helper to extract JSON from text that might contain markdown or conversational filler
-function extractJsonFromText(text: string | null | undefined): string {
+function extractJsonFromText(text: string): string {
   if (!text || typeof text !== 'string') return '';
 
   try {
@@ -108,17 +100,11 @@ function extractJsonFromText(text: string | null | undefined): string {
     if (start !== -1 && end !== -1 && end > start) {
       return text.substring(start, end + 1);
     }
-
-    // Fallback: clean markdown if no JSON structure found
-    if (text && typeof text === 'string') {
-      return text.replace(/```json\n?|\n?```/g, '').trim();
-    }
-
-    return '';
   } catch (e) {
-    console.warn("JSON extraction failed completely", e);
-    return '';
+    console.warn("Manual JSON extraction failed, falling back to regex", e);
   }
+
+  return text.replace(/```json\n?|\n?```/g, '').trim();
 }
 
 // Generate supplemental leads when real data is insufficient
@@ -127,10 +113,12 @@ async function generateSupplementalLeads(query: string, count: number): Promise<
 Generate ${count} realistic leads...`; // Prompt truncated for clarity in replacement chunk
 
   try {
-    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" });
-    const result = await model.generateContent(prompt);
+    const result = await getGenAI().models.generateContent({
+      model: "gemini-3-pro-preview",
+      contents: prompt
+    });
 
-    const rawText = result.response.text();
+    const rawText = result.text || '';
     const text = extractJsonFromText(rawText);
     if (!text) return [];
 
@@ -329,21 +317,12 @@ IMPORTANT: If there's NO clear competitor or insufficient data, SET competitorAn
 `;
 
   try {
-    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" });
-    const result = await model.generateContent(prompt);
+    const result = await getGenAI().models.generateContent({
+      model: "gemini-3-pro-preview",
+      contents: prompt
+    });
 
-    // Safely extract text from response
-    const rawText = result.response.text();
-
-    if (!rawText) {
-      console.warn("⚠️ NO TEXT IN NEURAL RESPONSE");
-      return {
-        opportunities: [],
-        totalSourcesAnalyzed: realData.length,
-        summary: "Analysis failed: No response from neural engine."
-      };
-    }
-
+    const rawText = result.text || '';
     console.log("%c 🧠 RAW NEURAL RESPONSE ", "background: #1e293b; color: #8b5cf6; font-weight: bold; padding: 2px 4px;", rawText);
 
     const text = extractJsonFromText(rawText);
@@ -409,9 +388,11 @@ Requirements:
 Return only the message text, no extra formatting.
 `;
 
-    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" });
-    const result = await model.generateContent(prompt);
-    return result.response.text();
+    const result = await getGenAI().models.generateContent({
+      model: "gemini-3-pro-preview",
+      contents: prompt
+    });
+    return result.text || '';
   } catch (error) {
     console.error('Gemini API Error:', error);
     throw new Error('Failed to generate outreach message.');
@@ -445,10 +426,12 @@ Return ONLY valid JSON in this format:
 }
 `;
 
-    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" });
-    const result = await model.generateContent(prompt);
+    const result = await getGenAI().models.generateContent({
+      model: "gemini-3-pro-preview",
+      contents: prompt
+    });
 
-    const text = result.response.text();
+    const text = result.text || '';
     const cleanText = text.replace(/```json\n?|\n?```/g, '').trim();
     return JSON.parse(cleanText);
   } catch (error) {
