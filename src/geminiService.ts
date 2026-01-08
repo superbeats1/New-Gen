@@ -7,6 +7,14 @@ const apiKey = import.meta.env.VITE_GEMINI_API_KEY ||
   import.meta.env.VITE_GOOGLE_API_KEY ||
   import.meta.env.GEMINI_API_KEY;
 
+// Debug: Log API key status (safe partial)
+if (apiKey) {
+  console.log(`🔑 API Key loaded: ${apiKey.substring(0, 8)}...${apiKey.substring(apiKey.length - 4)} (${apiKey.length} chars)`);
+} else {
+  console.error('❌ NO API KEY FOUND! Check environment variables.');
+  console.error('Available env vars:', Object.keys(import.meta.env));
+}
+
 let genAIInstance: GoogleGenAI | null = null;
 let realDataCollector: RealDataCollector | null = null;
 
