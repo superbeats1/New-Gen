@@ -265,7 +265,10 @@ const App: React.FC = () => {
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      if (session) fetchProfile(session.user.id);
+      if (session) {
+        fetchProfile(session.user.id);
+        setShowLanding(false); // Take user directly to Intelligence Hub if already signed in
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -273,6 +276,7 @@ const App: React.FC = () => {
       if (session) {
         fetchProfile(session.user.id);
         setShowAuthModal(false);
+        setShowLanding(false); // Take user directly to Intelligence Hub
       } else {
         setProfile(null);
         setResults(null);
