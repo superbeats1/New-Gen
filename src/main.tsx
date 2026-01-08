@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 
-console.log('%c 🎯 SCOPA AI v2.16.4 - EMPTY STATE FIXED! 🎯 ', 'background: #ef4444; color: #fff; padding: 10px; border-radius: 8px; font-weight: 900; font-size: 14px; border: 2px solid #fff;');
-(window as any).SCOPA_VERSION = '2.16.4';
-(window as any).GEMINI_MODEL = 'gemini-1.5-pro-latest';
+console.log('%c 🎯 SCOPA AI v2.17.0 - CORRECT MODEL! 🎯 ', 'background: #22c55e; color: #fff; padding: 10px; border-radius: 8px; font-weight: 900; font-size: 14px; border: 2px solid #fff;');
+(window as any).SCOPA_VERSION = '2.17.0';
+(window as any).GEMINI_MODEL = 'gemini-1.5-pro';
 (window as any).SDK = '@google/genai v1.34.0';
 (window as any).DATA_SOURCES = 'Twitter + Reddit + HackerNews + GitHub';
 (window as any).ARCHITECTURE = 'Serverless API Proxies (CORS-free)';
