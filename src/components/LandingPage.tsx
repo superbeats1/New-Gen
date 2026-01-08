@@ -28,6 +28,7 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
   const [showSuccessBanner, setShowSuccessBanner] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -124,6 +125,52 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
             <button className="px-8 py-6 rounded-3xl border border-white/10 hover:bg-white/5 transition-all text-xl font-bold uppercase tracking-tighter">
               View Protocol
             </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Powered By Data Sources Section */}
+      <section className="px-8 pb-16">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="text-[10px] font-black text-violet-400 uppercase tracking-[0.3em] mb-8">
+            Powered By Real-Time Intelligence
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16 opacity-60">
+            {/* Twitter/X */}
+            <div className="group cursor-pointer hover:opacity-100 transition-opacity duration-300">
+              <svg className="w-12 h-12 text-slate-400 group-hover:text-blue-400 transition-colors" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+              <div className="text-[8px] font-bold text-slate-500 mt-2 uppercase tracking-wider">Twitter/X</div>
+            </div>
+            {/* Reddit */}
+            <div className="group cursor-pointer hover:opacity-100 transition-opacity duration-300">
+              <svg className="w-12 h-12 text-slate-400 group-hover:text-orange-400 transition-colors" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
+              </svg>
+              <div className="text-[8px] font-bold text-slate-500 mt-2 uppercase tracking-wider">Reddit</div>
+            </div>
+            {/* HackerNews */}
+            <div className="group cursor-pointer hover:opacity-100 transition-opacity duration-300">
+              <div className="w-12 h-12 bg-[#ff6600] rounded-sm flex items-center justify-center group-hover:bg-[#ff8833] transition-colors">
+                <span className="text-white font-black text-2xl">Y</span>
+              </div>
+              <div className="text-[8px] font-bold text-slate-500 mt-2 uppercase tracking-wider">HackerNews</div>
+            </div>
+            {/* GitHub */}
+            <div className="group cursor-pointer hover:opacity-100 transition-opacity duration-300">
+              <svg className="w-12 h-12 text-slate-400 group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+              </svg>
+              <div className="text-[8px] font-bold text-slate-500 mt-2 uppercase tracking-wider">GitHub</div>
+            </div>
+            {/* Google Gemini AI */}
+            <div className="group cursor-pointer hover:opacity-100 transition-opacity duration-300">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 via-violet-500 to-purple-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <span className="text-white font-black text-lg">✦</span>
+              </div>
+              <div className="text-[8px] font-bold text-slate-500 mt-2 uppercase tracking-wider">Gemini AI</div>
+            </div>
           </div>
         </div>
       </section>
@@ -325,6 +372,78 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
         </div>
       </section>
 
+      {/* How It Works Section */}
+      <section className="px-8 py-32 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-violet-950/20 via-transparent to-transparent pointer-events-none"></div>
+        <div className="max-w-7xl mx-auto relative">
+          <div className="text-center mb-20">
+            <h2 className="text-5xl md:text-6xl font-black text-white mb-6 uppercase tracking-tighter">How It Works</h2>
+            <p className="text-slate-400 text-xl font-medium max-w-2xl mx-auto">
+              From signal detection to revenue validation in seconds
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 relative">
+            {/* Connection Lines */}
+            <div className="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-violet-500/30 to-transparent -translate-y-1/2"></div>
+
+            {/* Step 1 */}
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-br from-violet-600/20 to-transparent rounded-3xl blur-xl group-hover:from-violet-600/40 transition duration-500"></div>
+              <div className="relative bg-gradient-to-br from-white/[0.05] to-white/[0.01] p-8 rounded-3xl border border-white/10 backdrop-blur-xl hover:border-violet-500/30 transition-all duration-500">
+                <div className="w-16 h-16 bg-gradient-to-br from-violet-600 to-violet-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-violet-600/30 group-hover:scale-110 transition-transform">
+                  <span className="text-3xl font-black text-white">1</span>
+                </div>
+                <h3 className="text-2xl font-black text-white mb-4 tracking-tight">Enter Your Query</h3>
+                <p className="text-slate-400 leading-relaxed font-medium">
+                  Type your market interest or problem space. Our AI understands context and searches across millions of discussions.
+                </p>
+                <div className="mt-6 inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-violet-500/10 border border-violet-500/20">
+                  <Search className="w-4 h-4 text-violet-400" />
+                  <span className="text-xs font-bold text-violet-300 uppercase tracking-wider">Neural Scan Active</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-br from-blue-600/20 to-transparent rounded-3xl blur-xl group-hover:from-blue-600/40 transition duration-500"></div>
+              <div className="relative bg-gradient-to-br from-white/[0.05] to-white/[0.01] p-8 rounded-3xl border border-white/10 backdrop-blur-xl hover:border-blue-500/30 transition-all duration-500">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-600/30 group-hover:scale-110 transition-transform">
+                  <span className="text-3xl font-black text-white">2</span>
+                </div>
+                <h3 className="text-2xl font-black text-white mb-4 tracking-tight">AI Analysis</h3>
+                <p className="text-slate-400 leading-relaxed font-medium">
+                  Gemini AI processes signals to identify demand intensity, competition gaps, and revenue potential using real market data.
+                </p>
+                <div className="mt-6 inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                  <Database className="w-4 h-4 text-blue-400" />
+                  <span className="text-xs font-bold text-blue-300 uppercase tracking-wider">Processing Intelligence</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-br from-emerald-600/20 to-transparent rounded-3xl blur-xl group-hover:from-emerald-600/40 transition duration-500"></div>
+              <div className="relative bg-gradient-to-br from-white/[0.05] to-white/[0.01] p-8 rounded-3xl border border-white/10 backdrop-blur-xl hover:border-emerald-500/30 transition-all duration-500">
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-600 to-emerald-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-emerald-600/30 group-hover:scale-110 transition-transform">
+                  <span className="text-3xl font-black text-white">3</span>
+                </div>
+                <h3 className="text-2xl font-black text-white mb-4 tracking-tight">Get Insights</h3>
+                <p className="text-slate-400 leading-relaxed font-medium">
+                  Receive validated opportunities with Speed to $1K MRR, competitor weaknesses, and actionable attack vectors.
+                </p>
+                <div className="mt-6 inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                  <Rocket className="w-4 h-4 text-emerald-400" />
+                  <span className="text-xs font-bold text-emerald-300 uppercase tracking-wider">Ready to Launch</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Stats Counter */}
       <section className="px-8 py-32 border-y border-white/5 relative overflow-hidden">
         <div className="max-w-7xl mx-auto flex flex-wrap justify-center gap-16 md:gap-32 text-center">
@@ -339,6 +458,99 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
               <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{stat.label}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="px-8 py-32 border-t border-white/5 relative overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-rose-600/5 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-violet-600/5 rounded-full blur-[120px]"></div>
+
+        <div className="max-w-4xl mx-auto relative">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl md:text-6xl font-black text-white mb-6 uppercase tracking-tighter">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-slate-400 text-lg font-medium">
+              Everything you need to know about SCOPA AI
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {[
+              {
+                question: "What is SCOPA AI and how does it work?",
+                answer: "SCOPA AI is an advanced market intelligence platform that scans millions of conversations across Twitter/X, Reddit, HackerNews, and GitHub to identify untapped business opportunities. Using Google's Gemini AI, we analyze demand signals, competition gaps, and revenue potential to help you discover and validate profitable business ideas before your competitors do."
+              },
+              {
+                question: "What data sources does SCOPA AI analyze?",
+                answer: "SCOPA AI pulls real-time data from Twitter/X (1,500 tweets/month), Reddit discussions, HackerNews threads, and GitHub repositories. Our serverless API architecture ensures CORS-free access to authentic market signals, giving you access to genuine user pain points and demands across the most active developer and entrepreneur communities."
+              },
+              {
+                question: "How accurate is the Speed to $1K MRR calculator?",
+                answer: "Our Speed to $1K MRR calculator analyzes competition level, entry difficulty, market readiness, and MVP complexity based on historical data from similar products. While every business journey is unique, our algorithm provides data-driven estimates (Fast: 4-8 weeks, Medium: 8-16 weeks, Slow: 16-24+ weeks) backed by real market validation patterns and competitor analysis."
+              },
+              {
+                question: "What is the Competitor Weakness Map feature?",
+                answer: "The Competitor Weakness Map is our strategic advantage tool that analyzes user complaints across platforms to identify your competitors' primary weaknesses (Pricing, UX, Features, Support, etc.). You'll see the exact percentage of complaints, real user quotes, and a specific attack vector strategy to exploit these gaps and position your product effectively."
+              },
+              {
+                question: "Do I need technical knowledge to use SCOPA AI?",
+                answer: "No technical knowledge required! Simply enter your market interest or problem space in natural language, and SCOPA AI handles the rest. Our platform is designed for entrepreneurs, indie hackers, and product builders who want validated opportunities without spending weeks on manual research."
+              },
+              {
+                question: "How is SCOPA AI different from other market research tools?",
+                answer: "Unlike traditional market research tools, SCOPA AI provides two unique features NO competitor offers: (1) Speed to $1K MRR calculator that predicts revenue timeline based on real market data, and (2) Competitor Weakness Map that reveals specific attack vectors from analyzing thousands of user complaints. Plus, we scan authentic community discussions, not just generic market reports."
+              },
+              {
+                question: "What's included in the free tier?",
+                answer: "The free tier gives you access to basic opportunity scanning with limited queries per month. You'll see demand signals, basic market analysis, and opportunity scores. Premium tiers unlock unlimited queries, full Speed to $1K MRR analysis, Competitor Weakness Maps, raw data export, and priority support."
+              },
+              {
+                question: "Can I export the intelligence data?",
+                answer: "Yes! Premium users can export all opportunity data, raw findings, competitor analysis, and market signals in JSON or CSV format. Perfect for building pitch decks, sharing with co-founders, or integrating into your own market research workflow."
+              }
+            ].map((faq, index) => (
+              <div
+                key={index}
+                className="bg-gradient-to-br from-white/[0.03] to-white/[0.01] rounded-2xl border border-white/10 backdrop-blur-xl overflow-hidden hover:border-violet-500/30 transition-all duration-300"
+              >
+                <button
+                  onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+                  className="w-full px-8 py-6 flex items-center justify-between text-left group"
+                >
+                  <span className="text-lg font-black text-white group-hover:text-violet-400 transition-colors pr-4">
+                    {faq.question}
+                  </span>
+                  <ChevronDown
+                    className={`w-5 h-5 text-violet-400 flex-shrink-0 transition-transform duration-300 ${
+                      openFaqIndex === index ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    openFaqIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <div className="px-8 pb-6 text-slate-400 leading-relaxed font-medium">
+                    {faq.answer}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-16">
+            <p className="text-slate-500 font-medium mb-6">Still have questions?</p>
+            <button
+              onClick={onStart}
+              className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-black py-4 px-10 rounded-2xl transition-all shadow-lg shadow-violet-600/30 uppercase tracking-wider text-sm inline-flex items-center space-x-2"
+            >
+              <span>Try SCOPA AI Now</span>
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </section>
 
