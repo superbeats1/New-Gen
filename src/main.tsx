@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 
-console.log('%c 🎯 SCOPA AI v2.17.1 - GEMINI PRO! 🎯 ', 'background: #3b82f6; color: #fff; padding: 10px; border-radius: 8px; font-weight: 900; font-size: 14px; border: 2px solid #fff;');
-(window as any).SCOPA_VERSION = '2.17.1';
+console.log('%c 🎯 SCOPA AI v2.18.0 - CORRECT SDK! 🎯 ', 'background: #a855f7; color: #fff; padding: 10px; border-radius: 8px; font-weight: 900; font-size: 14px; border: 2px solid #fff;');
+(window as any).SCOPA_VERSION = '2.18.0';
 (window as any).GEMINI_MODEL = 'gemini-pro';
-(window as any).SDK = '@google/genai v1.34.0';
+(window as any).SDK = '@google/generative-ai v0.21.0';
 (window as any).DATA_SOURCES = 'Twitter + Reddit + HackerNews + GitHub';
 (window as any).ARCHITECTURE = 'Serverless API Proxies (CORS-free)';
 

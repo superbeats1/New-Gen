@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { WorkflowMode, AnalysisResult } from "./types";
 import { RealDataCollector } from "./services/realDataService";
 
@@ -15,7 +15,7 @@ if (apiKey) {
   console.error('Available env vars:', Object.keys(import.meta.env));
 }
 
-let genAIInstance: GoogleGenAI | null = null;
+let genAIInstance: GoogleGenerativeAI | null = null;
 let realDataCollector: RealDataCollector | null = null;
 
 const getGenAI = () => {
@@ -24,7 +24,7 @@ const getGenAI = () => {
       console.error('All environment variables:', import.meta.env);
       throw new Error(`VITE_GEMINI_API_KEY environment variable is not set.`);
     }
-    genAIInstance = new GoogleGenAI({ apiKey });
+    genAIInstance = new GoogleGenerativeAI(apiKey);
   }
   return genAIInstance;
 };
@@ -127,12 +127,10 @@ async function generateSupplementalLeads(query: string, count: number): Promise<
 Generate ${count} realistic leads...`; // Prompt truncated for clarity in replacement chunk
 
   try {
-    const result = await getGenAI().models.generateContent({
-      model: "gemini-pro",
-      contents: prompt
-    });
+    const model = getGenAI().getGenerativeModel({ model: "gemini-pro" });
+    const result = await model.generateContent(prompt);
 
-    const rawText = result.text || '';
+    const rawText = result.response.text();
     const text = extractJsonFromText(rawText);
     if (!text) return [];
 
@@ -331,13 +329,11 @@ IMPORTANT: If there's NO clear competitor or insufficient data, SET competitorAn
 `;
 
   try {
-    const result = await getGenAI().models.generateContent({
-      model: "gemini-pro",
-      contents: prompt
-    });
+    const model = getGenAI().getGenerativeModel({ model: "gemini-pro" });
+    const result = await model.generateContent(prompt);
 
     // Safely extract text from response
-    const rawText = (result && typeof result.text === 'string') ? result.text : '';
+    const rawText = result.response.text();
 
     if (!rawText) {
       console.warn("⚠️ NO TEXT IN NEURAL RESPONSE");
@@ -413,11 +409,9 @@ Requirements:
 Return only the message text, no extra formatting.
 `;
 
-    const result = await getGenAI().models.generateContent({
-      model: "gemini-pro",
-      contents: prompt
-    });
-    return result.text || '';
+    const model = getGenAI().getGenerativeModel({ model: "gemini-pro" });
+    const result = await model.generateContent(prompt);
+    return result.response.text();
   } catch (error) {
     console.error('Gemini API Error:', error);
     throw new Error('Failed to generate outreach message.');
@@ -451,12 +445,10 @@ Return ONLY valid JSON in this format:
 }
 `;
 
-    const result = await getGenAI().models.generateContent({
-      model: "gemini-pro",
-      contents: prompt
-    });
+    const model = getGenAI().getGenerativeModel({ model: "gemini-pro" });
+    const result = await model.generateContent(prompt);
 
-    const text = result.text || '';
+    const text = result.response.text();
     const cleanText = text.replace(/```json\n?|\n?```/g, '').trim();
     return JSON.parse(cleanText);
   } catch (error) {
