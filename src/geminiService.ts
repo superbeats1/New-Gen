@@ -127,7 +127,7 @@ async function generateSupplementalLeads(query: string, count: number): Promise<
 Generate ${count} realistic leads...`; // Prompt truncated for clarity in replacement chunk
 
   try {
-    const model = getGenAI().getGenerativeModel({ model: "gemini-pro" });
+    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" });
     const result = await model.generateContent(prompt);
 
     const rawText = result.response.text();
@@ -329,7 +329,7 @@ IMPORTANT: If there's NO clear competitor or insufficient data, SET competitorAn
 `;
 
   try {
-    const model = getGenAI().getGenerativeModel({ model: "gemini-pro" });
+    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" });
     const result = await model.generateContent(prompt);
 
     // Safely extract text from response
@@ -409,7 +409,7 @@ Requirements:
 Return only the message text, no extra formatting.
 `;
 
-    const model = getGenAI().getGenerativeModel({ model: "gemini-pro" });
+    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" });
     const result = await model.generateContent(prompt);
     return result.response.text();
   } catch (error) {
@@ -445,7 +445,7 @@ Return ONLY valid JSON in this format:
 }
 `;
 
-    const model = getGenAI().getGenerativeModel({ model: "gemini-pro" });
+    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash" });
     const result = await model.generateContent(prompt);
 
     const text = result.response.text();
