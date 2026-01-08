@@ -72,7 +72,7 @@ export const analyzeQuery = async (query: string): Promise<AnalysisResult> => {
 };
 
 // Helper to extract JSON from text that might contain markdown or conversational filler
-function extractJsonFromText(text: string): string {
+function extractJsonFromText(text: string | null | undefined): string {
   if (!text || typeof text !== 'string') return '';
 
   try {
@@ -100,11 +100,17 @@ function extractJsonFromText(text: string): string {
     if (start !== -1 && end !== -1 && end > start) {
       return text.substring(start, end + 1);
     }
-  } catch (e) {
-    console.warn("Manual JSON extraction failed, falling back to regex", e);
-  }
 
-  return text.replace(/```json\n?|\n?```/g, '').trim();
+    // Fallback: clean markdown if no JSON structure found
+    if (text && typeof text === 'string') {
+      return text.replace(/```json\n?|\n?```/g, '').trim();
+    }
+
+    return '';
+  } catch (e) {
+    console.warn("JSON extraction failed completely", e);
+    return '';
+  }
 }
 
 // Generate supplemental leads when real data is insufficient
@@ -322,7 +328,18 @@ IMPORTANT: If there's NO clear competitor or insufficient data, SET competitorAn
       contents: prompt
     });
 
-    const rawText = result.text || '';
+    // Safely extract text from response
+    const rawText = (result && typeof result.text === 'string') ? result.text : '';
+
+    if (!rawText) {
+      console.warn("⚠️ NO TEXT IN NEURAL RESPONSE");
+      return {
+        opportunities: [],
+        totalSourcesAnalyzed: realData.length,
+        summary: "Analysis failed: No response from neural engine."
+      };
+    }
+
     console.log("%c 🧠 RAW NEURAL RESPONSE ", "background: #1e293b; color: #8b5cf6; font-weight: bold; padding: 2px 4px;", rawText);
 
     const text = extractJsonFromText(rawText);
