@@ -62,10 +62,10 @@ export const AlertsManager: React.FC<AlertsManagerProps> = ({ userId, isOpen, on
         }
     };
 
-    if (!isOpen) return null;
+    if (!isOpen || !userId) return null;
 
     return (
-        <div className="fixed inset-0 z[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
             <div
                 className="relative w-full max-w-2xl bg-[#050507] border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
                 onClick={e => e.stopPropagation()}
