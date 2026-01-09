@@ -227,6 +227,7 @@ const MobileShowcase: React.FC = () => {
                     </div>
                 </div>
             </div>
+</div>
 
             <style>{`
                 .perspective-[2000px] {
