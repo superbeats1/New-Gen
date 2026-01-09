@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, Plus, Trash2, Clock, CheckCircle, AlertCircle, Loader2, Zap } from 'lucide-react';
+import { Bell, Plus, Trash2, Clock, CheckCircle, AlertCircle, Loader2, Zap, TrendingUp } from 'lucide-react';
 import { Alert } from '../types';
 import { alertsService } from '../services/alertsService';
+import { showSuccess, showError } from '../lib/toast';
+import { AlertHistoryPanel } from './AlertHistoryPanel';
 
 interface AlertsManagerProps {
     userId: string;
@@ -16,6 +18,7 @@ export const AlertsManager: React.FC<AlertsManagerProps> = ({ userId, isOpen, on
     const [frequency, setFrequency] = useState<'daily' | 'weekly'>('daily');
     const [adding, setAdding] = useState(false);
     const [isLocalMode, setIsLocalMode] = useState(false);
+    const [activeTab, setActiveTab] = useState<'manage' | 'history'>('manage');
 
     useEffect(() => {
         if (isOpen) {
@@ -57,8 +60,21 @@ export const AlertsManager: React.FC<AlertsManagerProps> = ({ userId, isOpen, on
         try {
             await alertsService.deleteAlert(id);
             setAlerts(alerts.filter(a => a.id !== id));
+            showSuccess('Alert deleted successfully');
         } catch (error) {
             console.error('Failed to delete alert', error);
+            showError('Failed to delete alert');
+        }
+    };
+
+    const handleToggleAlert = async (id: string, currentEnabled: boolean) => {
+        try {
+            await alertsService.toggleAlert(id, !currentEnabled);
+            setAlerts(alerts.map(a => a.id === id ? { ...a, enabled: !currentEnabled } : a));
+            showSuccess(`Alert ${!currentEnabled ? 'enabled' : 'paused'}`);
+        } catch (error) {
+            console.error('Failed to toggle alert', error);
+            showError('Failed to update alert');
         }
     };
 
@@ -99,8 +115,34 @@ export const AlertsManager: React.FC<AlertsManagerProps> = ({ userId, isOpen, on
                     </div>
                 </div>
 
+                {/* Tabs */}
+                <div className="flex border-b border-white/5">
+                    <button
+                        onClick={() => setActiveTab('manage')}
+                        className={`flex-1 py-4 text-xs font-black uppercase tracking-widest transition-all ${
+                            activeTab === 'manage'
+                                ? 'text-violet-400 border-b-2 border-violet-500 bg-violet-500/5'
+                                : 'text-slate-500 hover:text-slate-400 hover:bg-white/[0.02]'
+                        }`}
+                    >
+                        Manage Alerts
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('history')}
+                        className={`flex-1 py-4 text-xs font-black uppercase tracking-widest transition-all ${
+                            activeTab === 'history'
+                                ? 'text-violet-400 border-b-2 border-violet-500 bg-violet-500/5'
+                                : 'text-slate-500 hover:text-slate-400 hover:bg-white/[0.02]'
+                        }`}
+                    >
+                        Alert History
+                    </button>
+                </div>
+
                 {/* Content */}
                 <div className="flex-1 overflow-y-auto p-8 space-y-8">
+                    {activeTab === 'manage' ? (
+                        <>
 
                     {/* Add New Alert */}
                     <div className="glass-panel p-6 rounded-2xl border border-white/5">
@@ -160,35 +202,88 @@ export const AlertsManager: React.FC<AlertsManagerProps> = ({ userId, isOpen, on
                         ) : (
                             <div className="space-y-3">
                                 {alerts.map((alert) => (
-                                    <div key={alert.id} className="group flex items-center justify-between p-6 bg-[#0A0A0C]/50 backdrop-blur-md rounded-2xl border border-white/5 hover:border-violet-500/30 transition-all hover:translate-x-1">
-                                        <div className="flex items-center space-x-5">
-                                            <div className="w-12 h-12 rounded-full bg-violet-500/10 flex items-center justify-center text-violet-400 border border-violet-500/20 shadow-inner">
-                                                <Zap className="w-5 h-5 fill-violet-400/20" />
-                                            </div>
-                                            <div>
-                                                <h4 className="text-white font-black uppercase tracking-tight text-lg italic">{alert.keyword}</h4>
-                                                <div className="flex items-center space-x-3 text-[10px] text-slate-500 mt-2 font-bold uppercase tracking-widest">
-                                                    <span className="flex items-center space-x-1.5">
-                                                        <Clock className="w-3 h-3 text-violet-500" />
-                                                        <span>{alert.frequency}</span>
-                                                    </span>
-                                                    <span className="text-slate-700">•</span>
-                                                    <span>Active since {new Date(alert.createdAt).toLocaleDateString()}</span>
+                                    <div key={alert.id} className="group p-6 bg-[#0A0A0C]/50 backdrop-blur-md rounded-2xl border border-white/5 hover:border-violet-500/30 transition-all">
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div className="flex items-center space-x-4 flex-1">
+                                                <div className={`w-12 h-12 rounded-full flex items-center justify-center border shadow-inner ${
+                                                    alert.enabled
+                                                        ? 'bg-violet-500/10 border-violet-500/20 text-violet-400'
+                                                        : 'bg-slate-500/10 border-slate-500/20 text-slate-500'
+                                                }`}>
+                                                    <Zap className="w-5 h-5 fill-current/20" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <div className="flex items-center space-x-3 mb-1">
+                                                        <h4 className="text-white font-black uppercase tracking-tight text-lg italic">{alert.keyword}</h4>
+                                                        {!alert.enabled && (
+                                                            <span className="px-2 py-0.5 rounded-full bg-slate-500/10 border border-slate-500/20 text-[9px] font-black text-slate-500 uppercase tracking-widest">
+                                                                Paused
+                                                            </span>
+                                                        )}
+                                                        {alert.opportunitiesFound && alert.opportunitiesFound > 5 && (
+                                                            <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-black text-emerald-400 uppercase tracking-widest flex items-center space-x-1">
+                                                                <TrendingUp className="w-3 h-3" />
+                                                                <span>High Yield</span>
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center space-x-3 text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+                                                        <span className="flex items-center space-x-1.5">
+                                                            <Clock className="w-3 h-3 text-violet-500" />
+                                                            <span>{alert.frequency}</span>
+                                                        </span>
+                                                        <span className="text-slate-700">•</span>
+                                                        <span>{alert.opportunitiesFound || 0} opportunities</span>
+                                                        {alert.lastChecked && (
+                                                            <>
+                                                                <span className="text-slate-700">•</span>
+                                                                <span>Checked {new Date(alert.lastChecked).toLocaleDateString()}</span>
+                                                            </>
+                                                        )}
+                                                        {alert.successRate && (
+                                                            <>
+                                                                <span className="text-slate-700">•</span>
+                                                                <span>{Math.round(alert.successRate)}% success</span>
+                                                            </>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <button
-                                            onClick={() => handleDeleteAlert(alert.id)}
-                                            className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                                        >
-                                            <Trash2 className="w-5 h-5" />
-                                        </button>
+                                            <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                {/* Toggle Switch */}
+                                                <button
+                                                    onClick={() => handleToggleAlert(alert.id, alert.enabled ?? true)}
+                                                    className={`relative w-12 h-6 rounded-full transition-colors ${
+                                                        alert.enabled ? 'bg-violet-600' : 'bg-slate-700'
+                                                    }`}
+                                                    title={alert.enabled ? 'Pause alert' : 'Enable alert'}
+                                                >
+                                                    <span
+                                                        className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                                                            alert.enabled ? 'translate-x-6' : 'translate-x-0'
+                                                        }`}
+                                                    />
+                                                </button>
+
+                                                {/* Delete Button */}
+                                                <button
+                                                    onClick={() => handleDeleteAlert(alert.id)}
+                                                    className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all"
+                                                >
+                                                    <Trash2 className="w-5 h-5" />
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
                         )}
                     </div>
+                    </>
+                    ) : (
+                        <AlertHistoryPanel userId={userId} />
+                    )}
                 </div>
             </div>
         </div>
