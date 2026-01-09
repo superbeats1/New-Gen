@@ -161,6 +161,7 @@ const MobileShowcase: React.FC = () => {
                             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-30 animate-scanning-line"></div>
                         </div>
                     </div>
+                    </div>
                 </div>
 
                 {/* Mobile-Only Phone Mockup - Centered & Beautiful */}
@@ -227,7 +228,6 @@ const MobileShowcase: React.FC = () => {
                     </div>
                 </div>
             </div>
-</div>
 
             <style>{`
                 .perspective-[2000px] {
