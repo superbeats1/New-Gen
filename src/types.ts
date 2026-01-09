@@ -136,6 +136,23 @@ export interface Alert {
   frequency: 'daily' | 'weekly';
   lastChecked?: string;
   createdAt: string;
+  enabled?: boolean;
+  opportunitiesFound?: number;
+  lastNotified?: string;
+  successRate?: number;
+  totalChecks?: number;
+}
+
+export interface Notification {
+  id: string;
+  userId: string;
+  alertId?: string;
+  type: 'alert_result' | 'system' | 'credit' | 'error';
+  title: string;
+  message?: string;
+  metadata?: Record<string, any>;
+  isRead: boolean;
+  createdAt: string;
 }
 
 export interface SavedLead extends Lead {

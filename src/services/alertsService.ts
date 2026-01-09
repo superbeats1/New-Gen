@@ -21,7 +21,12 @@ export const alertsService = {
                 keyword: a.keyword,
                 frequency: a.frequency,
                 lastChecked: a.last_checked,
-                createdAt: a.created_at
+                createdAt: a.created_at,
+                enabled: a.enabled ?? true,
+                opportunitiesFound: a.opportunities_found ?? 0,
+                lastNotified: a.last_notified,
+                successRate: a.success_rate,
+                totalChecks: a.total_checks ?? 0
             }));
         } catch (error) {
             console.warn('Supabase alerts fetch failed, falling back to local storage', error);
@@ -53,7 +58,12 @@ export const alertsService = {
                 keyword: data.keyword,
                 frequency: data.frequency,
                 lastChecked: data.last_checked,
-                createdAt: data.created_at
+                createdAt: data.created_at,
+                enabled: data.enabled ?? true,
+                opportunitiesFound: data.opportunities_found ?? 0,
+                lastNotified: data.last_notified,
+                successRate: data.success_rate,
+                totalChecks: data.total_checks ?? 0
             };
         } catch (error) {
             console.warn('Supabase alert create failed, falling back to local storage', error);
@@ -90,6 +100,29 @@ export const alertsService = {
                 const filtered = alerts.filter((a: Alert) => a.id !== id);
                 localStorage.setItem(MOCK_ALERTS_KEY, JSON.stringify(filtered));
             }
+        }
+    },
+
+    async toggleAlert(id: string, enabled: boolean): Promise<void> {
+        try {
+            const { error } = await supabase
+                .from('alerts')
+                .update({ enabled })
+                .eq('id', id);
+
+            if (error) throw error;
+        } catch (error) {
+            console.error('Failed to toggle alert', error);
+            // For localStorage fallback, we'd need to update the stored alert
+            const stored = localStorage.getItem(MOCK_ALERTS_KEY);
+            if (stored) {
+                const alerts = JSON.parse(stored);
+                const updated = alerts.map((a: Alert) =>
+                    a.id === id ? { ...a, enabled } : a
+                );
+                localStorage.setItem(MOCK_ALERTS_KEY, JSON.stringify(updated));
+            }
+            throw error;
         }
     }
 };

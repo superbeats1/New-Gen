@@ -37,6 +37,9 @@ import { supabase } from './lib/supabase';
 import { Auth } from './components/Auth';
 import { createCheckoutSession } from './lib/stripe';
 import IntelligentBackground from './components/IntelligentBackground';
+import { Toaster } from 'sonner';
+import { NotificationCenter } from './components/NotificationCenter';
+import { NotificationProvider } from './contexts/NotificationContext';
 
 // --- NEW DIAGNOSTIC LAYER ---
 interface ErrorBoundaryProps {
@@ -478,10 +481,24 @@ const App: React.FC = () => {
 
   return (
     <ErrorBoundary>
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          className: 'glass-panel',
+          style: {
+            background: 'rgba(255, 255, 255, 0.03)',
+            backdropFilter: 'blur(24px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+          }
+        }}
+      />
       <div className="flex h-screen overflow-hidden bg-[#030407] text-slate-200 selection:bg-violet-500/30 relative">
         <IntelligentBackground />
         <DiagnosticHub results={results} isSearching={isSearching} stats={diagStats} />
 
+        {profile ? (
+          <NotificationProvider userId={profile.id}>
+            {/* Content wrapped in NotificationProvider */}
         {/* Mobile Sidebar Overlay */}
         {isMobileMenuOpen && (
           <div
@@ -621,6 +638,7 @@ const App: React.FC = () => {
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span className="text-xs font-medium text-slate-300">System Online</span>
               </div>
+              {profile && <NotificationCenter />}
             </div>
           </header>
 
@@ -733,6 +751,16 @@ const App: React.FC = () => {
             )}
           </div>
         </main>
+
+          </NotificationProvider>
+        ) : (
+          // Not authenticated - show basic layout without notifications
+          <main className="flex-1 overflow-y-auto">
+            <header className="sticky top-0 z-20 backdrop-blur-2xl bg-[#030407]/80 border-b border-white/5 p-4 lg:p-6 flex items-center justify-between">
+              <h1 className="text-lg lg:text-xl font-bold text-white tracking-tight">Sign In Required</h1>
+            </header>
+          </main>
+        )}
 
         <AuthModal />
         <UpgradeModal

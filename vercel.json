@@ -5,6 +5,12 @@
       "maxDuration": 10
     }
   },
+  "crons": [
+    {
+      "path": "/api/trigger-alerts",
+      "schedule": "0 9 * * *"
+    }
+  ],
   "rewrites": [
     {
       "source": "/((?!api/.*).*)",
