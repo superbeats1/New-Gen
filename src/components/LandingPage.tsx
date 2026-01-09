@@ -123,7 +123,10 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
               <span>{session ? 'Enter Platform' : 'Start Discovery'}</span>
               <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
             </button>
-            <button className="px-8 py-6 rounded-3xl border border-white/10 hover:bg-white/5 transition-all text-xl font-bold uppercase tracking-tighter">
+            <button
+              onClick={() => document.getElementById('workflow')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+              className="px-8 py-6 rounded-3xl border border-white/10 hover:bg-white/5 transition-all text-xl font-bold uppercase tracking-tighter"
+            >
               View Protocol
             </button>
           </div>
@@ -435,7 +438,7 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
       </section>
 
       {/* How It Works Section */}
-      <section className="px-8 py-32 relative overflow-hidden">
+      <section id="workflow" className="px-8 py-32 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-violet-950/20 via-transparent to-transparent pointer-events-none"></div>
         <div className="max-w-7xl mx-auto relative">
           <div className="text-center mb-20">
