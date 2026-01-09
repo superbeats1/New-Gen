@@ -146,42 +146,42 @@ export const AlertsManager: React.FC<AlertsManagerProps> = ({ userId, isOpen, on
 
                     {/* Add New Alert */}
                     <div className="glass-panel p-6 rounded-2xl border border-white/5">
-                        <form onSubmit={handleAddAlert} className="flex gap-4">
-                            <div className="flex-1">
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
-                                    Monitor Keyword
-                                </label>
-                                <input
-                                    type="text"
-                                    value={newKeyword}
-                                    onChange={(e) => setNewKeyword(e.target.value)}
-                                    placeholder="e.g. 'SaaS Pricing Models' or 'Remote Work Tools'"
-                                    className="w-full bg-[#0A0A0C] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all placeholder-slate-600"
-                                />
+                        <form onSubmit={handleAddAlert} className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
+                                        Monitor Keyword
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={newKeyword}
+                                        onChange={(e) => setNewKeyword(e.target.value)}
+                                        placeholder="e.g. 'SaaS Pricing Models' or 'Remote Work Tools'"
+                                        className="w-full bg-[#0A0A0C] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all placeholder-slate-600"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
+                                        Frequency
+                                    </label>
+                                    <select
+                                        value={frequency}
+                                        onChange={(e) => setFrequency(e.target.value as 'daily' | 'weekly')}
+                                        className="w-full bg-[#0A0A0C] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/50 transition-all appearance-none cursor-pointer text-sm font-medium"
+                                    >
+                                        <option value="daily">Daily Pulse</option>
+                                        <option value="weekly">Weekly Summary</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div className="w-40">
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
-                                    Frequency
-                                </label>
-                                <select
-                                    value={frequency}
-                                    onChange={(e) => setFrequency(e.target.value as 'daily' | 'weekly')}
-                                    className="w-full bg-[#0A0A0C] border border-white/10 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/50 transition-all appearance-none cursor-pointer text-xs font-bold uppercase tracking-widest"
-                                >
-                                    <option value="daily">Daily Pulse</option>
-                                    <option value="weekly">Weekly Summary</option>
-                                </select>
-                            </div>
-                            <div className="flex items-end">
-                                <button
-                                    type="submit"
-                                    disabled={!newKeyword.trim() || adding}
-                                    className="bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black py-4 px-8 rounded-2xl transition-all shadow-xl shadow-violet-600/20 flex items-center space-x-3 uppercase tracking-tighter italic"
-                                >
-                                    {adding ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
-                                    <span>Initiate Protocol</span>
-                                </button>
-                            </div>
+                            <button
+                                type="submit"
+                                disabled={!newKeyword.trim() || adding}
+                                className="w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black py-4 px-8 rounded-2xl transition-all shadow-xl shadow-violet-600/20 flex items-center justify-center space-x-3 uppercase tracking-tighter italic"
+                            >
+                                {adding ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
+                                <span>Initiate Protocol</span>
+                            </button>
                         </form>
                     </div>
 
