@@ -12,26 +12,26 @@ import {
 
 const MobileShowcase: React.FC = () => {
     return (
-        <section className="relative py-24 px-8 overflow-hidden bg-gradient-to-b from-blue-900/5 to-transparent">
+        <section className="relative py-16 sm:py-24 px-4 sm:px-8 overflow-hidden bg-gradient-to-b from-blue-900/5 to-transparent">
             {/* Background Glows */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-violet-600/10 blur-[120px] rounded-full pointer-events-none"></div>
 
-            <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-20">
+            <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
                 {/* Left Side: Content */}
-                <div className="flex-1 text-center lg:text-left z-10">
+                <div className="flex-1 text-center lg:text-left z-10 w-full">
                     <div className="inline-flex items-center space-x-2 px-4 py-2 bg-violet-500/10 border border-violet-500/20 rounded-full mb-8">
                         <Zap className="w-4 h-4 text-violet-400" />
                         <span className="text-xs font-black uppercase tracking-[0.2em] text-violet-400">Intelligence on the Go</span>
                     </div>
-                    <h2 className="text-4xl md:text-6xl font-black text-white mb-8 leading-tight tracking-tighter uppercase italic text-left">
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight tracking-tighter uppercase italic text-left">
                         Market Analysis <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400">In Your Pocket</span>
                     </h2>
-                    <p className="text-slate-400 text-lg md:text-xl font-medium max-w-xl mb-10 leading-relaxed text-left">
+                    <p className="text-slate-400 text-base sm:text-lg md:text-xl font-medium max-w-xl mb-8 leading-relaxed text-left">
                         Stay connected to your market shadows wherever you are. Receive neural alerts for high-value business gaps the moment they emerge.
                     </p>
 
-                    <div className="grid grid-cols-2 gap-6 max-w-md mx-auto lg:mx-0">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-md mx-auto lg:mx-0">
                         <div className="flex items-center space-x-3">
                             <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 italic font-black text-violet-400">01</div>
                             <span className="text-sm font-bold text-slate-300">Shadow Sync</span>
@@ -52,7 +52,7 @@ const MobileShowcase: React.FC = () => {
                 </div>
 
                 {/* Right Side: 3D Phones */}
-                <div className="flex-1 relative w-full h-[500px] md:h-[600px] flex items-center justify-center perspective-[2000px] scale-90 md:scale-100 mt-12 lg:mt-0">
+                <div className="flex-1 relative w-full h-[400px] sm:h-[500px] md:h-[600px] flex items-center justify-center perspective-[2000px] scale-75 sm:scale-90 md:scale-100 mt-8 lg:mt-0">
                     {/* Background floating elements */}
                     <div className="absolute top-10 right-20 w-16 h-16 bg-violet-600/20 blur-2xl rounded-full animate-pulse"></div>
                     <div className="absolute bottom-10 left-20 w-24 h-24 bg-indigo-600/20 blur-3xl rounded-full animate-pulse delay-700"></div>
