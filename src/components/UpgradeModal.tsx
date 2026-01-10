@@ -12,8 +12,8 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose, onUpgrade,
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-in fade-in duration-300">
-      <div className="glass-panel relative w-full max-w-4xl rounded-[2rem] sm:rounded-[2.5rem] border border-white/10 shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden max-h-[92vh] flex flex-col">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 pb-6 sm:pb-4 bg-black/80 backdrop-blur-xl animate-in fade-in duration-300">
+      <div className="glass-panel relative w-full max-w-4xl rounded-[2rem] sm:rounded-[2.5rem] border border-white/10 shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden max-h-[85vh] sm:max-h-[90vh] flex flex-col">
         {/* Decorative background blobs */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
           <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/20 blur-[100px] rounded-full"></div>
@@ -30,7 +30,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose, onUpgrade,
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto overscroll-contain relative z-10">
-          <div className="p-6 sm:p-8 md:p-10">
+          <div className="p-6 sm:p-8 md:p-10 pb-8 sm:pb-10 md:pb-12">
             {/* Header */}
             <div className="text-center mb-8 sm:mb-10 space-y-2 sm:space-y-3 pt-2">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">
@@ -118,12 +118,12 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose, onUpgrade,
                     <button
                       onClick={onUpgrade}
                       disabled={isUpgrading}
-                      className="w-full py-3 sm:py-4 bg-white text-black hover:bg-slate-200 font-bold text-xs sm:text-sm rounded-xl sm:rounded-2xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full py-4 sm:py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-500 hover:to-indigo-500 font-black text-sm sm:text-base rounded-xl sm:rounded-2xl transition-all shadow-xl shadow-blue-600/30 hover:shadow-2xl hover:shadow-blue-600/40 hover:-translate-y-0.5 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider"
                     >
                       {isUpgrading ? <span className="animate-pulse">Processing...</span> : (
                         <>
-                          <span>Upgrade Now</span>
-                          <Zap className="w-4 h-4 fill-black" />
+                          <Zap className="w-5 h-5 fill-white" />
+                          <span>Upgrade to Pro</span>
                         </>
                       )}
                     </button>

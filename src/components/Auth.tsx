@@ -17,31 +17,40 @@ export const Auth: React.FC = () => {
     setError(null);
 
     try {
+      // Validate inputs
+      if (!email || !email.trim()) {
+        throw new Error('Please enter your email address.');
+      }
+      if (!password || !password.trim()) {
+        throw new Error('Please enter your password.');
+      }
+
       if (isSignUp) {
-        if (!firstName || !lastName) {
+        if (!firstName || !firstName.trim() || !lastName || !lastName.trim()) {
           throw new Error('Please enter both your first and last name.');
         }
 
         const { error } = await supabase.auth.signUp({
-          email,
+          email: email.trim(),
           password,
           options: {
             data: {
-              first_name: firstName,
-              last_name: lastName,
+              first_name: firstName.trim(),
+              last_name: lastName.trim(),
             },
           },
         });
         if (error) throw error;
       } else {
         const { error } = await supabase.auth.signInWithPassword({
-          email,
+          email: email.trim(),
           password,
         });
         if (error) throw error;
       }
     } catch (err: any) {
-      setError(err.message);
+      console.error('Auth error:', err);
+      setError(err?.message || err?.error_description || 'An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }

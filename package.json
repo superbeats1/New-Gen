@@ -1,7 +1,7 @@
 {
   "name": "scopa-ai",
   "private": true,
-  "version": "2.21.5",
+  "version": "2.22.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
