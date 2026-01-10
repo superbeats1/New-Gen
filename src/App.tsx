@@ -112,7 +112,7 @@ const DiagnosticHub: React.FC<{ results: AnalysisResult | null; isSearching: boo
     <div className="fixed bottom-4 right-4 z-[100] w-96 bg-black/90 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl animate-in slide-in-from-right-4">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xs font-black uppercase tracking-widest text-violet-400">Deep Diagnostic Hub</h3>
-        <button onClick={() => setShow(false)} className="text-slate-500 hover:text-white"><X className="w-4 h-4" /></button>
+        <button onClick={() => setShow(false)} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-500 hover:text-white rounded-lg hover:bg-white/5 transition-colors"><X className="w-4 h-4" /></button>
       </div>
       <div className="space-y-4 font-mono text-[10px] text-slate-400">
         <div className="flex justify-between"><span>Status:</span><span className={isSearching ? 'text-amber-400' : 'text-emerald-400'}>{isSearching ? 'Scanning...' : 'Idle'}</span></div>
@@ -138,36 +138,64 @@ const SEARCH_STEPS = [
   "Finalizing Scopa intelligence report..."
 ];
 
+const SkeletonOpportunityCard: React.FC<{ delay: number }> = ({ delay }) => {
+  return (
+    <div
+      className="bg-[#050608]/40 backdrop-blur-2xl rounded-3xl p-8 border border-white/5 animate-in fade-in slide-in-from-bottom-4"
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <div className="animate-pulse space-y-4">
+        <div className="flex items-center space-x-3">
+          <div className="h-6 w-24 bg-violet-500/20 rounded-full"></div>
+          <div className="h-6 w-20 bg-slate-700/50 rounded-full"></div>
+        </div>
+        <div className="h-8 bg-slate-700/30 rounded-xl w-3/4"></div>
+        <div className="space-y-2">
+          <div className="h-4 bg-slate-700/20 rounded-lg w-full"></div>
+          <div className="h-4 bg-slate-700/20 rounded-lg w-5/6"></div>
+          <div className="h-4 bg-slate-700/20 rounded-lg w-4/6"></div>
+        </div>
+        <div className="flex items-center space-x-2 pt-4">
+          <div className="h-8 w-28 bg-emerald-500/10 rounded-xl"></div>
+          <div className="h-8 w-24 bg-amber-500/10 rounded-xl"></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const SearchingModule: React.FC<{ stepIndex: number; onStop: () => void }> = ({ stepIndex, onStop }) => {
   return (
-    <div className="glass-panel rounded-3xl p-10 relative overflow-hidden animate-in zoom-in-95 duration-500 max-w-2xl mx-auto">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-violet-500 to-transparent shadow-[0_0_20px_rgba(139,92,246,0.5)] animate-scanning-line"></div>
-      </div>
-
-      <div className="relative z-10 flex flex-col items-center space-y-10">
-        <div className="relative">
-          <div className="absolute -inset-8 bg-violet-600/20 blur-3xl rounded-full animate-pulse"></div>
-          <div className="relative glass-card p-6 rounded-full border border-violet-500/30">
-            <Cpu className="w-12 h-12 text-violet-400 animate-spin-slow" />
-          </div>
+    <div className="space-y-8 animate-in fade-in duration-500">
+      {/* Progress Panel */}
+      <div className="glass-panel rounded-3xl p-10 relative overflow-hidden max-w-2xl mx-auto">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-violet-500 to-transparent shadow-[0_0_20px_rgba(139,92,246,0.5)] animate-scanning-line"></div>
         </div>
 
-        <div className="w-full space-y-6">
-          <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
-            <span className="flex items-center space-x-2">
-              <Activity className="w-4 h-4 text-violet-500" />
-              <span>Neural Processing</span>
-            </span>
-            <span className="text-violet-300">{Math.round(((stepIndex + 1) / SEARCH_STEPS.length) * 100)}%</span>
+        <div className="relative z-10 flex flex-col items-center space-y-10">
+          <div className="relative">
+            <div className="absolute -inset-8 bg-violet-600/20 blur-3xl rounded-full animate-pulse"></div>
+            <div className="relative glass-card p-6 rounded-full border border-violet-500/30">
+              <Cpu className="w-12 h-12 text-violet-400 animate-spin-slow" />
+            </div>
           </div>
 
-          <div className="h-2 w-full bg-slate-800/50 rounded-full overflow-hidden border border-white/5">
-            <div
-              className="h-full bg-gradient-to-r from-violet-600 to-indigo-600 transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(139,92,246,0.5)]"
-              style={{ width: `${((stepIndex + 1) / SEARCH_STEPS.length) * 100}%` }}
-            ></div>
-          </div>
+          <div className="w-full space-y-6">
+            <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
+              <span className="flex items-center space-x-2">
+                <Activity className="w-4 h-4 text-violet-500" />
+                <span>Neural Processing</span>
+              </span>
+              <span className="text-violet-300">{Math.round(((stepIndex + 1) / SEARCH_STEPS.length) * 100)}%</span>
+            </div>
+
+            <div className="h-2 w-full bg-slate-800/50 rounded-full overflow-hidden border border-white/5">
+              <div
+                className="h-full bg-gradient-to-r from-violet-600 to-indigo-600 transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(139,92,246,0.5)]"
+                style={{ width: `${((stepIndex + 1) / SEARCH_STEPS.length) * 100}%` }}
+              ></div>
+            </div>
 
           <div className="flex items-center justify-center space-x-3 text-slate-400 font-mono text-xs h-6 overflow-hidden">
             <Terminal className="w-4 h-4 text-violet-500 shrink-0" />
@@ -183,6 +211,24 @@ const SearchingModule: React.FC<{ stepIndex: number; onStop: () => void }> = ({ 
           <span>Stop Discovery</span>
         </button>
       </div>
+    </div>
+
+      {/* Skeleton Preview Cards */}
+      {stepIndex >= 4 && (
+        <div className="max-w-7xl mx-auto space-y-6">
+          <div className="flex items-center space-x-2 mb-4">
+            <Search className="w-4 h-4 text-violet-400" />
+            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">
+              Discovering Opportunities...
+            </h3>
+          </div>
+          <div className="grid gap-6">
+            <SkeletonOpportunityCard delay={0} />
+            <SkeletonOpportunityCard delay={200} />
+            <SkeletonOpportunityCard delay={400} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -541,7 +587,7 @@ const App: React.FC = () => {
                   </div>
                   <span className="text-xl font-bold tracking-tight text-white uppercase italic">Scopa AI</span>
                 </div>
-                <button className="lg:hidden p-2 text-slate-400 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>
+                <button className="lg:hidden p-3 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400 hover:text-white rounded-xl hover:bg-white/5 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
                   <X className="w-6 h-6" />
                 </button>
               </div>
@@ -642,7 +688,7 @@ const App: React.FC = () => {
               <header className="h-20 flex items-center justify-between px-4 lg:px-10 sticky top-0 z-30 bg-[#0a0b0f]/50 backdrop-blur-md lg:bg-transparent">
                 <div className="flex items-center space-x-4">
                   <button
-                    className="lg:hidden p-2 -ml-2 text-slate-400 hover:text-white transition-colors"
+                    className="lg:hidden p-3 -ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400 hover:text-white transition-colors rounded-xl hover:bg-white/5"
                     onClick={() => setIsMobileMenuOpen(true)}
                   >
                     <Menu className="w-6 h-6" />
@@ -712,11 +758,11 @@ const App: React.FC = () => {
                             <button
                               type="submit"
                               disabled={!query.trim()}
-                              className="bg-violet-600 text-white hover:bg-violet-500 disabled:bg-slate-700 disabled:text-slate-500 font-black px-8 lg:px-12 py-3 lg:py-4 rounded-2xl transition-all shadow-xl shadow-violet-600/20 flex items-center space-x-3 uppercase tracking-tighter"
+                              className="bg-violet-600 text-white hover:bg-violet-500 disabled:bg-slate-700 disabled:text-slate-500 font-black px-8 lg:px-12 py-3 lg:py-4 rounded-2xl transition-all shadow-xl shadow-violet-600/20 flex items-center space-x-3 uppercase tracking-tighter min-h-[44px]"
                             >
                               <Zap className="w-5 h-5 fill-white" />
-                              <span className="hidden sm:inline">Start Neuro-Scan</span>
-                              <span className="sm:hidden">Scan</span>
+                              <span className="hidden sm:inline">Start Free Discovery</span>
+                              <span className="sm:hidden">Discover</span>
                             </button>
                           </div>
                         </div>
