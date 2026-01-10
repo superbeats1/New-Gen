@@ -24,7 +24,9 @@ import {
   Sparkles,
   Menu,
   Bell,
-  ShieldAlert
+  ShieldAlert,
+  Rocket,
+  Building2
 } from 'lucide-react';
 import { WorkflowMode, AnalysisResult } from './types';
 import { analyzeQuery } from './geminiService';
@@ -252,8 +254,26 @@ const App: React.FC = () => {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [diagStats, setDiagStats] = useState({ realDataCount: 0, lastLog: '' });
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
+
+  const EXAMPLE_QUERIES = [
+    "AI-powered productivity tools for remote teams",
+    "Sustainable fashion marketplace opportunities",
+    "Developer tools for API monitoring and debugging",
+    "Mental health apps targeting Gen Z professionals",
+    "No-code automation platforms for small businesses",
+    "Eco-friendly packaging solutions for e-commerce"
+  ];
 
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Rotate placeholder examples
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPlaceholderIndex((prev) => (prev + 1) % EXAMPLE_QUERIES.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     // Check for success redirect from Stripe
@@ -499,258 +519,291 @@ const App: React.FC = () => {
         {profile ? (
           <NotificationProvider userId={profile.id}>
             {/* Content wrapped in NotificationProvider */}
-        {/* Mobile Sidebar Overlay */}
-        {isMobileMenuOpen && (
-          <div
-            className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm lg:hidden animate-in fade-in duration-300"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-        )}
+            {/* Mobile Sidebar Overlay */}
+            {isMobileMenuOpen && (
+              <div
+                className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm lg:hidden animate-in fade-in duration-300"
+                onClick={() => setIsMobileMenuOpen(false)}
+              />
+            )}
 
-        {/* Sidebar */}
-        <aside className={`
+            {/* Sidebar */}
+            <aside className={`
         fixed inset-y-0 left-0 z-[70] w-72 lg:static lg:w-72 
         bg-[#050608]/80 backdrop-blur-2xl border-r border-white/5 flex flex-col p-6 m-4 lg:my-4 lg:ml-4 lg:mr-0 
         rounded-3xl transition-transform duration-300 ease-in-out
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-[calc(100%+2rem)] lg:translate-x-0'}
       `}>
-          <div className="flex items-center justify-between mb-10">
-            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => { setShowLanding(true); setIsMobileMenuOpen(false); }}>
-              <div className="bg-gradient-to-br from-violet-600 to-indigo-600 p-2 rounded-xl shadow-lg shadow-violet-600/20">
-                <Zap className="w-5 h-5 text-white fill-white" />
-              </div>
-              <span className="text-xl font-bold tracking-tight text-white uppercase italic">Scopa AI</span>
-            </div>
-            <button className="lg:hidden p-2 text-slate-400 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-
-          <nav className="flex-1 space-y-2">
-            <button
-              className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all ${view === 'home' ? 'bg-violet-600/20 text-white font-medium border border-violet-500/30' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
-              onClick={() => { setView('home'); setResults(null); setQuery(''); setIsMobileMenuOpen(false); }}
-            >
-              <Search className={`w-5 h-5 ${view === 'home' ? 'text-violet-400' : ''}`} />
-              <span>Discover</span>
-            </button>
-
-            <button
-              onClick={() => { setShowAlerts(true); setIsMobileMenuOpen(false); }}
-              className="w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all hover:bg-white/5 text-slate-400 hover:text-white"
-            >
-              <History className="w-5 h-5" />
-              <span>Alerts</span>
-            </button>
-
-            <div className="pt-8 pb-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-widest">
-              Your Plan
-            </div>
-            <div className="glass-card p-4 rounded-2xl mx-1 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-20 h-20 bg-violet-500/10 rounded-full blur-2xl group-hover:bg-violet-500/20 transition-all"></div>
-              <div className="flex items-center justify-between mb-3 relative z-10">
-                <span className="text-xs font-medium text-slate-300">Credits</span>
-                {profile?.is_pro ? (
-                  <span className="flex items-center text-[10px] font-bold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
-                    PRO
-                  </span>
-                ) : (
-                  <span className="text-xs font-bold text-white">{profile?.credits} left</span>
-                )}
-              </div>
-
-              <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden mb-3">
-                <div
-                  className="h-full bg-gradient-to-r from-violet-500 to-indigo-600 transition-all duration-500"
-                  style={{ width: profile?.is_pro ? '100%' : `${Math.max(0, Math.min(100, (profile?.credits / 10) * 100))}%` }}
-                ></div>
-              </div>
-
-              {!profile?.is_pro && (
-                <button
-                  onClick={handleUpgradeClick}
-                  className="w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-white transition-all flex items-center justify-center space-x-2"
-                >
-                  <Sparkles className="w-3 h-3 text-amber-400" />
-                  <span>Upgrade Plan</span>
-                </button>
-              )}
-            </div>
-          </nav>
-
-          <div className="border-t border-white/5 pt-6 space-y-2">
-            <div className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-white/5 border border-white/5">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white border border-white/10 shadow-lg shadow-violet-500/20">
-                {profile?.first_name?.[0] || 'U'}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-xs font-bold text-white truncate">{profile?.first_name} {profile?.last_name}</div>
-                <div className="text-[10px] text-slate-400 truncate">{session?.user?.email}</div>
-              </div>
-              {profile?.is_pro && <Crown className="w-3 h-3 text-amber-400 shrink-0" />}
-            </div>
-
-            {!profile?.is_pro && (
-              <button onClick={handleManualUpgrade} className="w-full text-[10px] text-slate-600 hover:text-amber-500 p-1 text-center">
-                (Admin: Upgrade)
-              </button>
-            )}
-
-            <button
-              onClick={handleSignOut}
-              className="w-full flex items-center space-x-3 px-4 py-2 rounded-xl text-rose-400 hover:bg-rose-500/10 transition-all ml-1"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="text-sm">Sign Out</span>
-            </button>
-
-            <div className="pt-4 flex items-center justify-between px-4 opacity-50 hover:opacity-100 transition-opacity">
-              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Protocol v{(window as any).SCOPA_VERSION || '2.6.1'}</span>
-              <button
-                onClick={handleForceSync}
-                className="text-[9px] font-black text-violet-400 uppercase tracking-widest hover:text-violet-300 transition-colors"
-                title="Force deep cache clear and service worker purge"
-              >
-                Force Sync
-              </button>
-            </div>
-          </div>
-        </aside>
-
-        {/* Main Content */}
-        <main className="flex-1 flex flex-col h-full relative overflow-y-auto z-10 w-full">
-          <header className="h-20 flex items-center justify-between px-4 lg:px-10 sticky top-0 z-30 bg-[#0a0b0f]/50 backdrop-blur-md lg:bg-transparent">
-            <div className="flex items-center space-x-4">
-              <button
-                className="lg:hidden p-2 -ml-2 text-slate-400 hover:text-white transition-colors"
-                onClick={() => setIsMobileMenuOpen(true)}
-              >
-                <Menu className="w-6 h-6" />
-              </button>
-              <h1 className="text-lg lg:text-xl font-bold text-white tracking-tight">
-                {isSearching ? 'Neural Protocol' :
-                  view === 'home' ? 'Intelligence Hub' : 'Opportunity Analysis'}
-              </h1>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="glass-panel px-4 py-2 rounded-full flex items-center space-x-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span className="text-xs font-medium text-slate-300">System Online</span>
-              </div>
-              {profile && <NotificationCenter />}
-            </div>
-          </header>
-
-          <div className="flex-1 px-4 lg:px-10 pb-10">
-            {view === 'home' && !isSearching && (
-              <div className="max-w-4xl mx-auto py-16">
-                <div className="text-center mb-12 lg:mb-20 space-y-6">
-                  <div className="inline-flex items-center space-x-3 px-4 py-1.5 rounded-full bg-violet-600/10 border border-violet-500/20 mb-4 animate-in fade-in slide-in-from-bottom-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse"></span>
-                    <span className="text-[10px] font-black text-violet-400 uppercase tracking-[0.3em]">Protocol v2.6.1 Active</span>
+              <div className="flex items-center justify-between mb-10">
+                <div className="flex items-center space-x-3 cursor-pointer" onClick={() => { setShowLanding(true); setIsMobileMenuOpen(false); }}>
+                  <div className="bg-gradient-to-br from-violet-600 to-indigo-600 p-2 rounded-xl shadow-lg shadow-violet-600/20">
+                    <Zap className="w-5 h-5 text-white fill-white" />
                   </div>
-                  <h2 className="text-5xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] uppercase italic">
-                    Scopa <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-400 to-violet-500">Intelligence</span>
-                  </h2>
-                  <p className="text-slate-500 text-lg lg:text-2xl font-medium tracking-tight max-w-2xl mx-auto">
-                    Scan global markets for untapped blue ocean opportunities using high-fidelity neural analysis.
-                  </p>
+                  <span className="text-xl font-bold tracking-tight text-white uppercase italic">Scopa AI</span>
+                </div>
+                <button className="lg:hidden p-2 text-slate-400 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <nav className="flex-1 space-y-2">
+                <button
+                  className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all ${view === 'home' ? 'bg-violet-600/20 text-white font-medium border border-violet-500/30' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
+                  onClick={() => { setView('home'); setResults(null); setQuery(''); setIsMobileMenuOpen(false); }}
+                >
+                  <Search className={`w-5 h-5 ${view === 'home' ? 'text-violet-400' : ''}`} />
+                  <span>Discover</span>
+                </button>
+
+                <button
+                  onClick={() => { setShowAlerts(true); setIsMobileMenuOpen(false); }}
+                  className="w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all hover:bg-white/5 text-slate-400 hover:text-white"
+                >
+                  <History className="w-5 h-5" />
+                  <span>Alerts</span>
+                </button>
+
+                <div className="pt-8 pb-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-widest">
+                  Your Plan
+                </div>
+                <div className="glass-card p-4 rounded-2xl mx-1 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-violet-500/10 rounded-full blur-2xl group-hover:bg-violet-500/20 transition-all"></div>
+                  <div className="flex items-center justify-between mb-3 relative z-10">
+                    <span className="text-xs font-medium text-slate-300">Credits</span>
+                    {profile?.is_pro ? (
+                      <span className="flex items-center text-[10px] font-bold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                        PRO
+                      </span>
+                    ) : (
+                      <span className="text-xs font-bold text-white">{profile?.credits} left</span>
+                    )}
+                  </div>
+
+                  <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden mb-3">
+                    <div
+                      className="h-full bg-gradient-to-r from-violet-500 to-indigo-600 transition-all duration-500"
+                      style={{ width: profile?.is_pro ? '100%' : `${Math.max(0, Math.min(100, (profile?.credits / 10) * 100))}%` }}
+                    ></div>
+                  </div>
+
+                  {!profile?.is_pro && (
+                    <button
+                      onClick={handleUpgradeClick}
+                      className="w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-white transition-all flex items-center justify-center space-x-2"
+                    >
+                      <Sparkles className="w-3 h-3 text-amber-400" />
+                      <span>Upgrade Plan</span>
+                    </button>
+                  )}
+                </div>
+              </nav>
+
+              <div className="border-t border-white/5 pt-6 space-y-2">
+                <div className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-white/5 border border-white/5">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white border border-white/10 shadow-lg shadow-violet-500/20">
+                    {profile?.first_name?.[0] || 'U'}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-bold text-white truncate">{profile?.first_name} {profile?.last_name}</div>
+                    <div className="text-[10px] text-slate-400 truncate">{session?.user?.email}</div>
+                  </div>
+                  {profile?.is_pro && <Crown className="w-3 h-3 text-amber-400 shrink-0" />}
                 </div>
 
-                <div className="relative group max-w-3xl mx-auto">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 via-indigo-500 to-violet-600 rounded-[2.5rem] blur opacity-20 group-focus-within:opacity-50 transition duration-1000 animate-pulse-glow"></div>
-                  <form onSubmit={handleSearch} className="relative bg-[#050608]/80 backdrop-blur-xl border border-white/10 rounded-[2.2rem] p-1 shadow-2xl">
-                    <div className="bg-[#050608]/50 rounded-[2rem] p-6 lg:p-8">
-                      <textarea
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            handleSearch(e);
-                          }
-                        }}
-                        placeholder="Describe your target market or ideal lead..."
-                        className="w-full bg-transparent border-none focus:ring-0 text-lg lg:text-xl text-white placeholder-slate-600 resize-none min-h-[120px]"
-                      />
-                      <div className="flex items-center justify-between pt-6 mt-2 border-t border-white/5">
-                        <div className="flex flex-wrap gap-2 lg:gap-3">
-                          <button type="button" className="glass-panel px-3 py-1.5 rounded-full text-[10px] lg:text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors flex items-center space-x-1.5">
-                            <Globe className="w-3 h-3" />
-                            <span>Global</span>
-                          </button>
-                          <button type="button" className="glass-panel px-3 py-1.5 rounded-full text-[10px] lg:text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors flex items-center space-x-1.5">
-                            <Target className="w-3 h-3" />
-                            <span>High Intent</span>
-                          </button>
-                          <div className="flex items-center space-x-2 text-xs text-slate-500 font-medium ml-auto hidden sm:flex">
-                            <kbd className="px-2 py-1 text-xs font-mono bg-slate-800/50 border border-slate-700/50 rounded">Enter</kbd>
-                            <span>to scan</span>
+                {!profile?.is_pro && (
+                  <button onClick={handleManualUpgrade} className="w-full text-[10px] text-slate-600 hover:text-amber-500 p-1 text-center">
+                    (Admin: Upgrade)
+                  </button>
+                )}
+
+                <button
+                  onClick={handleSignOut}
+                  className="w-full flex items-center space-x-3 px-4 py-2 rounded-xl text-rose-400 hover:bg-rose-500/10 transition-all ml-1"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="text-sm">Sign Out</span>
+                </button>
+
+                <div className="pt-4 flex items-center justify-between px-4 opacity-50 hover:opacity-100 transition-opacity">
+                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Protocol v{(window as any).SCOPA_VERSION || '2.6.1'}</span>
+                  <button
+                    onClick={handleForceSync}
+                    className="text-[9px] font-black text-violet-400 uppercase tracking-widest hover:text-violet-300 transition-colors"
+                    title="Force deep cache clear and service worker purge"
+                  >
+                    Force Sync
+                  </button>
+                </div>
+              </div>
+            </aside>
+
+            {/* Main Content */}
+            <main className="flex-1 flex flex-col h-full relative overflow-y-auto z-10 w-full">
+              <header className="h-20 flex items-center justify-between px-4 lg:px-10 sticky top-0 z-30 bg-[#0a0b0f]/50 backdrop-blur-md lg:bg-transparent">
+                <div className="flex items-center space-x-4">
+                  <button
+                    className="lg:hidden p-2 -ml-2 text-slate-400 hover:text-white transition-colors"
+                    onClick={() => setIsMobileMenuOpen(true)}
+                  >
+                    <Menu className="w-6 h-6" />
+                  </button>
+                  <h1 className="text-lg lg:text-xl font-bold text-white tracking-tight">
+                    {isSearching ? 'Neural Protocol' :
+                      view === 'home' ? 'Intelligence Hub' : 'Opportunity Analysis'}
+                  </h1>
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  <div className="glass-panel px-4 py-2 rounded-full flex items-center space-x-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span className="text-xs font-medium text-slate-300">System Online</span>
+                  </div>
+                  {profile && <NotificationCenter />}
+                </div>
+              </header>
+
+              <div className="flex-1 px-4 lg:px-10 pb-10">
+                {view === 'home' && !isSearching && (
+                  <div className="max-w-4xl mx-auto py-16">
+                    <div className="text-center mb-12 lg:mb-20 space-y-6">
+                      <div className="inline-flex items-center space-x-3 px-4 py-1.5 rounded-full bg-violet-600/10 border border-violet-500/20 mb-4 animate-in fade-in slide-in-from-bottom-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse"></span>
+                        <span className="text-[10px] font-black text-violet-400 uppercase tracking-[0.3em]">Protocol v2.6.1 Active</span>
+                      </div>
+                      <h2 className="text-5xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] uppercase italic">
+                        Scopa <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-400 to-violet-500">Intelligence</span>
+                      </h2>
+                      <p className="text-slate-500 text-lg lg:text-2xl font-medium tracking-tight max-w-2xl mx-auto">
+                        Scan global markets for untapped blue ocean opportunities using high-fidelity neural analysis.
+                      </p>
+                    </div>
+
+                    <div className="relative group max-w-3xl mx-auto">
+                      <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 via-indigo-500 to-violet-600 rounded-[2.5rem] blur opacity-20 group-focus-within:opacity-50 transition duration-1000 animate-pulse-glow"></div>
+                      <form onSubmit={handleSearch} className="relative bg-[#050608]/80 backdrop-blur-xl border border-white/10 rounded-[2.2rem] p-1 shadow-2xl">
+                        <div className="bg-[#050608]/50 rounded-[2rem] p-6 lg:p-8">
+                          <textarea
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                handleSearch(e);
+                              }
+                            }}
+                            placeholder={`e.g. "${EXAMPLE_QUERIES[placeholderIndex]}"`}
+                            className="w-full bg-transparent border-none focus:ring-0 text-lg lg:text-xl text-white placeholder-slate-600 resize-none min-h-[120px]"
+                          />
+                          <div className="flex items-center justify-between pt-6 mt-2 border-t border-white/5">
+                            <div className="flex flex-wrap gap-2 lg:gap-3">
+                              <button type="button" className="glass-panel px-3 py-1.5 rounded-full text-[10px] lg:text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors flex items-center space-x-1.5">
+                                <Globe className="w-3 h-3" />
+                                <span>Global</span>
+                              </button>
+                              <button type="button" className="glass-panel px-3 py-1.5 rounded-full text-[10px] lg:text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors flex items-center space-x-1.5">
+                                <Target className="w-3 h-3" />
+                                <span>High Intent</span>
+                              </button>
+                              <div className="flex items-center space-x-2 text-xs text-slate-500 font-medium ml-auto hidden sm:flex">
+                                <kbd className="px-2 py-1 text-xs font-mono bg-slate-800/50 border border-slate-700/50 rounded">Enter</kbd>
+                                <span>to scan</span>
+                              </div>
+                            </div>
+                            <button
+                              type="submit"
+                              disabled={!query.trim()}
+                              className="bg-violet-600 text-white hover:bg-violet-500 disabled:bg-slate-700 disabled:text-slate-500 font-black px-8 lg:px-12 py-3 lg:py-4 rounded-2xl transition-all shadow-xl shadow-violet-600/20 flex items-center space-x-3 uppercase tracking-tighter"
+                            >
+                              <Zap className="w-5 h-5 fill-white" />
+                              <span className="hidden sm:inline">Start Neuro-Scan</span>
+                              <span className="sm:hidden">Scan</span>
+                            </button>
                           </div>
                         </div>
-                        <button
-                          type="submit"
-                          disabled={!query.trim()}
-                          className="bg-violet-600 text-white hover:bg-violet-500 disabled:bg-slate-700 disabled:text-slate-500 font-black px-8 lg:px-12 py-3 lg:py-4 rounded-2xl transition-all shadow-xl shadow-violet-600/20 flex items-center space-x-3 uppercase tracking-tighter"
-                        >
-                          <Zap className="w-5 h-5 fill-white" />
-                          <span className="hidden sm:inline">Start Neuro-Scan</span>
-                          <span className="sm:hidden">Scan</span>
-                        </button>
+                      </form>
+
+                      {/* Quick Start Templates */}
+                      <div className="mt-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+                        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 text-center">
+                          Quick Start Templates
+                        </div>
+                        <div className="flex flex-wrap justify-center gap-3">
+                          {[
+                            { label: 'SaaS Tools', icon: Rocket, query: 'SaaS productivity tools for remote teams' },
+                            { label: 'E-commerce', icon: Building2, query: 'E-commerce marketplace opportunities' },
+                            { label: 'Developer Tools', icon: Activity, query: 'Developer tools for API monitoring' },
+                            { label: 'Health Tech', icon: Target, query: 'Mental health apps for professionals' }
+                          ].map((template) => (
+                            <button
+                              key={template.label}
+                              type="button"
+                              onClick={() => {
+                                setQuery(template.query);
+                                setTimeout(() => {
+                                  const form = document.querySelector('form');
+                                  if (form) {
+                                    form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                                  }
+                                }, 100);
+                              }}
+                              className="group px-5 py-3 bg-white/5 hover:bg-violet-600 border border-white/10 hover:border-violet-500 rounded-2xl text-sm font-bold transition-all flex items-center space-x-2 hover:scale-105 hover:shadow-lg hover:shadow-violet-600/20"
+                            >
+                              <template.icon className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
+                              <span className="text-slate-300 group-hover:text-white transition-colors">{template.label}</span>
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </form>
-                </div>
 
-                <div className="mt-24 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                  <div
-                    className="group bg-[#050608]/40 backdrop-blur-2xl p-12 rounded-[3.5rem] cursor-pointer hover:bg-white/[0.04] transition-all border border-white/5 hover:border-violet-500/30 w-full text-left relative overflow-hidden"
-                    onClick={() => { setQuery("Find emerging opportunities in the AI-powered health-tech space for 2026"); setView('home'); }}
-                  >
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-violet-600/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
-                    <div className="w-16 h-16 rounded-2xl bg-violet-500/10 flex items-center justify-center mb-10 border border-violet-500/20 group-hover:scale-110 transition-transform">
-                      <Zap className="w-8 h-8 text-violet-400 fill-violet-400/20" />
+                    <div className="mt-24 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                      <div
+                        className="group bg-[#050608]/40 backdrop-blur-2xl p-12 rounded-[3.5rem] cursor-pointer hover:bg-white/[0.04] transition-all border border-white/5 hover:border-violet-500/30 w-full text-left relative overflow-hidden"
+                        onClick={() => { setQuery("Find emerging opportunities in the AI-powered health-tech space for 2026"); setView('home'); }}
+                      >
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-violet-600/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
+                        <div className="w-16 h-16 rounded-2xl bg-violet-500/10 flex items-center justify-center mb-10 border border-violet-500/20 group-hover:scale-110 transition-transform">
+                          <Zap className="w-8 h-8 text-violet-400 fill-violet-400/20" />
+                        </div>
+                        <h3 className="text-3xl font-black text-white mb-4 tracking-tighter uppercase italic">Strategic Pulse</h3>
+                        <p className="text-slate-500 text-lg leading-relaxed font-medium">
+                          Identify high-velocity market gaps with predictive intelligence.
+                        </p>
+                      </div>
+
+                      <div
+                        className="group bg-[#050608]/40 backdrop-blur-2xl p-12 rounded-[3.5rem] cursor-pointer hover:bg-white/[0.04] transition-all border border-white/5 hover:border-emerald-500/30 w-full text-left relative overflow-hidden"
+                        onClick={() => setShowAlerts(true)}
+                      >
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-600/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
+                        <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-10 border border-emerald-500/20 group-hover:scale-110 transition-transform">
+                          <Bell className="w-8 h-8 text-emerald-400" />
+                        </div>
+                        <h3 className="text-3xl font-black text-white mb-4 tracking-tighter uppercase italic">Neural Monitors</h3>
+                        <p className="text-slate-500 text-lg leading-relaxed font-medium">
+                          Set automated shadows to track market movements 24/7.
+                        </p>
+                      </div>
                     </div>
-                    <h3 className="text-3xl font-black text-white mb-4 tracking-tighter uppercase italic">Strategic Pulse</h3>
-                    <p className="text-slate-500 text-lg leading-relaxed font-medium">
-                      Identify high-velocity market gaps with predictive intelligence.
-                    </p>
                   </div>
+                )}
 
-                  <div
-                    className="group bg-[#050608]/40 backdrop-blur-2xl p-12 rounded-[3.5rem] cursor-pointer hover:bg-white/[0.04] transition-all border border-white/5 hover:border-emerald-500/30 w-full text-left relative overflow-hidden"
-                    onClick={() => setShowAlerts(true)}
-                  >
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-600/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
-                    <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-10 border border-emerald-500/20 group-hover:scale-110 transition-transform">
-                      <Bell className="w-8 h-8 text-emerald-400" />
-                    </div>
-                    <h3 className="text-3xl font-black text-white mb-4 tracking-tighter uppercase italic">Neural Monitors</h3>
-                    <p className="text-slate-500 text-lg leading-relaxed font-medium">
-                      Set automated shadows to track market movements 24/7.
-                    </p>
+                {isSearching && (
+                  <div className="max-w-4xl mx-auto py-16">
+                    <SearchingModule stepIndex={searchStep} onStop={stopSearch} />
                   </div>
-                </div>
-              </div>
-            )}
+                )}
 
-            {isSearching && (
-              <div className="max-w-4xl mx-auto py-16">
-                <SearchingModule stepIndex={searchStep} onStop={stopSearch} />
+                {view === 'results' && results && !isSearching && (
+                  <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <OpportunityView
+                      results={results}
+                      onNewSearch={() => { setView('home'); setResults(null); setQuery(''); }}
+                    />
+                  </div>
+                )}
               </div>
-            )}
-
-            {view === 'results' && results && !isSearching && (
-              <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <OpportunityView
-                  results={results}
-                  onNewSearch={() => { setView('home'); setResults(null); setQuery(''); }}
-                />
-              </div>
-            )}
-          </div>
-        </main>
+            </main>
 
           </NotificationProvider>
         ) : (

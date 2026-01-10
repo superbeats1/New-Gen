@@ -110,9 +110,35 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-400 to-fuchsia-500">Opportunities.</span>
           </h1>
 
-          <p className="max-w-2xl text-slate-400 text-xl md:text-2xl font-medium leading-relaxed mb-12 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
+          <p className="max-w-2xl text-slate-400 text-xl md:text-2xl font-medium leading-relaxed mb-8 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
             Scopa AI uses dual-agent intelligence to scan millions of signals across Reddit, X, and forums to reveal business gaps in real-time.
           </p>
+
+          {/* Social Proof */}
+          <div className="flex items-center justify-center space-x-6 mb-12 animate-in fade-in slide-in-from-bottom-14 duration-1000 delay-250">
+            <div className="flex items-center space-x-3">
+              <div className="flex -space-x-2">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-violet-400 border-2 border-[#030407] flex items-center justify-center text-white text-xs font-bold">A</div>
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-400 border-2 border-[#030407] flex items-center justify-center text-white text-xs font-bold">M</div>
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-400 border-2 border-[#030407] flex items-center justify-center text-white text-xs font-bold">S</div>
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-fuchsia-600 to-fuchsia-400 border-2 border-[#030407] flex items-center justify-center text-white text-xs font-bold">+</div>
+              </div>
+              <div className="text-left">
+                <div className="text-sm sm:text-base text-white font-bold">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400">2,400+</span> opportunities
+                </div>
+                <div className="text-xs text-slate-500 font-medium">discovered this month</div>
+              </div>
+            </div>
+            <div className="h-8 w-px bg-white/10"></div>
+            <div className="flex items-center space-x-2">
+              <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+              <div className="text-left">
+                <div className="text-sm sm:text-base text-white font-bold">4.9/5</div>
+                <div className="text-xs text-slate-500 font-medium">avg. rating</div>
+              </div>
+            </div>
+          </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-6 animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-300">
             <button
@@ -120,14 +146,15 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
               className="group relative bg-violet-600 hover:bg-violet-500 text-white font-black py-6 px-12 rounded-3xl transition-all shadow-2xl shadow-violet-600/30 flex items-center space-x-4 text-xl uppercase tracking-tighter overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-              <span>{session ? 'Enter Platform' : 'Start Discovery'}</span>
+              <span>{session ? 'Enter Platform' : 'Start Free Discovery'}</span>
               <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
             </button>
             <button
               onClick={() => document.getElementById('workflow')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-              className="px-8 py-6 rounded-3xl border border-white/10 hover:bg-white/5 transition-all text-xl font-bold uppercase tracking-tighter"
+              className="group px-8 py-6 rounded-3xl border border-white/10 hover:bg-white/5 transition-all text-xl font-bold uppercase tracking-tighter flex items-center space-x-2"
             >
-              View Protocol
+              <span>See How It Works</span>
+              <ChevronDown className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
             </button>
           </div>
         </div>
