@@ -42,6 +42,7 @@ import IntelligentBackground from './components/IntelligentBackground';
 import { Toaster } from 'sonner';
 import { NotificationCenter } from './components/NotificationCenter';
 import { NotificationProvider } from './contexts/NotificationContext';
+import { OnboardingFlow } from './components/OnboardingFlow';
 
 // --- NEW DIAGNOSTIC LAYER ---
 interface ErrorBoundaryProps {
@@ -298,6 +299,7 @@ const App: React.FC = () => {
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [showSuccessPage, setShowSuccessPage] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [diagStats, setDiagStats] = useState({ realDataCount: 0, lastLog: '' });
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
@@ -363,6 +365,33 @@ const App: React.FC = () => {
       .eq('id', userId)
       .single();
     if (data) setProfile(data);
+  };
+
+  // Check if user should see onboarding
+  useEffect(() => {
+    if (!profile || showLanding) return;
+
+    const hasCompletedOnboarding = localStorage.getItem('scopa_onboarding_completed');
+    const hasCompletedSearch = localStorage.getItem('scopa_first_search_completed');
+
+    // Show onboarding for first-time users who haven't seen it
+    if (!hasCompletedOnboarding && !hasCompletedSearch && view === 'home' && !isSearching) {
+      // Delay slightly so UI has time to render
+      const timer = setTimeout(() => {
+        setShowOnboarding(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [profile, showLanding, view, isSearching]);
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem('scopa_onboarding_completed', 'true');
+    setShowOnboarding(false);
+  };
+
+  const handleOnboardingSkip = () => {
+    localStorage.setItem('scopa_onboarding_completed', 'true');
+    setShowOnboarding(false);
   };
 
   const deductCredit = async () => {
@@ -604,6 +633,7 @@ const App: React.FC = () => {
                 <button
                   onClick={() => { setShowAlerts(true); setIsMobileMenuOpen(false); }}
                   className="w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all hover:bg-white/5 text-slate-400 hover:text-white"
+                  data-onboarding="alerts-button"
                 >
                   <History className="w-5 h-5" />
                   <span>Alerts</span>
@@ -739,6 +769,7 @@ const App: React.FC = () => {
                             }}
                             placeholder={`e.g. "${EXAMPLE_QUERIES[placeholderIndex]}"`}
                             className="w-full bg-transparent border-none focus:ring-0 text-lg lg:text-xl text-white placeholder-slate-600 resize-none min-h-[120px]"
+                            data-onboarding="search-input"
                           />
                           <div className="flex items-center justify-between pt-6 mt-2 border-t border-white/5">
                             <div className="flex flex-wrap gap-2 lg:gap-3">
@@ -872,6 +903,11 @@ const App: React.FC = () => {
           userId={profile?.id}
           isOpen={showAlerts}
           onClose={() => setShowAlerts(false)}
+        />
+        <OnboardingFlow
+          isOpen={showOnboarding}
+          onComplete={handleOnboardingComplete}
+          onSkip={handleOnboardingSkip}
         />
       </div>
     </ErrorBoundary>
