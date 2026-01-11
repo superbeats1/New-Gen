@@ -12,6 +12,27 @@ export const Auth: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  // Prevent form state loss
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e?.target?.value ?? '';
+    setEmail(value);
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e?.target?.value ?? '';
+    setPassword(value);
+  };
+
+  const handleFirstNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e?.target?.value ?? '';
+    setFirstName(value);
+  };
+
+  const handleLastNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e?.target?.value ?? '';
+    setLastName(value);
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -74,9 +95,22 @@ export const Auth: React.FC = () => {
       }
     } catch (err: any) {
       console.error('Auth error:', err);
-      setError(err?.message || err?.error_description || 'An error occurred. Please try again.');
+      const errorMessage = err?.message || err?.error_description || 'An error occurred. Please try again.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Toggle between sign in and sign up
+  const toggleMode = () => {
+    setIsSignUp(!isSignUp);
+    setError(null);
+    setSuccess(null);
+    // Keep the email/password but clear first/last name
+    if (isSignUp) {
+      setFirstName('');
+      setLastName('');
     }
   };
 
@@ -109,8 +143,8 @@ export const Auth: React.FC = () => {
                       required
                       placeholder="Jane"
                       className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
+                      value={firstName || ''}
+                      onChange={handleFirstNameChange}
                     />
                   </div>
                 </div>
@@ -123,8 +157,8 @@ export const Auth: React.FC = () => {
                       required
                       placeholder="Doe"
                       className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
+                      value={lastName || ''}
+                      onChange={handleLastNameChange}
                     />
                   </div>
                 </div>
@@ -140,8 +174,8 @@ export const Auth: React.FC = () => {
                   required
                   placeholder="name@company.com"
                   className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={email || ''}
+                  onChange={handleEmailChange}
                 />
               </div>
             </div>
@@ -155,8 +189,8 @@ export const Auth: React.FC = () => {
                   required
                   placeholder="••••••••"
                   className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={password || ''}
+                  onChange={handlePasswordChange}
                 />
               </div>
             </div>
@@ -181,7 +215,8 @@ export const Auth: React.FC = () => {
 
           <div className="mt-8 text-center">
             <button
-              onClick={() => setIsSignUp(!isSignUp)}
+              type="button"
+              onClick={toggleMode}
               className="text-slate-500 hover:text-white text-sm font-medium transition-colors"
             >
               {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}

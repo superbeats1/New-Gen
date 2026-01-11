@@ -104,6 +104,8 @@ function extractJsonFromText(text: string): string {
     console.warn("Manual JSON extraction failed, falling back to regex", e);
   }
 
+  // Final safety check before replace
+  if (!text || typeof text !== 'string') return '';
   return text.replace(/```json\n?|\n?```/g, '').trim();
 }
 
@@ -431,8 +433,14 @@ Return ONLY valid JSON in this format:
       contents: prompt
     });
 
-    const text = result.text || '';
+    const text = result?.text ?? '';
+    if (!text || typeof text !== 'string') {
+      throw new Error('Invalid response from Gemini API');
+    }
     const cleanText = text.replace(/```json\n?|\n?```/g, '').trim();
+    if (!cleanText) {
+      throw new Error('Empty response from Gemini API');
+    }
     return JSON.parse(cleanText);
   } catch (error) {
     console.error('Gemini API Error:', error);
