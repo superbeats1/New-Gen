@@ -1,28 +1,39 @@
-import { GoogleGenAI } from "@google/genai";
+import type { GoogleGenAI } from "@google/genai";
 import { WorkflowMode, AnalysisResult } from "./types";
-import { RealDataCollector } from "./services/realDataService";
+import type { RealDataCollector } from "./services/realDataService";
 
-// Check multiple possible environment variable names
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY ||
-  import.meta.env.VITE_GOOGLE_API_KEY ||
-  import.meta.env.GEMINI_API_KEY;
-
+// Check multiple possible environment variable names - but don't access import.meta.env at module level
+let apiKey: string | undefined;
 let genAIInstance: GoogleGenAI | null = null;
 let realDataCollector: RealDataCollector | null = null;
 
-const getGenAI = () => {
+const getApiKey = () => {
+  if (!apiKey) {
+    apiKey = import.meta.env.VITE_GEMINI_API_KEY ||
+      import.meta.env.VITE_GOOGLE_API_KEY ||
+      import.meta.env.GEMINI_API_KEY;
+  }
+  return apiKey;
+};
+
+const getGenAI = async () => {
   if (!genAIInstance) {
-    if (!apiKey) {
+    const key = getApiKey();
+    if (!key) {
       console.error('All environment variables:', import.meta.env);
       throw new Error(`VITE_GEMINI_API_KEY environment variable is not set.`);
     }
-    genAIInstance = new GoogleGenAI({ apiKey });
+    // Lazy load GoogleGenAI to prevent initialization errors on page load
+    const { GoogleGenAI } = await import("@google/genai");
+    genAIInstance = new GoogleGenAI({ apiKey: key });
   }
   return genAIInstance;
 };
 
-const getRealDataCollector = () => {
+const getRealDataCollector = async () => {
   if (!realDataCollector) {
+    // Lazy load RealDataCollector
+    const { RealDataCollector } = await import("./services/realDataService");
     realDataCollector = new RealDataCollector();
   }
   return realDataCollector;
@@ -38,7 +49,8 @@ export const analyzeQuery = async (query: string): Promise<AnalysisResult> => {
 
     // Step 2: Get real data from active sources
     console.log(`📡 Collecting real-time market data...`);
-    const realData = await getRealDataCollector().findRealLeads(query, detectedMode);
+    const collector = await getRealDataCollector();
+    const realData = await collector.findRealLeads(query, detectedMode);
 
     // Step 3: Generate high-fidelity analysis using real data
     console.log(`💡 Generating high-fidelity opportunities analysis...`);
@@ -115,7 +127,8 @@ async function generateSupplementalLeads(query: string, count: number): Promise<
 Generate ${count} realistic leads...`; // Prompt truncated for clarity in replacement chunk
 
   try {
-    const result = await getGenAI().models.generateContent({
+    const genAI = await getGenAI();
+    const result = await genAI.models.generateContent({
       model: "gemini-3-pro-preview",
       contents: prompt
     });
@@ -319,7 +332,8 @@ IMPORTANT: If there's NO clear competitor or insufficient data, SET competitorAn
 `;
 
   try {
-    const result = await getGenAI().models.generateContent({
+    const genAI = await getGenAI();
+    const result = await genAI.models.generateContent({
       model: "gemini-3-pro-preview",
       contents: prompt
     });
@@ -390,7 +404,8 @@ Requirements:
 Return only the message text, no extra formatting.
 `;
 
-    const result = await getGenAI().models.generateContent({
+    const genAI = await getGenAI();
+    const result = await genAI.models.generateContent({
       model: "gemini-3-pro-preview",
       contents: prompt
     });
@@ -428,7 +443,8 @@ Return ONLY valid JSON in this format:
 }
 `;
 
-    const result = await getGenAI().models.generateContent({
+    const genAI = await getGenAI();
+    const result = await genAI.models.generateContent({
       model: "gemini-3-pro-preview",
       contents: prompt
     });
