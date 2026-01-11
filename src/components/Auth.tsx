@@ -10,11 +10,13 @@ export const Auth: React.FC = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccess(null);
 
     try {
       // Validate inputs
@@ -30,7 +32,8 @@ export const Auth: React.FC = () => {
           throw new Error('Please enter both your first and last name.');
         }
 
-        const { error } = await supabase.auth.signUp({
+        console.log('🔐 Attempting sign up for:', email.trim());
+        const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
           password,
           options: {
@@ -40,13 +43,34 @@ export const Auth: React.FC = () => {
             },
           },
         });
-        if (error) throw error;
+
+        if (error) {
+          console.error('❌ Sign up error:', error);
+          throw error;
+        }
+
+        console.log('✅ Sign up response:', data);
+
+        // Check if email confirmation is required
+        if (data.user && !data.session) {
+          console.log('📧 Email confirmation required');
+          setSuccess('Account created! Please check your email to confirm your account before signing in.');
+          setLoading(false);
+          return;
+        }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        console.log('🔐 Attempting sign in for:', email.trim());
+        const { data, error } = await supabase.auth.signInWithPassword({
           email: email.trim(),
           password,
         });
-        if (error) throw error;
+
+        if (error) {
+          console.error('❌ Sign in error:', error);
+          throw error;
+        }
+
+        console.log('✅ Sign in successful:', data.user?.email);
       }
     } catch (err: any) {
       console.error('Auth error:', err);
@@ -138,6 +162,7 @@ export const Auth: React.FC = () => {
             </div>
 
             {error && <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-sm font-medium flex items-center space-x-2"><div className="w-1.5 h-1.5 rounded-full bg-rose-500"></div><span>{error}</span></div>}
+            {success && <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-sm font-medium flex items-center space-x-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><span>{success}</span></div>}
 
             <button
               disabled={loading}
