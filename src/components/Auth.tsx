@@ -10,34 +10,11 @@ export const Auth: React.FC = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-
-  // Prevent form state loss
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e?.target?.value ?? '';
-    setEmail(value);
-  };
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e?.target?.value ?? '';
-    setPassword(value);
-  };
-
-  const handleFirstNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e?.target?.value ?? '';
-    setFirstName(value);
-  };
-
-  const handleLastNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e?.target?.value ?? '';
-    setLastName(value);
-  };
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    setSuccess(null);
 
     try {
       // Validate inputs
@@ -53,8 +30,7 @@ export const Auth: React.FC = () => {
           throw new Error('Please enter both your first and last name.');
         }
 
-        console.log('🔐 Attempting sign up for:', email.trim());
-        const { data, error } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signUp({
           email: email.trim(),
           password,
           options: {
@@ -64,53 +40,19 @@ export const Auth: React.FC = () => {
             },
           },
         });
-
-        if (error) {
-          console.error('❌ Sign up error:', error);
-          throw error;
-        }
-
-        console.log('✅ Sign up response:', data);
-
-        // Check if email confirmation is required
-        if (data.user && !data.session) {
-          console.log('📧 Email confirmation required');
-          setSuccess('Account created! Please check your email to confirm your account before signing in.');
-          setLoading(false);
-          return;
-        }
+        if (error) throw error;
       } else {
-        console.log('🔐 Attempting sign in for:', email.trim());
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { error } = await supabase.auth.signInWithPassword({
           email: email.trim(),
           password,
         });
-
-        if (error) {
-          console.error('❌ Sign in error:', error);
-          throw error;
-        }
-
-        console.log('✅ Sign in successful:', data.user?.email);
+        if (error) throw error;
       }
     } catch (err: any) {
       console.error('Auth error:', err);
-      const errorMessage = err?.message || err?.error_description || 'An error occurred. Please try again.';
-      setError(errorMessage);
+      setError(err?.message || err?.error_description || 'An error occurred. Please try again.');
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Toggle between sign in and sign up
-  const toggleMode = () => {
-    setIsSignUp(!isSignUp);
-    setError(null);
-    setSuccess(null);
-    // Keep the email/password but clear first/last name
-    if (isSignUp) {
-      setFirstName('');
-      setLastName('');
     }
   };
 
@@ -143,8 +85,8 @@ export const Auth: React.FC = () => {
                       required
                       placeholder="Jane"
                       className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                      value={firstName || ''}
-                      onChange={handleFirstNameChange}
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
                     />
                   </div>
                 </div>
@@ -157,8 +99,8 @@ export const Auth: React.FC = () => {
                       required
                       placeholder="Doe"
                       className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                      value={lastName || ''}
-                      onChange={handleLastNameChange}
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
                     />
                   </div>
                 </div>
@@ -174,8 +116,8 @@ export const Auth: React.FC = () => {
                   required
                   placeholder="name@company.com"
                   className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                  value={email || ''}
-                  onChange={handleEmailChange}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
             </div>
@@ -189,14 +131,13 @@ export const Auth: React.FC = () => {
                   required
                   placeholder="••••••••"
                   className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                  value={password || ''}
-                  onChange={handlePasswordChange}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
             </div>
 
             {error && <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-sm font-medium flex items-center space-x-2"><div className="w-1.5 h-1.5 rounded-full bg-rose-500"></div><span>{error}</span></div>}
-            {success && <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-sm font-medium flex items-center space-x-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><span>{success}</span></div>}
 
             <button
               disabled={loading}
@@ -215,8 +156,7 @@ export const Auth: React.FC = () => {
 
           <div className="mt-8 text-center">
             <button
-              type="button"
-              onClick={toggleMode}
+              onClick={() => setIsSignUp(!isSignUp)}
               className="text-slate-500 hover:text-white text-sm font-medium transition-colors"
             >
               {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
