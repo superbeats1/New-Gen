@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AnalysisResult, Opportunity } from '../types';
 import { exportService } from '../services/exportService';
+import { SwipeableOpportunityCards } from './SwipeableOpportunityCards';
 import {
   TrendingUp,
   AlertTriangle,
@@ -700,32 +701,44 @@ const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
             <Lightbulb className="w-5 h-5 text-amber-400" />
             <span>Identified Opportunities</span>
           </h3>
-          <button className="text-slate-500 hover:text-slate-300 text-sm flex items-center space-x-1 px-3 py-1 rounded-lg hover:bg-white/5 transition-all">
+          <button className="hidden lg:flex text-slate-500 hover:text-slate-300 text-sm items-center space-x-1 px-3 py-1 rounded-lg hover:bg-white/5 transition-all">
             <Filter className="w-4 h-4" />
             <span>Filter</span>
           </button>
         </div>
-        <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-700">
-          {results.opportunities && results.opportunities.length > 0 ? (
-            results.opportunities.map((opp, idx) => (
-              <OpportunityCard key={opp.id} opportunity={opp} index={idx} />
-            ))
-          ) : (
-            <div className="glass-panel p-12 rounded-3xl border border-white/10 text-center">
-              <AlertTriangle className="w-16 h-16 text-amber-500/50 mx-auto mb-4" />
-              <h4 className="text-xl font-bold text-white mb-2">No Opportunities Found</h4>
-              <p className="text-slate-400 mb-6">
-                {results.summary || 'The analysis completed but no opportunities were identified. This could be due to API errors or insufficient data.'}
-              </p>
-              <button
-                onClick={onNewSearch}
-                className="px-6 py-3 bg-violet-600 hover:bg-violet-500 text-white rounded-xl font-bold transition-all"
-              >
-                Try New Search
-              </button>
+
+        {results.opportunities && results.opportunities.length > 0 ? (
+          <>
+            {/* Mobile: Swipeable Cards */}
+            <div className="lg:hidden animate-in slide-in-from-bottom-4 duration-700">
+              <SwipeableOpportunityCards
+                opportunities={results.opportunities}
+                renderCard={(opp, idx) => <OpportunityCard key={opp.id} opportunity={opp} index={idx} />}
+              />
             </div>
-          )}
-        </div>
+
+            {/* Desktop: Vertical List */}
+            <div className="hidden lg:block space-y-6 animate-in slide-in-from-bottom-4 duration-700">
+              {results.opportunities.map((opp, idx) => (
+                <OpportunityCard key={opp.id} opportunity={opp} index={idx} />
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="glass-panel p-12 rounded-3xl border border-white/10 text-center">
+            <AlertTriangle className="w-16 h-16 text-amber-500/50 mx-auto mb-4" />
+            <h4 className="text-xl font-bold text-white mb-2">No Opportunities Found</h4>
+            <p className="text-slate-400 mb-6">
+              {results.summary || 'The analysis completed but no opportunities were identified. This could be due to API errors or insufficient data.'}
+            </p>
+            <button
+              onClick={onNewSearch}
+              className="px-6 py-3 bg-violet-600 hover:bg-violet-500 text-white rounded-xl font-bold transition-all"
+            >
+              Try New Search
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Raw Data Section */}
