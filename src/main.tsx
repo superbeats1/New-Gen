@@ -10,7 +10,7 @@ console.log('%c 👆 SCOPA AI v2.26.0 - SWIPEABLE CARDS! 👆 ', 'background: #a
 (window as any).DATA_SOURCES = 'Twitter + Reddit + HackerNews + GitHub';
 (window as any).ARCHITECTURE = 'Serverless API Proxies (CORS-free)';
 
-// --- NEURAL STABILITY MONITOR v2.1 ---
+// --- NEURAL STABILITY MONITOR v2.2 - ENHANCED ---
 window.addEventListener('unhandledrejection', (event) => {
   const reason = event.reason;
   console.error('🔮 NEURAL SYNC FAILURE DETECTED:', reason);
@@ -22,11 +22,22 @@ window.addEventListener('unhandledrejection', (event) => {
       stack: reason?.stack,
       rawReason: reason
     });
+
+    // PREVENT ERROR FROM BREAKING THE APP
+    event.preventDefault();
+    console.log('✅ Error suppressed - app continues running');
   }
 });
 
 window.onerror = (message, source, lineno, colno, error) => {
   console.error('🔥 CRITICAL CORE BREACH:', { message, source, lineno, colno, error });
+
+  // Suppress .match() errors to prevent app crash
+  if (message && typeof message === 'string' && message.includes('match')) {
+    console.log('✅ Match error suppressed - app continues');
+    return true; // Prevent default error handling
+  }
+
   return false;
 };
 
