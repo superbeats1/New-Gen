@@ -43,6 +43,8 @@ import { Toaster } from 'sonner';
 import { NotificationCenter } from './components/NotificationCenter';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { OnboardingFlow } from './components/OnboardingFlow';
+import { BottomNavigation } from './components/BottomNavigation';
+import { exportService } from './services/exportService';
 
 // --- NEW DIAGNOSTIC LAYER ---
 interface ErrorBoundaryProps {
@@ -301,6 +303,7 @@ const App: React.FC = () => {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showMobileProfile, setShowMobileProfile] = useState(false);
   const [diagStats, setDiagStats] = useState({ realDataCount: 0, lastLog: '' });
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
 
@@ -392,6 +395,23 @@ const App: React.FC = () => {
   const handleOnboardingSkip = () => {
     localStorage.setItem('scopa_onboarding_completed', 'true');
     setShowOnboarding(false);
+  };
+
+  // Bottom navigation handlers
+  const handleBottomNavHome = () => {
+    setView('home');
+    setResults(null);
+    setQuery('');
+  };
+
+  const handleBottomNavExport = () => {
+    if (results) {
+      exportService.exportToCSV(results);
+    }
+  };
+
+  const handleBottomNavProfile = () => {
+    setShowMobileProfile(true);
   };
 
   const deductCredit = async () => {
@@ -543,6 +563,84 @@ const App: React.FC = () => {
             <X className="w-6 h-6" />
           </button>
           <Auth />
+        </div>
+      </div>
+    );
+  };
+
+  const MobileProfileModal = () => {
+    if (!showMobileProfile) return null;
+    return (
+      <div className="lg:hidden fixed inset-0 z-[100] flex items-end justify-center bg-black/80 backdrop-blur-md animate-in fade-in duration-300" onClick={() => setShowMobileProfile(false)}>
+        <div className="w-full bg-[#0A0A0C]/95 backdrop-blur-2xl border-t border-white/10 rounded-t-3xl p-6 pb-safe animate-in slide-in-from-bottom-4 duration-300" onClick={(e) => e.stopPropagation()}>
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-black uppercase tracking-tight text-white">Account</h3>
+            <button
+              onClick={() => setShowMobileProfile(false)}
+              className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-500 hover:text-white rounded-xl hover:bg-white/5 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Profile Info */}
+          {profile && (
+            <div className="glass-panel p-4 rounded-2xl mb-6">
+              <div className="flex items-center space-x-3 mb-3">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-white font-bold text-lg">
+                  {profile.first_name?.[0]}{profile.last_name?.[0]}
+                </div>
+                <div className="flex-1">
+                  <div className="text-white font-bold">{profile.first_name} {profile.last_name}</div>
+                  <div className="text-slate-500 text-sm">{session?.user?.email}</div>
+                </div>
+              </div>
+
+              {/* Credits/Pro Status */}
+              <div className="flex items-center justify-between pt-3 border-t border-white/5">
+                <span className="text-xs font-medium text-slate-400">Status</span>
+                {profile.is_pro ? (
+                  <span className="flex items-center text-xs font-bold text-amber-300 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+                    <Crown className="w-3 h-3 mr-1" />
+                    PRO
+                  </span>
+                ) : (
+                  <span className="text-xs font-bold text-white">{profile.credits} credits left</span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="space-y-2 mb-6">
+            {!profile?.is_pro && (
+              <button
+                onClick={() => { setShowMobileProfile(false); handleUpgradeClick(); }}
+                className="w-full flex items-center space-x-3 px-4 py-4 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold transition-all shadow-lg shadow-violet-600/20 min-h-[56px]"
+              >
+                <Sparkles className="w-5 h-5" />
+                <span>Upgrade to Pro</span>
+              </button>
+            )}
+
+            <button
+              onClick={() => { setShowMobileProfile(false); setShowLanding(true); }}
+              className="w-full flex items-center space-x-3 px-4 py-4 rounded-2xl hover:bg-white/5 text-slate-400 hover:text-white transition-all min-h-[56px]"
+            >
+              <Rocket className="w-5 h-5" />
+              <span>View Landing Page</span>
+            </button>
+          </div>
+
+          {/* Sign Out */}
+          <button
+            onClick={() => { setShowMobileProfile(false); handleSignOut(); }}
+            className="w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-xl text-rose-400 hover:bg-rose-500/10 transition-all border border-rose-500/20 min-h-[56px]"
+          >
+            <LogOut className="w-4 h-4" />
+            <span className="font-bold">Sign Out</span>
+          </button>
         </div>
       </div>
     );
@@ -738,7 +836,7 @@ const App: React.FC = () => {
                 </div>
               </header>
 
-              <div className="flex-1 px-4 lg:px-10 pb-10">
+              <div className="flex-1 px-4 lg:px-10 pb-24 lg:pb-10">
                 {view === 'home' && !isSearching && (
                   <div className="max-w-4xl mx-auto py-16">
                     <div className="text-center mb-12 lg:mb-20 space-y-6">
@@ -882,6 +980,18 @@ const App: React.FC = () => {
               </div>
             </main>
 
+            {/* Bottom Mobile Navigation */}
+            {profile && (
+              <BottomNavigation
+                currentView={view}
+                hasResults={!!results}
+                onNavigateHome={handleBottomNavHome}
+                onOpenAlerts={() => setShowAlerts(true)}
+                onOpenProfile={handleBottomNavProfile}
+                onExport={handleBottomNavExport}
+              />
+            )}
+
           </NotificationProvider>
         ) : (
           // Not authenticated - show basic layout without notifications
@@ -909,6 +1019,7 @@ const App: React.FC = () => {
           onComplete={handleOnboardingComplete}
           onSkip={handleOnboardingSkip}
         />
+        <MobileProfileModal />
       </div>
     </ErrorBoundary>
   );

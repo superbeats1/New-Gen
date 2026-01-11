@@ -109,12 +109,29 @@ body {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #0a0b0e; 
+  background: #0a0b0e;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2d313e; 
+  background: #2d313e;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f4454; 
+  background: #3f4454;
+}
+
+/* Safe Area Support for Notched Devices (iPhone X+, etc.) */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0.75rem);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+.pl-safe {
+  padding-left: env(safe-area-inset-left, 0);
+}
+
+.pr-safe {
+  padding-right: env(safe-area-inset-right, 0);
 }
