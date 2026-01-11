@@ -329,17 +329,27 @@ const App: React.FC = () => {
   useEffect(() => {
     // Check for success redirect from Stripe
     try {
-      const searchString = window?.location?.search ?? '';
-      const urlParams = new URLSearchParams(searchString);
-      const paymentSuccess = urlParams.get('payment');
-      if (paymentSuccess === 'success') {
-        window.history.replaceState({}, document.title, window.location.pathname);
-        if (session) {
-          fetchProfile(session.user.id);
+      // CRITICAL: Ensure we have a valid string for URLSearchParams
+      const searchString = typeof window?.location?.search === 'string'
+        ? window.location.search
+        : '';
+
+      // Only parse if we actually have a search string
+      if (searchString && searchString.length > 0) {
+        const urlParams = new URLSearchParams(searchString);
+        const paymentSuccess = urlParams.get('payment');
+        if (paymentSuccess === 'success') {
+          if (typeof window?.history?.replaceState === 'function') {
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
+          if (session) {
+            fetchProfile(session.user.id);
+          }
         }
       }
     } catch (err) {
-      console.warn('Failed to parse URL params:', err);
+      // Silently fail - don't break the app
+      console.debug('URL params parsing skipped:', err);
     }
 
     supabase.auth.getSession().then(({ data: { session } }) => {
