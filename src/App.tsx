@@ -351,15 +351,12 @@ const App: React.FC = () => {
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('🔐 Auth state changed:', _event, 'Session:', session ? 'EXISTS' : 'NULL');
       setSession(session);
       if (session) {
-        console.log('✅ User authenticated:', session.user.email);
         fetchProfile(session.user.id);
         setShowAuthModal(false);
         setShowLanding(false); // Take user directly to Intelligence Hub
       } else {
-        console.log('❌ No session - showing landing page');
         setProfile(null);
         setResults(null);
         setShowLanding(true);
@@ -370,51 +367,12 @@ const App: React.FC = () => {
   }, []);
 
   const fetchProfile = async (userId: string) => {
-    console.log('📊 Fetching profile for user:', userId);
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
       .single();
-
-    if (error) {
-      console.error('❌ Error fetching profile:', error.message);
-
-      // If profile doesn't exist, create it
-      if (error.code === 'PGRST116') {
-        console.log('🆕 Profile not found, creating new profile...');
-        const session = await supabase.auth.getSession();
-        const user = session.data.session?.user;
-
-        if (user) {
-          const newProfile = {
-            id: userId,
-            email: user.email,
-            first_name: user.user_metadata?.first_name || '',
-            last_name: user.user_metadata?.last_name || '',
-            credits: 3,
-            is_pro: false,
-            created_at: new Date().toISOString()
-          };
-
-          const { data: createdProfile, error: createError } = await supabase
-            .from('profiles')
-            .insert([newProfile])
-            .select()
-            .single();
-
-          if (createError) {
-            console.error('❌ Error creating profile:', createError.message);
-          } else {
-            console.log('✅ Profile created successfully:', createdProfile);
-            setProfile(createdProfile);
-          }
-        }
-      }
-    } else if (data) {
-      console.log('✅ Profile fetched successfully:', data.email);
-      setProfile(data);
-    }
+    if (data) setProfile(data);
   };
 
   // Check if user should see onboarding
