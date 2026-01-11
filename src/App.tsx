@@ -328,13 +328,18 @@ const App: React.FC = () => {
 
   useEffect(() => {
     // Check for success redirect from Stripe
-    const urlParams = new URLSearchParams(window.location.search);
-    const paymentSuccess = urlParams.get('payment');
-    if (paymentSuccess === 'success') {
-      window.history.replaceState({}, document.title, window.location.pathname);
-      if (session) {
-        fetchProfile(session.user.id);
+    try {
+      const searchString = window?.location?.search ?? '';
+      const urlParams = new URLSearchParams(searchString);
+      const paymentSuccess = urlParams.get('payment');
+      if (paymentSuccess === 'success') {
+        window.history.replaceState({}, document.title, window.location.pathname);
+        if (session) {
+          fetchProfile(session.user.id);
+        }
       }
+    } catch (err) {
+      console.warn('Failed to parse URL params:', err);
     }
 
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -907,7 +912,7 @@ const App: React.FC = () => {
                                 handleSearch(e);
                               }
                             }}
-                            placeholder={`e.g. "${EXAMPLE_QUERIES[placeholderIndex]}"`}
+                            placeholder={`e.g. "${EXAMPLE_QUERIES[placeholderIndex] || 'AI-powered productivity tools'}"`}
                             className="w-full bg-transparent border-none focus:ring-0 text-lg lg:text-xl text-white placeholder-slate-600 resize-none min-h-[120px]"
                             data-onboarding="search-input"
                           />
