@@ -115,29 +115,29 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
             <span>Neural Discovery Protocol Active</span>
           </div>
 
-          <h1 className="text-[2.5rem] leading-[0.9] sm:text-6xl md:text-8xl lg:text-[10rem] font-black text-white sm:leading-[0.85] tracking-tighter mb-4 sm:mb-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100 px-2">
+          <h1 className="text-[2.75rem] leading-[0.95] sm:text-6xl md:text-8xl lg:text-[9rem] font-black text-white sm:leading-[0.9] tracking-tighter mb-6 sm:mb-10 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100 px-2">
             Identify<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-400 to-fuchsia-500">Opportunities.</span>
           </h1>
 
-          <p className="max-w-2xl text-slate-400 text-sm sm:text-xl md:text-2xl font-medium leading-relaxed mb-6 sm:mb-8 px-4 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
+          <p className="max-w-2xl text-slate-400 text-sm sm:text-xl md:text-2xl font-medium leading-relaxed mb-8 sm:mb-12 px-4 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
             Scopa AI uses dual-agent intelligence to scan millions of signals across Reddit, X, and forums to reveal business gaps in real-time.
           </p>
 
           {/* Social Proof - Compact Mobile Layout */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 mb-8 sm:mb-12 animate-in fade-in slide-in-from-bottom-14 duration-1000 delay-250 w-full px-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mb-10 sm:mb-14 animate-in fade-in slide-in-from-bottom-14 duration-1000 delay-250 w-full px-4 mt-2 sm:mt-4">
             <div className="flex items-center space-x-3">
               <div className="flex -space-x-1.5 sm:-space-x-2">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-violet-600 to-violet-400 border-2 border-[#030407] flex items-center justify-center text-white text-[10px] sm:text-xs font-bold shadow-lg">A</div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-400 border-2 border-[#030407] flex items-center justify-center text-white text-[10px] sm:text-xs font-bold shadow-lg">M</div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-400 border-2 border-[#030407] flex items-center justify-center text-white text-[10px] sm:text-xs font-bold shadow-lg">S</div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-fuchsia-600 to-fuchsia-400 border-2 border-[#030407] flex items-center justify-center text-white text-[10px] sm:text-xs font-bold shadow-lg">+</div>
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-violet-600 to-violet-400 border-2 border-[#030407] flex items-center justify-center text-white text-[10px] sm:text-xs font-bold shadow-lg flex-shrink-0">A</div>
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-400 border-2 border-[#030407] flex items-center justify-center text-white text-[10px] sm:text-xs font-bold shadow-lg flex-shrink-0">M</div>
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-400 border-2 border-[#030407] flex items-center justify-center text-white text-[10px] sm:text-xs font-bold shadow-lg flex-shrink-0">S</div>
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-fuchsia-600 to-fuchsia-400 border-2 border-[#030407] flex items-center justify-center text-white text-[10px] sm:text-xs font-bold shadow-lg flex-shrink-0">+</div>
               </div>
-              <div className="text-left">
-                <div className="text-xs sm:text-sm md:text-base text-white font-bold">
+              <div className="text-left flex flex-col justify-center">
+                <div className="text-xs sm:text-sm md:text-base text-white font-bold leading-tight">
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400">2,400+</span> opportunities
                 </div>
-                <div className="text-[10px] sm:text-xs text-slate-500 font-medium">discovered this month</div>
+                <div className="text-[10px] sm:text-xs text-slate-500 font-medium leading-tight">discovered this month</div>
               </div>
             </div>
             <div className="hidden sm:block h-8 w-px bg-white/10"></div>

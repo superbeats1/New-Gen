@@ -200,21 +200,21 @@ const SearchingModule: React.FC<{ stepIndex: number; onStop: () => void }> = ({ 
               ></div>
             </div>
 
-          <div className="flex items-center justify-center space-x-3 text-slate-400 font-mono text-xs h-6 overflow-hidden">
-            <Terminal className="w-4 h-4 text-violet-500 shrink-0" />
-            <span className="truncate animate-pulse">{SEARCH_STEPS[stepIndex]}</span>
+            <div className="flex items-center justify-center space-x-3 text-slate-400 font-mono text-xs h-6 overflow-hidden">
+              <Terminal className="w-4 h-4 text-violet-500 shrink-0" />
+              <span className="truncate animate-pulse">{SEARCH_STEPS[stepIndex]}</span>
+            </div>
           </div>
-        </div>
 
-        <button
-          onClick={onStop}
-          className="group flex items-center space-x-2 px-6 py-2.5 rounded-xl hover:bg-white/5 border border-white/5 text-slate-400 hover:text-white text-sm font-medium transition-all"
-        >
-          <XCircle className="w-4 h-4 group-hover:rotate-90 transition-transform" />
-          <span>Stop Discovery</span>
-        </button>
+          <button
+            onClick={onStop}
+            className="group flex items-center space-x-2 px-6 py-2.5 rounded-xl hover:bg-white/5 border border-white/5 text-slate-400 hover:text-white text-sm font-medium transition-all"
+          >
+            <XCircle className="w-4 h-4 group-hover:rotate-90 transition-transform" />
+            <span>Stop Discovery</span>
+          </button>
+        </div>
       </div>
-    </div>
 
       {/* Skeleton Preview Cards */}
       {stepIndex >= 4 && (
@@ -769,7 +769,7 @@ const App: React.FC = () => {
                 </div>
               </header>
 
-              <div className="flex-1 px-3 sm:px-4 lg:px-10 pb-28 sm:pb-24 lg:pb-10 overflow-y-auto">
+              <div className="flex-1 px-3 sm:px-4 lg:px-10 pb-32 sm:pb-32 lg:pb-20 overflow-y-auto">
                 {view === 'home' && !isSearching && (
                   <div className="max-w-4xl mx-auto py-4 sm:py-10 lg:py-16">
                     <div className="text-center mb-6 sm:mb-12 lg:mb-20 space-y-2 sm:space-y-4 lg:space-y-6">
@@ -785,8 +785,8 @@ const App: React.FC = () => {
                       </p>
                     </div>
 
-                    <div className="relative group max-w-3xl mx-auto px-1 sm:px-0">
-                      <div className="absolute -inset-0.5 sm:-inset-1 bg-gradient-to-r from-violet-600 via-indigo-500 to-violet-600 rounded-[1.5rem] sm:rounded-[2.5rem] blur opacity-20 group-focus-within:opacity-50 transition duration-1000 animate-pulse-glow"></div>
+                    <div className="relative group max-w-3xl mx-auto px-1 sm:px-0 mt-8 sm:mt-12">
+                      <div className="absolute -inset-0.5 sm:-inset-1 bg-gradient-to-r from-violet-600 via-indigo-500 to-violet-600 rounded-[1.5rem] sm:rounded-[2.5rem] blur opacity-10 group-focus-within:opacity-30 transition duration-1000 animate-pulse-glow"></div>
                       <form onSubmit={handleSearch} className="relative bg-[#050608]/80 backdrop-blur-xl border border-white/10 rounded-[1.5rem] sm:rounded-[2.2rem] p-0.5 sm:p-1 shadow-2xl">
                         <div className="bg-[#050608]/50 rounded-[1.5rem] sm:rounded-[2rem] p-3 sm:p-6 lg:p-8">
                           <textarea
@@ -830,7 +830,7 @@ const App: React.FC = () => {
                       </form>
 
                       {/* Quick Start Templates */}
-                      <div className="mt-4 sm:mt-6 lg:mt-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+                      <div className="mt-8 sm:mt-10 lg:mt-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
                         <div className="text-[9px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 sm:mb-3 text-center">
                           Quick Start Templates
                         </div>
@@ -853,7 +853,7 @@ const App: React.FC = () => {
                                   const searchForm = document.querySelector('form');
                                   if (searchForm) {
                                     const syntheticEvent = {
-                                      preventDefault: () => {},
+                                      preventDefault: () => { },
                                       target: searchForm,
                                       currentTarget: searchForm
                                     } as React.FormEvent;
