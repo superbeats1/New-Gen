@@ -77,6 +77,25 @@ export const analyzeQuery = async (query: string): Promise<AnalysisResult> => {
   }
 };
 
+// Helper to safely extract text from Gemini response
+function getGeminiText(result: any): string {
+  try {
+    if (result.response?.text && typeof result.response.text === 'function') {
+      return result.response.text();
+    }
+    if (result.text && typeof result.text === 'function') {
+      return result.text();
+    }
+    if (result.text && typeof result.text === 'string') {
+      return result.text;
+    }
+    return '';
+  } catch (e) {
+    console.error("Error extracting text from Gemini result:", e);
+    return '';
+  }
+}
+
 // Helper to extract JSON from text that might contain markdown or conversational filler
 function extractJsonFromText(text: string): string {
   if (!text || typeof text !== 'string') return '';
@@ -127,7 +146,7 @@ Generate ${count} realistic leads...`; // Prompt truncated for clarity in replac
       contents: prompt
     });
 
-    const rawText = result.text || '';
+    const rawText = getGeminiText(result);
     const text = extractJsonFromText(rawText);
     if (!text) return [];
 
@@ -332,7 +351,7 @@ IMPORTANT: If there's NO clear competitor or insufficient data, SET competitorAn
       contents: prompt
     });
 
-    const rawText = result.text || '';
+    const rawText = getGeminiText(result);
     console.log("%c 🧠 RAW NEURAL RESPONSE ", "background: #1e293b; color: #8b5cf6; font-weight: bold; padding: 2px 4px;", rawText);
 
     const text = extractJsonFromText(rawText);
@@ -423,7 +442,7 @@ Return only the message text, no extra formatting.
       model: "gemini-1.5-flash",
       contents: prompt
     });
-    return result.text || '';
+    return getGeminiText(result);
   } catch (error) {
     console.error('Gemini API Error:', error);
     throw new Error('Failed to generate outreach message.');
@@ -463,7 +482,7 @@ Return ONLY valid JSON in this format:
       contents: prompt
     });
 
-    const text = result?.text ?? '';
+    const text = getGeminiText(result);
     if (!text || typeof text !== 'string') {
       throw new Error('Invalid response from Gemini API');
     }
