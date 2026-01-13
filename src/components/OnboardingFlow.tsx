@@ -112,22 +112,27 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
 
     const selector = step.highlightSelector;
     if (selector) {
-      findElementWithRetry(selector).then((element) => {
+      findElementWithRetry(selector, 20).then((element) => {
         if (element) {
           setHighlightedElement(element);
 
-          // Scroll element into view on mobile if it's not fully visible
-          const isMobile = window.innerWidth < 768;
-          if (isMobile) {
-            setTimeout(() => {
+          // Scroll element into view for better visibility
+          setTimeout(() => {
+            const isMobile = window.innerWidth < 768;
+            const rect = element.getBoundingClientRect();
+            const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+
+            // Only scroll if element is not fully visible
+            if (!isVisible || isMobile) {
               element.scrollIntoView({
                 behavior: 'smooth',
-                block: 'center',
+                block: isMobile ? 'start' : 'center',
                 inline: 'center'
               });
-            }, 100);
-          }
+            }
+          }, 300);
         } else {
+          console.warn(`Onboarding: Could not find element with selector: ${selector}`);
           setHighlightedElement(null);
         }
       });
@@ -247,28 +252,32 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
 
   // Get spotlight position for highlighted element
   const getSpotlightStyle = () => {
-    if (!highlightedElement) return {};
+    if (!highlightedElement) return { display: 'none' };
 
     const rect = highlightedElement.getBoundingClientRect();
 
     // Check if element is actually visible on screen
-    if (rect.width === 0 || rect.height === 0 || rect.top < 0 || rect.left < 0) {
+    if (rect.width === 0 || rect.height === 0) {
       return { display: 'none' };
     }
 
-    const padding = 8;
+    const isMobile = window.innerWidth < 768;
+    const padding = isMobile ? 12 : 8;
 
     return {
       position: 'fixed' as const,
-      top: `${rect.top - padding}px`,
-      left: `${rect.left - padding}px`,
+      top: `${Math.max(0, rect.top - padding)}px`,
+      left: `${Math.max(0, rect.left - padding)}px`,
       width: `${rect.width + padding * 2}px`,
       height: `${rect.height + padding * 2}px`,
-      boxShadow: '0 0 0 4px rgba(139, 92, 246, 0.6), 0 0 0 9999px rgba(0, 0, 0, 0.85)',
-      borderRadius: '1.5rem',
+      boxShadow: isMobile
+        ? '0 0 0 3px rgba(139, 92, 246, 0.8), 0 0 0 9999px rgba(0, 0, 0, 0.90), 0 0 40px rgba(139, 92, 246, 0.5)'
+        : '0 0 0 4px rgba(139, 92, 246, 0.6), 0 0 0 9999px rgba(0, 0, 0, 0.85)',
+      borderRadius: isMobile ? '1rem' : '1.5rem',
       zIndex: 201,
       transition: 'all 0.3s ease-out',
-      pointerEvents: 'none' as const
+      pointerEvents: 'none' as const,
+      display: 'block'
     };
   };
 
@@ -279,14 +288,44 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
       {/* Backdrop with spotlight effect */}
       <div className="fixed inset-0 z-[200]">
         {/* Dark overlay */}
-        <div className="absolute inset-0 bg-black/85 backdrop-blur-sm animate-in fade-in duration-300" />
+        <div className="absolute inset-0 bg-black/90 backdrop-blur-sm animate-in fade-in duration-300" />
 
-        {/* Spotlight on highlighted element - hide on mobile for cleaner UX */}
-        {highlightedElement && !isMobile && (
-          <div
-            className="absolute"
-            style={getSpotlightStyle()}
-          />
+        {/* Spotlight on highlighted element - NOW WORKS ON MOBILE! */}
+        {highlightedElement && (
+          <>
+            <div
+              className="absolute"
+              style={getSpotlightStyle()}
+            />
+            {/* Add pulsing ring animation on mobile for extra visibility */}
+            {isMobile && (
+              <>
+                <div
+                  className="absolute animate-pulse"
+                  style={{
+                    ...getSpotlightStyle(),
+                    boxShadow: '0 0 0 3px rgba(139, 92, 246, 0.4)',
+                    animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                  }}
+                />
+                {/* Floating label pointing to element */}
+                <div
+                  className="absolute z-[202] animate-bounce"
+                  style={{
+                    top: `${highlightedElement.getBoundingClientRect().top - 50}px`,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    pointerEvents: 'none'
+                  }}
+                >
+                  <div className="bg-violet-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center space-x-1">
+                    <span>👇</span>
+                    <span>Look here!</span>
+                  </div>
+                </div>
+              </>
+            )}
+          </>
         )}
 
         {/* Onboarding Modal */}
