@@ -168,14 +168,14 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
   const getModalPosition = () => {
     const isMobile = window.innerWidth < 768;
 
-    // On mobile, always use fixed bottom positioning for better UX
+    // On mobile, always use fixed positioning centered vertically for better UX
     if (isMobile) {
       return {
         position: 'fixed' as const,
-        bottom: '80px', // Higher up to avoid being cut off by browser UI
-        left: '12px',
-        right: '12px',
-        transform: 'none',
+        top: '50%',
+        left: '16px',
+        right: '16px',
+        transform: 'translateY(-50%)',
         maxWidth: 'none'
       };
     }
@@ -303,7 +303,7 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
           className="z-[202] w-full max-w-lg"
           style={getModalPosition()}
         >
-          <div className="glass-panel rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-white/10 shadow-2xl animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-300 relative overflow-visible flex flex-col" style={{ maxHeight: window.innerWidth < 768 ? 'calc(100vh - 200px)' : '90vh' }}>
+          <div className="glass-panel rounded-2xl sm:rounded-3xl p-5 sm:p-6 md:p-8 border border-white/10 shadow-2xl animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-300 relative overflow-visible flex flex-col" style={{ maxHeight: window.innerWidth < 768 ? '80vh' : '90vh' }}>
             {/* Decorative gradient */}
             <div className="absolute -top-20 -right-20 w-40 h-40 bg-violet-600/20 blur-[100px] rounded-full" />
             <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-indigo-600/20 blur-[100px] rounded-full" />
@@ -311,13 +311,13 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
             {/* Skip button */}
             <button
               onClick={onSkip}
-              className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-500 hover:text-white transition-colors rounded-xl hover:bg-white/5 z-20 touch-manipulation"
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-500 hover:text-white transition-colors rounded-xl hover:bg-white/5 z-20 touch-manipulation flex-shrink-0"
             >
               <X className="w-5 h-5" />
             </button>
 
             {/* Scrollable Content */}
-            <div className="relative z-10 flex-1 min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-violet-500/20 scrollbar-track-transparent">
+            <div className="relative z-10 flex-1 min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-violet-500/20 scrollbar-track-transparent flex-shrink-1">
               {/* Icon */}
               <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-violet-600/20 to-indigo-600/20 border border-violet-500/30 flex items-center justify-center mb-3 sm:mb-4 flex-shrink-0">
                 <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-violet-400" />
@@ -329,12 +329,12 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
               </h2>
 
               {/* Description */}
-              <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-3 sm:mb-4">
+              <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-4">
                 {step.description}
               </p>
 
               {/* Progress dots */}
-              <div className="flex items-center justify-center space-x-2 mb-1 py-2">
+              <div className="flex items-center justify-center space-x-2 py-2">
                 {ONBOARDING_STEPS.map((_, index) => (
                   <button
                     key={index}
@@ -352,9 +352,9 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
             </div>
 
             {/* Fixed Navigation Footer */}
-            <div className="relative z-10 pt-3 border-t border-white/5 mt-2 flex-shrink-0">
+            <div className="relative z-10 pt-4 border-t border-white/5 mt-3 flex-shrink-0">
               {/* Navigation */}
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center justify-between gap-2 mb-2">
                 <button
                   onClick={handlePrevious}
                   disabled={isFirstStep}
@@ -383,10 +383,10 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
 
               {/* Skip text */}
               {!isLastStep && (
-                <div className="text-center mt-2">
+                <div className="text-center">
                   <button
                     onClick={onSkip}
-                    className="text-[10px] text-slate-500 hover:text-slate-400 transition-colors font-medium touch-manipulation py-1.5"
+                    className="text-[10px] text-slate-500 hover:text-slate-400 transition-colors font-medium touch-manipulation py-1 min-h-[32px]"
                   >
                     Skip tutorial
                   </button>
