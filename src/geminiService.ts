@@ -185,6 +185,9 @@ ${dataContext}
 Perform a deep-dive analysis across professional forums, Reddit (r/entrepreneur, industry subs), and communities.
 Extract high-fidelity signals based on real user pain points and desperation.
 
+IMPORTANT: Generate AT LEAST 3-5 HIGH-QUALITY OPPORTUNITIES. Do not stop at just one.
+Each opportunity should represent a distinct market gap or pain point.
+
 Return ONLY a valid JSON object with the following structure:
 {
   "totalSourcesAnalyzed": 156,
@@ -253,7 +256,9 @@ Return ONLY a valid JSON object with the following structure:
           }
         ]
       }
-    }
+    },
+    // ... include at least 2-4 more opportunities here (opp-2, opp-3, opp-4, opp-5)
+    // Each with unique problem statements, scores, and evidence
   ],
   "rawFindings": [
     {
@@ -269,6 +274,8 @@ Return ONLY a valid JSON object with the following structure:
 }
 
 IMPORTANT:
+- GENERATE 3-5 DISTINCT OPPORTUNITIES (minimum 3, ideally 5) - do NOT return just one opportunity
+- Each opportunity must represent a different market gap, pain point, or segment
 - Demand Intensity should reflect "desperation indicators" in the language used.
 - Readiness should look for mentions of "workarounds", "hacks", or "failed solutions".
 - Supporting Evidence must be 3-5 real, high-impact quotes per top opportunity.
