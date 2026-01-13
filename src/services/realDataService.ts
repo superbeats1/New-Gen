@@ -185,67 +185,67 @@ export class RealDataCollector {
       : DATA_SOURCES.reddit.subreddits.opportunities;
 
     try {
-      for (const subreddit of subreddits.slice(0, 6)) { // Increased to 6 subreddits per query
-        console.log(`Scanning Reddit r/${subreddit} for: ${query}`);
+      const scanPromises = subreddits.slice(0, 6).map(async (subreddit) => {
+        try {
+          console.log(`Scanning Reddit r/${subreddit} for: ${query}`);
 
-        // Call our server-side Reddit API proxy
-        const response = await fetch('/api/reddit', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            subreddit: subreddit,
-            limit: 25
-          })
-        });
+          // Call our server-side Reddit API proxy
+          const response = await fetch('/api/reddit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ subreddit: subreddit, limit: 25 })
+          });
 
-        if (!response.ok) {
-          console.warn(`Reddit API proxy error for r/${subreddit}: ${response.status}`);
-          continue;
-        }
-
-        const data: RedditResponse = await response.json();
-
-        if (!data || !data.data || !Array.isArray(data.data.children)) {
-          console.warn(`⚠️ Reddit API returned unexpected format for ${subreddit}`);
-          continue;
-        }
-
-        for (const post of data.data.children) {
-          if (!post || !post.data) continue;
-          const postData = post.data;
-          const fullText = `${postData.title || ''} ${postData.selftext || ''}`.toLowerCase();
-
-          // Check if post matches query and contains lead indicators
-          if (this.matchesQuery(fullText, query) && this.containsLeadIndicators(fullText, mode)) {
-            const budgetInfo = this.extractBudget(fullText);
-            const lead: Lead = {
-              id: `reddit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-              prospectName: postData.author,
-              username: `@${postData.author}`,
-              requestSummary: this.extractRequestSummary(postData.title, postData.selftext),
-              postedAt: this.formatTimeAgo(postData.created_utc),
-              source: 'Reddit',
-              location: this.extractLocation(fullText),
-              fitScore: this.calculateFitScore(fullText, query),
-              budget: budgetInfo.category,
-              budgetAmount: budgetInfo.amount,
-              urgency: this.extractUrgency(fullText),
-              contactInfo: `Reddit user: u/${postData.author}`,
-              sourceUrl: `https://reddit.com${postData.permalink}`,
-              status: 'New'
-            };
-
-            leads.push(lead);
-
-            if (leads.length >= 10) break; // Increased to 10 results per subreddit
+          if (!response.ok) {
+            console.warn(`Reddit API proxy error for r/${subreddit}: ${response.status}`);
+            return [];
           }
-        }
 
-        // Rate limit between subreddit calls (500ms to avoid Reddit 403)
-        await new Promise(resolve => setTimeout(resolve, 500));
-      }
+          const data: RedditResponse = await response.json();
+
+          if (!data || !data.data || !Array.isArray(data.data.children)) {
+            console.warn(`⚠️ Reddit API returned unexpected format for ${subreddit}`);
+            return [];
+          }
+
+          const localLeads: Lead[] = [];
+          for (const post of data.data.children) {
+            if (!post || !post.data) continue;
+            const postData = post.data;
+            const fullText = `${postData.title || ''} ${postData.selftext || ''}`.toLowerCase();
+
+            // Check if post matches query and contains lead indicators
+            if (this.matchesQuery(fullText, query) && this.containsLeadIndicators(fullText, mode)) {
+              const budgetInfo = this.extractBudget(fullText);
+              const lead: Lead = {
+                id: `reddit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                prospectName: postData.author,
+                username: `@${postData.author}`,
+                requestSummary: this.extractRequestSummary(postData.title, postData.selftext),
+                postedAt: this.formatTimeAgo(postData.created_utc),
+                source: 'Reddit',
+                location: this.extractLocation(fullText),
+                fitScore: this.calculateFitScore(fullText, query),
+                budget: budgetInfo.category,
+                budgetAmount: budgetInfo.amount,
+                urgency: this.extractUrgency(fullText),
+                contactInfo: `Reddit user: u/${postData.author}`,
+                sourceUrl: `https://reddit.com${postData.permalink}`,
+                status: 'New'
+              };
+              localLeads.push(lead);
+              if (localLeads.length >= 5) break;
+            }
+          }
+          return localLeads;
+        } catch (err) {
+          console.warn(`Failed to scan r/${subreddit}:`, err);
+          return [];
+        }
+      });
+
+      const results = await Promise.all(scanPromises);
+      leads.push(...results.flat());
     } catch (error) {
       console.error('Reddit scanning failed:', error);
     }

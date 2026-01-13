@@ -171,7 +171,7 @@ const SearchingModule: React.FC<{ stepIndex: number; onStop: () => void }> = ({ 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Progress Panel */}
-      <div className="glass-panel rounded-3xl p-10 relative overflow-hidden max-w-2xl mx-auto">
+      <div className="glass-panel rounded-3xl p-10 relative overflow-hidden max-w-2xl mx-auto h-[420px] flex flex-col justify-center">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-violet-500 to-transparent shadow-[0_0_20px_rgba(139,92,246,0.5)] animate-scanning-line"></div>
         </div>
