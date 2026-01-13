@@ -169,28 +169,28 @@ const SkeletonOpportunityCard: React.FC<{ delay: number }> = ({ delay }) => {
 
 const SearchingModule: React.FC<{ stepIndex: number; onStop: () => void }> = ({ stepIndex, onStop }) => {
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500 w-full px-4 sm:px-0">
       {/* Progress Panel */}
-      <div className="glass-panel rounded-3xl p-10 relative overflow-hidden max-w-2xl mx-auto h-[420px] flex flex-col justify-center">
+      <div className="glass-panel rounded-2xl sm:rounded-3xl p-6 sm:p-10 relative overflow-hidden max-w-2xl mx-auto min-h-[420px] sm:min-h-[460px] flex flex-col justify-center">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-violet-500 to-transparent shadow-[0_0_20px_rgba(139,92,246,0.5)] animate-scanning-line"></div>
         </div>
 
-        <div className="relative z-10 flex flex-col items-center space-y-10">
-          <div className="relative">
-            <div className="absolute -inset-8 bg-violet-600/20 blur-3xl rounded-full animate-pulse"></div>
-            <div className="relative glass-card p-6 rounded-full border border-violet-500/30">
-              <Cpu className="w-12 h-12 text-violet-400 animate-spin-slow" />
+        <div className="relative z-10 flex flex-col items-center space-y-8 sm:space-y-10">
+          <div className="relative flex-shrink-0">
+            <div className="absolute -inset-6 sm:-inset-8 bg-violet-600/20 blur-3xl rounded-full animate-pulse"></div>
+            <div className="relative glass-card p-5 sm:p-6 rounded-full border border-violet-500/30">
+              <Cpu className="w-10 h-10 sm:w-12 sm:h-12 text-violet-400 animate-spin-slow" />
             </div>
           </div>
 
-          <div className="w-full space-y-6">
-            <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
+          <div className="w-full space-y-5 sm:space-y-6 px-2 sm:px-0">
+            <div className="flex items-center justify-between text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-400">
               <span className="flex items-center space-x-2">
-                <Activity className="w-4 h-4 text-violet-500" />
+                <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-violet-500 flex-shrink-0" />
                 <span>Neural Processing</span>
               </span>
-              <span className="text-violet-300">{Math.round(((stepIndex + 1) / SEARCH_STEPS.length) * 100)}%</span>
+              <span className="text-violet-300 flex-shrink-0">{Math.round(((stepIndex + 1) / SEARCH_STEPS.length) * 100)}%</span>
             </div>
 
             <div className="h-2 w-full bg-slate-800/50 rounded-full overflow-hidden border border-white/5">
@@ -200,18 +200,18 @@ const SearchingModule: React.FC<{ stepIndex: number; onStop: () => void }> = ({ 
               ></div>
             </div>
 
-            <div className="w-full max-w-xs mx-auto grid grid-cols-[auto_1fr] gap-3 items-center text-slate-400 font-mono text-xs h-6 overflow-hidden">
-              <Terminal className="w-4 h-4 text-violet-500 shrink-0" />
-              <span className="truncate animate-pulse text-left">{SEARCH_STEPS[stepIndex]}</span>
+            <div className="w-full mx-auto grid grid-cols-[auto_1fr] gap-3 items-center text-slate-400 font-mono text-[11px] sm:text-xs min-h-[28px] sm:min-h-[32px]">
+              <Terminal className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-violet-500 flex-shrink-0" />
+              <span className="truncate animate-pulse text-left leading-tight">{SEARCH_STEPS[stepIndex]}</span>
             </div>
           </div>
 
           <button
             onClick={onStop}
-            className="group flex items-center space-x-2 px-6 py-2.5 rounded-xl hover:bg-white/5 border border-white/5 text-slate-400 hover:text-white text-sm font-medium transition-all"
+            className="group flex items-center justify-center space-x-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl hover:bg-white/5 border border-white/5 text-slate-400 hover:text-white text-xs sm:text-sm font-medium transition-all min-w-[160px] sm:min-w-[180px] flex-shrink-0 touch-manipulation"
           >
-            <XCircle className="w-4 h-4 group-hover:rotate-90 transition-transform" />
-            <span>Stop Discovery</span>
+            <XCircle className="w-4 h-4 group-hover:rotate-90 transition-transform flex-shrink-0" />
+            <span className="whitespace-nowrap">Stop Discovery</span>
           </button>
         </div>
       </div>
@@ -890,7 +890,7 @@ const App: React.FC = () => {
                 )}
 
                 {isSearching && (
-                  <div className="max-w-4xl mx-auto py-16">
+                  <div className="w-full max-w-4xl mx-auto py-8 sm:py-16">
                     <SearchingModule stepIndex={searchStep} onStop={stopSearch} />
                   </div>
                 )}
