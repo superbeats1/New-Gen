@@ -636,11 +636,11 @@ const App: React.FC = () => {
             {/* Sidebar */}
             <aside className={`
         fixed inset-y-0 left-0 z-[70] w-80 lg:w-72
-        bg-[#050608]/95 backdrop-blur-2xl border-r border-white/10 flex flex-col p-5 lg:p-6 m-0 lg:m-4 lg:my-4 lg:ml-4 lg:mr-0
+        bg-[#050608]/95 backdrop-blur-2xl border-r border-white/10 flex flex-col p-5 pb-6 lg:p-6 m-0 lg:m-4 lg:my-4 lg:ml-4 lg:mr-0
         lg:rounded-3xl transition-transform duration-300 ease-in-out
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-              <div className="flex items-center justify-between mb-8 pb-5 border-b border-white/5 lg:border-0">
+              <div className="flex items-center justify-between mb-8 pb-5 border-b border-white/5 lg:border-0 flex-shrink-0">
                 <div className="flex items-center space-x-3 cursor-pointer" onClick={() => { setShowLanding(true); setIsMobileMenuOpen(false); }}>
                   <div className="bg-gradient-to-br from-violet-600 to-indigo-600 p-2.5 rounded-xl shadow-lg shadow-violet-600/30">
                     <Zap className="w-5 h-5 text-white fill-white" />
@@ -652,7 +652,7 @@ const App: React.FC = () => {
                 </button>
               </div>
 
-              <nav className="flex-1 space-y-2.5 overflow-y-auto">
+              <nav className="flex-1 space-y-2.5 overflow-y-auto min-h-0">
                 <button
                   className={`w-full flex items-center space-x-3 px-5 py-4 rounded-2xl transition-all touch-manipulation active:scale-[0.98] ${view === 'home' ? 'bg-violet-600/20 text-white font-bold border border-violet-500/30 shadow-lg shadow-violet-600/10' : 'hover:bg-white/5 text-slate-400 hover:text-white active:bg-white/10'}`}
                   onClick={() => { setView('home'); setResults(null); setQuery(''); setIsMobileMenuOpen(false); }}
@@ -705,7 +705,7 @@ const App: React.FC = () => {
                 </div>
               </nav>
 
-              <div className="border-t border-white/10 pt-5 space-y-3 mt-auto">
+              <div className="border-t border-white/10 pt-5 space-y-3 mt-auto flex-shrink-0">
                 <div className="flex items-center space-x-3 px-4 py-3 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 hover:border-white/20 transition-all">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-sm font-black text-white border-2 border-white/20 shadow-lg shadow-violet-500/30 flex-shrink-0">
                     {profile?.first_name?.[0]?.toUpperCase() || 'U'}
