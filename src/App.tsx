@@ -745,7 +745,7 @@ const App: React.FC = () => {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col h-full relative overflow-y-auto z-10 w-full">
+            <main className="flex-1 flex flex-col h-full relative overflow-y-auto z-10 w-full lg:pl-80">
               <header className="h-16 sm:h-20 flex items-center justify-between px-3 sm:px-4 lg:px-10 sticky top-0 z-30 bg-[#0a0b0f]/80 backdrop-blur-xl lg:bg-transparent border-b border-white/5 lg:border-0">
                 <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
                   <button
