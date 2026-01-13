@@ -150,7 +150,7 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-6 animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-300 w-full max-w-md sm:max-w-none px-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-center gap-3 sm:gap-6 animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-300 w-full max-w-md sm:max-w-none px-4 mx-auto">
             <button
               onClick={onStart}
               className="group relative bg-violet-600 hover:bg-violet-500 active:bg-violet-700 text-white font-black py-4 sm:py-6 px-8 sm:px-12 rounded-2xl sm:rounded-3xl transition-all shadow-2xl shadow-violet-600/30 flex items-center justify-center space-x-2 sm:space-x-4 text-sm sm:text-xl uppercase tracking-tighter overflow-hidden touch-manipulation"

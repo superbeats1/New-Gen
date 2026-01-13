@@ -771,7 +771,7 @@ const App: React.FC = () => {
 
               <div className="flex-1 px-3 sm:px-4 lg:px-10 pb-32 sm:pb-32 lg:pb-20 overflow-y-auto">
                 {view === 'home' && !isSearching && (
-                  <div className="max-w-4xl mx-auto py-4 sm:py-10 lg:py-16">
+                  <div className="max-w-4xl w-full mx-auto py-4 sm:py-10 lg:py-16">
                     <div className="text-center mb-6 sm:mb-12 lg:mb-20 space-y-2 sm:space-y-4 lg:space-y-6">
                       <div className="inline-flex items-center space-x-2 sm:space-x-3 px-3 sm:px-4 py-1.5 rounded-full bg-violet-600/10 border border-violet-500/20 animate-in fade-in slide-in-from-bottom-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse"></span>
