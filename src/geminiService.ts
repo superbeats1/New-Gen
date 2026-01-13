@@ -346,10 +346,8 @@ IMPORTANT: If there's NO clear competitor or insufficient data, SET competitorAn
 
   try {
     const genAI = await getGenAI();
-    const result = await genAI.models.generateContent({
-      model: "gemini-1.5-flash",
-      contents: prompt
-    });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(prompt);
 
     const rawText = getGeminiText(result);
     console.log("%c 🧠 RAW NEURAL RESPONSE ", "background: #1e293b; color: #8b5cf6; font-weight: bold; padding: 2px 4px;", rawText);
@@ -438,10 +436,8 @@ Return only the message text, no extra formatting.
 `;
 
     const genAI = await getGenAI();
-    const result = await genAI.models.generateContent({
-      model: "gemini-1.5-flash",
-      contents: prompt
-    });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(prompt);
     return getGeminiText(result);
   } catch (error) {
     console.error('Gemini API Error:', error);
@@ -477,10 +473,8 @@ Return ONLY valid JSON in this format:
 `;
 
     const genAI = await getGenAI();
-    const result = await genAI.models.generateContent({
-      model: "gemini-1.5-flash",
-      contents: prompt
-    });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(prompt);
 
     const text = getGeminiText(result);
     if (!text || typeof text !== 'string') {
