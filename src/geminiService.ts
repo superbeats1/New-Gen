@@ -328,7 +328,7 @@ IMPORTANT: If there's NO clear competitor or insufficient data, SET competitorAn
   try {
     const genAI = await getGenAI();
     const result = await genAI.models.generateContent({
-      model: "gemini-3-pro-preview",
+      model: "gemini-1.5-flash",
       contents: prompt
     });
 
@@ -420,7 +420,7 @@ Return only the message text, no extra formatting.
 
     const genAI = await getGenAI();
     const result = await genAI.models.generateContent({
-      model: "gemini-3-pro-preview",
+      model: "gemini-1.5-flash",
       contents: prompt
     });
     return result.text || '';
@@ -459,7 +459,7 @@ Return ONLY valid JSON in this format:
 
     const genAI = await getGenAI();
     const result = await genAI.models.generateContent({
-      model: "gemini-3-pro-preview",
+      model: "gemini-1.5-flash",
       contents: prompt
     });
 

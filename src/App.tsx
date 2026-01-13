@@ -217,21 +217,7 @@ const SearchingModule: React.FC<{ stepIndex: number; onStop: () => void }> = ({ 
       </div>
 
       {/* Skeleton Preview Cards */}
-      {stepIndex >= 4 && (
-        <div className="max-w-7xl mx-auto space-y-6">
-          <div className="flex items-center space-x-2 mb-4">
-            <Search className="w-4 h-4 text-violet-400" />
-            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">
-              Discovering Opportunities...
-            </h3>
-          </div>
-          <div className="grid gap-6">
-            <SkeletonOpportunityCard delay={0} />
-            <SkeletonOpportunityCard delay={200} />
-            <SkeletonOpportunityCard delay={400} />
-          </div>
-        </div>
-      )}
+
     </div>
   );
 };
