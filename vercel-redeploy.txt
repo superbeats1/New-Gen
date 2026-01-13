@@ -1,0 +1,10 @@
+🚀 FORCED DEPLOYMENT TRIGGERED
+================================
+This will force Vercel to rebuild and redeploy with all latest changes.
+
+Wait 2-3 minutes, then:
+1. Clear your browser cache completely
+2. Open scopa.pro in Private/Incognito mode
+3. Hard refresh (Cmd+Shift+R or Ctrl+Shift+R)
+
+All mobile fixes should now be live!

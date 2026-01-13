@@ -167,9 +167,9 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
     if (isMobile) {
       return {
         position: 'fixed' as const,
-        bottom: '20px',
-        left: '16px',
-        right: '16px',
+        bottom: '80px', // Higher up to avoid being cut off by browser UI
+        left: '12px',
+        right: '12px',
         transform: 'none',
         maxWidth: 'none'
       };
@@ -294,7 +294,7 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
           className="z-[202] w-full max-w-lg"
           style={getModalPosition()}
         >
-          <div className="glass-panel rounded-2xl sm:rounded-3xl p-5 sm:p-6 md:p-8 border border-white/10 shadow-2xl animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-300 relative max-h-[70vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
+          <div className="glass-panel rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-white/10 shadow-2xl animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-300 relative overflow-visible flex flex-col" style={{ maxHeight: window.innerWidth < 768 ? 'calc(100vh - 200px)' : '90vh' }}>
             {/* Decorative gradient */}
             <div className="absolute -top-20 -right-20 w-40 h-40 bg-violet-600/20 blur-[100px] rounded-full" />
             <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-indigo-600/20 blur-[100px] rounded-full" />
@@ -308,34 +308,34 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
             </button>
 
             {/* Scrollable Content */}
-            <div className="relative z-10 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-violet-500/20 scrollbar-track-transparent">
+            <div className="relative z-10 flex-1 min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-violet-500/20 scrollbar-track-transparent">
               {/* Icon */}
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-violet-600/20 to-indigo-600/20 border border-violet-500/30 flex items-center justify-center mb-4 sm:mb-6">
-                <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-violet-400" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-violet-600/20 to-indigo-600/20 border border-violet-500/30 flex items-center justify-center mb-3 sm:mb-4 flex-shrink-0">
+                <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-violet-400" />
               </div>
 
               {/* Title */}
-              <h2 className="text-lg sm:text-xl md:text-2xl font-black text-white mb-2 sm:mb-3 tracking-tight pr-10">
+              <h2 className="text-base sm:text-lg md:text-xl font-black text-white mb-2 tracking-tight pr-8">
                 {step.title}
               </h2>
 
               {/* Description */}
-              <p className="text-slate-400 text-sm sm:text-base leading-relaxed mb-5 sm:mb-6">
+              <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-3 sm:mb-4">
                 {step.description}
               </p>
 
               {/* Progress dots */}
-              <div className="flex items-center justify-center space-x-2 mb-2">
+              <div className="flex items-center justify-center space-x-2 mb-1 py-2">
                 {ONBOARDING_STEPS.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentStep(index)}
-                    className={`h-2 rounded-full transition-all touch-manipulation ${
+                    className={`h-1.5 rounded-full transition-all touch-manipulation ${
                       index === currentStep
-                        ? 'w-8 bg-violet-500'
+                        ? 'w-6 bg-violet-500'
                         : index < currentStep
-                        ? 'w-2 bg-emerald-500'
-                        : 'w-2 bg-slate-700'
+                        ? 'w-1.5 bg-emerald-500'
+                        : 'w-1.5 bg-slate-700'
                     }`}
                   />
                 ))}
@@ -343,27 +343,27 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
             </div>
 
             {/* Fixed Navigation Footer */}
-            <div className="relative z-10 pt-4 border-t border-white/5 mt-2">
+            <div className="relative z-10 pt-3 border-t border-white/5 mt-2 flex-shrink-0">
               {/* Navigation */}
               <div className="flex items-center justify-between gap-2">
                 <button
                   onClick={handlePrevious}
                   disabled={isFirstStep}
-                  className="flex items-center space-x-1 sm:space-x-2 px-3 sm:px-5 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed min-h-[44px] min-w-[44px] touch-manipulation active:scale-95"
+                  className="flex items-center justify-center space-x-1 px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed min-h-[44px] min-w-[60px] touch-manipulation active:scale-95"
                 >
-                  <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="font-medium text-sm hidden sm:inline">Back</span>
+                  <ArrowLeft className="w-4 h-4" />
+                  <span className="font-semibold text-xs">Back</span>
                 </button>
 
-                <div className="text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-widest flex-shrink-0">
+                <div className="text-[10px] font-bold text-slate-600 uppercase tracking-wider flex-shrink-0">
                   {currentStep + 1} / {ONBOARDING_STEPS.length}
                 </div>
 
                 <button
                   onClick={handleNext}
-                  className="flex items-center space-x-1 sm:space-x-2 px-4 sm:px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 active:bg-violet-700 text-white font-bold transition-all shadow-lg shadow-violet-600/20 min-h-[44px] touch-manipulation flex-shrink-0 active:scale-95"
+                  className="flex items-center justify-center space-x-1.5 px-4 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 active:bg-violet-700 text-white font-bold transition-all shadow-lg shadow-violet-600/20 min-h-[44px] min-w-[80px] touch-manipulation flex-shrink-0 active:scale-95"
                 >
-                  <span className="text-sm sm:text-base">{isLastStep ? 'Get Started' : 'Next'}</span>
+                  <span className="text-xs font-bold">{isLastStep ? 'Start' : 'Next'}</span>
                   {isLastStep ? (
                     <Check className="w-4 h-4" />
                   ) : (
@@ -374,10 +374,10 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
 
               {/* Skip text */}
               {!isLastStep && (
-                <div className="text-center mt-3">
+                <div className="text-center mt-2">
                   <button
                     onClick={onSkip}
-                    className="text-xs text-slate-500 hover:text-slate-400 transition-colors font-medium touch-manipulation py-2"
+                    className="text-[10px] text-slate-500 hover:text-slate-400 transition-colors font-medium touch-manipulation py-1.5"
                   >
                     Skip tutorial
                   </button>
