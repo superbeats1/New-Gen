@@ -58,13 +58,79 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
   const isLastStep = currentStep === ONBOARDING_STEPS.length - 1;
   const isFirstStep = currentStep === 0;
 
+  // Reposition modal on viewport changes
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleResize = () => {
+      // Force re-render by updating state
+      setHighlightedElement(prev => prev);
+    };
+
+    const handleScroll = () => {
+      // Only reposition if we have a highlighted element
+      if (highlightedElement) {
+        setHighlightedElement(prev => prev);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    window.addEventListener('scroll', handleScroll, true); // Use capture phase
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+      window.removeEventListener('scroll', handleScroll, true);
+    };
+  }, [isOpen, highlightedElement]);
+
+  // Function to find element with retry logic
+  const findElementWithRetry = (selector: string, maxRetries = 10): Promise<HTMLElement | null> => {
+    return new Promise((resolve) => {
+      let retries = 0;
+
+      const findElement = () => {
+        const element = document.querySelector(selector) as HTMLElement;
+        if (element || retries >= maxRetries) {
+          resolve(element || null);
+          return;
+        }
+
+        retries++;
+        // Wait a bit longer between retries on mobile
+        const delay = window.innerWidth < 768 ? 200 : 100;
+        setTimeout(findElement, delay);
+      };
+
+      findElement();
+    });
+  };
+
   useEffect(() => {
     if (!isOpen) return;
 
     const selector = step.highlightSelector;
     if (selector) {
-      const element = document.querySelector(selector) as HTMLElement;
-      setHighlightedElement(element);
+      findElementWithRetry(selector).then((element) => {
+        if (element) {
+          setHighlightedElement(element);
+
+          // Scroll element into view on mobile if it's not fully visible
+          const isMobile = window.innerWidth < 768;
+          if (isMobile) {
+            setTimeout(() => {
+              element.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+                inline: 'center'
+              });
+            }, 100);
+          }
+        } else {
+          setHighlightedElement(null);
+        }
+      });
     } else {
       setHighlightedElement(null);
     }
@@ -95,24 +161,82 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
 
   // Calculate position for modal based on highlighted element
   const getModalPosition = () => {
+    const isMobile = window.innerWidth < 768;
+
+    // On mobile, always use fixed bottom positioning for better UX
+    if (isMobile) {
+      return {
+        position: 'fixed' as const,
+        bottom: '20px',
+        left: '16px',
+        right: '16px',
+        transform: 'none',
+        maxWidth: 'none'
+      };
+    }
+
+    // Desktop positioning logic
     if (!highlightedElement) {
       return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
     }
 
     const rect = highlightedElement.getBoundingClientRect();
-    const modalHeight = 400; // Approximate modal height
+    const modalHeight = 450;
+    const modalWidth = 600;
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const padding = 20;
+
+    // For center position, always center the modal
+    if (step.position === 'center') {
+      return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
+    }
 
     if (step.position === 'top') {
+      // Position below the element
+      const top = rect.bottom + padding;
+      const left = Math.max(padding, Math.min(rect.left + rect.width / 2 - modalWidth / 2, viewportWidth - modalWidth - padding));
+
+      // If it would go off-screen vertically, position above instead
+      if (top + modalHeight > viewportHeight - padding) {
+        const topAlt = rect.top - modalHeight - padding;
+        if (topAlt >= padding) {
+          return {
+            top: `${topAlt}px`,
+            left: `${left}px`,
+            transform: 'none'
+          };
+        }
+        return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
+      }
+
       return {
-        top: `${rect.bottom + 20}px`,
-        left: '50%',
-        transform: 'translateX(-50%)'
+        top: `${top}px`,
+        left: `${left}px`,
+        transform: 'none'
       };
     } else if (step.position === 'bottom') {
+      // Position above the element
+      const top = rect.top - modalHeight - padding;
+      const left = Math.max(padding, Math.min(rect.left + rect.width / 2 - modalWidth / 2, viewportWidth - modalWidth - padding));
+
+      // If it would go off-screen vertically, position below instead
+      if (top < padding) {
+        const topAlt = rect.bottom + padding;
+        if (topAlt + modalHeight <= viewportHeight - padding) {
+          return {
+            top: `${topAlt}px`,
+            left: `${left}px`,
+            transform: 'none'
+          };
+        }
+        return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
+      }
+
       return {
-        top: `${rect.top - modalHeight - 20}px`,
-        left: '50%',
-        transform: 'translateX(-50%)'
+        top: `${top}px`,
+        left: `${left}px`,
+        transform: 'none'
       };
     }
 
@@ -121,36 +245,56 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
 
   const Icon = step.icon;
 
+  // Get spotlight position for highlighted element
+  const getSpotlightStyle = () => {
+    if (!highlightedElement) return {};
+
+    const rect = highlightedElement.getBoundingClientRect();
+
+    // Check if element is actually visible on screen
+    if (rect.width === 0 || rect.height === 0 || rect.top < 0 || rect.left < 0) {
+      return { display: 'none' };
+    }
+
+    const padding = 8;
+
+    return {
+      position: 'fixed' as const,
+      top: `${rect.top - padding}px`,
+      left: `${rect.left - padding}px`,
+      width: `${rect.width + padding * 2}px`,
+      height: `${rect.height + padding * 2}px`,
+      boxShadow: '0 0 0 4px rgba(139, 92, 246, 0.6), 0 0 0 9999px rgba(0, 0, 0, 0.85)',
+      borderRadius: '1.5rem',
+      zIndex: 201,
+      transition: 'all 0.3s ease-out',
+      pointerEvents: 'none' as const
+    };
+  };
+
+  const isMobile = window.innerWidth < 768;
+
   return (
     <>
       {/* Backdrop with spotlight effect */}
       <div className="fixed inset-0 z-[200]">
         {/* Dark overlay */}
-        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300" />
+        <div className="absolute inset-0 bg-black/85 backdrop-blur-sm animate-in fade-in duration-300" />
 
-        {/* Spotlight on highlighted element */}
-        {highlightedElement && (
+        {/* Spotlight on highlighted element - hide on mobile for cleaner UX */}
+        {highlightedElement && !isMobile && (
           <div
-            className="absolute pointer-events-none"
-            style={{
-              top: highlightedElement.offsetTop - 8,
-              left: highlightedElement.offsetLeft - 8,
-              width: highlightedElement.offsetWidth + 16,
-              height: highlightedElement.offsetHeight + 16,
-              boxShadow: '0 0 0 4px rgba(139, 92, 246, 0.5), 0 0 0 9999px rgba(0, 0, 0, 0.8)',
-              borderRadius: '1.5rem',
-              zIndex: 201,
-              transition: 'all 0.3s ease-out'
-            }}
+            className="absolute"
+            style={getSpotlightStyle()}
           />
         )}
 
         {/* Onboarding Modal */}
         <div
-          className="fixed z-[202] w-full max-w-lg px-4"
+          className="z-[202] w-full max-w-lg"
           style={getModalPosition()}
         >
-          <div className="glass-panel rounded-3xl p-8 border border-white/10 shadow-2xl animate-in zoom-in-95 duration-300 relative overflow-hidden">
+          <div className="glass-panel rounded-2xl sm:rounded-3xl p-5 sm:p-6 md:p-8 border border-white/10 shadow-2xl animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-300 relative max-h-[70vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
             {/* Decorative gradient */}
             <div className="absolute -top-20 -right-20 w-40 h-40 bg-violet-600/20 blur-[100px] rounded-full" />
             <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-indigo-600/20 blur-[100px] rounded-full" />
@@ -158,35 +302,35 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
             {/* Skip button */}
             <button
               onClick={onSkip}
-              className="absolute top-4 right-4 p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-500 hover:text-white transition-colors rounded-xl hover:bg-white/5"
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-500 hover:text-white transition-colors rounded-xl hover:bg-white/5 z-20 touch-manipulation"
             >
               <X className="w-5 h-5" />
             </button>
 
-            {/* Content */}
-            <div className="relative z-10">
+            {/* Scrollable Content */}
+            <div className="relative z-10 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-violet-500/20 scrollbar-track-transparent">
               {/* Icon */}
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600/20 to-indigo-600/20 border border-violet-500/30 flex items-center justify-center mb-6">
-                <Icon className="w-8 h-8 text-violet-400" />
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-violet-600/20 to-indigo-600/20 border border-violet-500/30 flex items-center justify-center mb-4 sm:mb-6">
+                <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-violet-400" />
               </div>
 
               {/* Title */}
-              <h2 className="text-2xl font-black text-white mb-3 tracking-tight">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-black text-white mb-2 sm:mb-3 tracking-tight pr-10">
                 {step.title}
               </h2>
 
               {/* Description */}
-              <p className="text-slate-400 text-base leading-relaxed mb-8">
+              <p className="text-slate-400 text-sm sm:text-base leading-relaxed mb-5 sm:mb-6">
                 {step.description}
               </p>
 
               {/* Progress dots */}
-              <div className="flex items-center justify-center space-x-2 mb-8">
+              <div className="flex items-center justify-center space-x-2 mb-2">
                 {ONBOARDING_STEPS.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentStep(index)}
-                    className={`h-2 rounded-full transition-all ${
+                    className={`h-2 rounded-full transition-all touch-manipulation ${
                       index === currentStep
                         ? 'w-8 bg-violet-500'
                         : index < currentStep
@@ -196,27 +340,30 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
                   />
                 ))}
               </div>
+            </div>
 
+            {/* Fixed Navigation Footer */}
+            <div className="relative z-10 pt-4 border-t border-white/5 mt-2">
               {/* Navigation */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <button
                   onClick={handlePrevious}
                   disabled={isFirstStep}
-                  className="flex items-center space-x-2 px-6 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed min-h-[44px]"
+                  className="flex items-center space-x-1 sm:space-x-2 px-3 sm:px-5 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed min-h-[44px] min-w-[44px] touch-manipulation active:scale-95"
                 >
-                  <ArrowLeft className="w-4 h-4" />
-                  <span className="font-medium">Back</span>
+                  <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="font-medium text-sm hidden sm:inline">Back</span>
                 </button>
 
-                <div className="text-xs font-bold text-slate-600 uppercase tracking-widest">
+                <div className="text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-widest flex-shrink-0">
                   {currentStep + 1} / {ONBOARDING_STEPS.length}
                 </div>
 
                 <button
                   onClick={handleNext}
-                  className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold transition-all shadow-lg shadow-violet-600/20 min-h-[44px]"
+                  className="flex items-center space-x-1 sm:space-x-2 px-4 sm:px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 active:bg-violet-700 text-white font-bold transition-all shadow-lg shadow-violet-600/20 min-h-[44px] touch-manipulation flex-shrink-0 active:scale-95"
                 >
-                  <span>{isLastStep ? 'Get Started' : 'Next'}</span>
+                  <span className="text-sm sm:text-base">{isLastStep ? 'Get Started' : 'Next'}</span>
                   {isLastStep ? (
                     <Check className="w-4 h-4" />
                   ) : (
@@ -227,10 +374,10 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
 
               {/* Skip text */}
               {!isLastStep && (
-                <div className="text-center mt-6">
+                <div className="text-center mt-3">
                   <button
                     onClick={onSkip}
-                    className="text-xs text-slate-500 hover:text-slate-400 transition-colors font-medium"
+                    className="text-xs text-slate-500 hover:text-slate-400 transition-colors font-medium touch-manipulation py-2"
                   >
                     Skip tutorial
                   </button>

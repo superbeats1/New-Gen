@@ -12,12 +12,28 @@ View your app in AI Studio: https://ai.studio/apps/drive/18Iwuus9hGpoRSw9RNoyaJw
 
 **Prerequisites:**  Node.js
 
-
 1. Install dependencies:
-   `npm install`
-2. Configure environment variables in [.env.local](.env.local):
-   - **Required:** Set `VITE_GEMINI_API_KEY` to your Gemini API key
-   - **Optional:** Set `VITE_TWITTER_BEARER_TOKEN` to enable Twitter data collection (1,500 tweets/month free)
-   - See [.env.example](.env.example) for all configuration options
-3. Run the app:
-   `npm run dev`
+   ```bash
+   npm install
+   ```
+
+2. Set up environment variables:
+   Create a `.env.local` file in the project root with:
+   ```env
+   # REQUIRED: Get your Gemini API key from https://aistudio.google.com/app/apikey
+   VITE_GEMINI_API_KEY=your_actual_gemini_api_key_here
+
+   # OPTIONAL: For Pro upgrade payments (get from Stripe Dashboard)
+   VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_key_here
+
+   # OPTIONAL: Enhanced features
+   VITE_HUNTER_API_KEY=your_hunter_api_key_here
+   VITE_CLEARBIT_API_KEY=your_clearbit_api_key_here
+   ```
+
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+**Note:** Without `VITE_GEMINI_API_KEY`, the app will show an error when trying to analyze queries. The basic UI will still work for testing.

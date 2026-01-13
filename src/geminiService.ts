@@ -354,12 +354,32 @@ IMPORTANT: If there's NO clear competitor or insufficient data, SET competitorAn
 
     try {
       const parsed = JSON.parse(text);
+
+      // Validate and clean opportunities data
+      const validatedOpportunities = Array.isArray(parsed.opportunities)
+        ? parsed.opportunities.map((opp: any) => ({
+            ...opp,
+            supportingEvidence: Array.isArray(opp.supportingEvidence)
+              ? opp.supportingEvidence
+                  .filter((ev: any) => ev && typeof ev === 'object' && ev.quote && ev.context)
+                  .map((ev: any) => ({
+                    quote: ev.quote || '',
+                    context: ev.context || '',
+                    sourceUrl: ev.sourceUrl && typeof ev.sourceUrl === 'string' && ev.sourceUrl.trim()
+                      ? ev.sourceUrl.trim()
+                      : undefined
+                  }))
+                  .filter((ev: any) => ev.sourceUrl) // Only keep evidence with valid URLs
+              : []
+          }))
+        : [];
+
       return {
         totalSourcesAnalyzed: parsed.totalSourcesAnalyzed || realData.length,
         dateRange: parsed.dateRange || 'Recent',
         queryInterpretation: parsed.queryInterpretation || '',
         summary: parsed.summary || 'Analysis complete',
-        opportunities: Array.isArray(parsed.opportunities) ? parsed.opportunities : [],
+        opportunities: validatedOpportunities,
         rawFindings: Array.isArray(parsed.rawFindings) ? parsed.rawFindings : []
       };
     } catch (e) {

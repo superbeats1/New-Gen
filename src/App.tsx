@@ -302,6 +302,7 @@ const App: React.FC = () => {
   const [showSuccessPage, setShowSuccessPage] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingTriggered, setOnboardingTriggered] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showMobileProfile, setShowMobileProfile] = useState(false);
   const [diagStats, setDiagStats] = useState({ realDataCount: 0, lastLog: '' });
@@ -366,10 +367,22 @@ const App: React.FC = () => {
         fetchProfile(session.user.id);
         setShowAuthModal(false);
         setShowLanding(false); // Take user directly to Intelligence Hub
+        // Check if onboarding should be shown after a brief delay
+        setTimeout(() => {
+          const hasCompletedOnboarding = localStorage.getItem('scopa_onboarding_completed');
+          const hasCompletedSearch = localStorage.getItem('scopa_first_search_completed');
+          if (!hasCompletedOnboarding && !hasCompletedSearch && !onboardingTriggered) {
+            setOnboardingTriggered(true);
+            setTimeout(() => {
+              setShowOnboarding(true);
+            }, 1000);
+          }
+        }, 500);
       } else {
         setProfile(null);
         setResults(null);
         setShowLanding(true);
+        setOnboardingTriggered(false); // Reset for next user
       }
     });
 
@@ -385,22 +398,7 @@ const App: React.FC = () => {
     if (data) setProfile(data);
   };
 
-  // Check if user should see onboarding
-  useEffect(() => {
-    if (!profile || showLanding) return;
-
-    const hasCompletedOnboarding = localStorage.getItem('scopa_onboarding_completed');
-    const hasCompletedSearch = localStorage.getItem('scopa_first_search_completed');
-
-    // Show onboarding for first-time users who haven't seen it
-    if (!hasCompletedOnboarding && !hasCompletedSearch && view === 'home' && !isSearching) {
-      // Delay slightly so UI has time to render
-      const timer = setTimeout(() => {
-        setShowOnboarding(true);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [profile, showLanding, view, isSearching]);
+  // Onboarding is now handled directly in the auth state change handler for better reliability
 
   const handleOnboardingComplete = () => {
     localStorage.setItem('scopa_onboarding_completed', 'true');
@@ -637,45 +635,45 @@ const App: React.FC = () => {
 
             {/* Sidebar */}
             <aside className={`
-        fixed inset-y-0 left-0 z-[70] w-72 lg:static lg:w-72 
-        bg-[#050608]/80 backdrop-blur-2xl border-r border-white/5 flex flex-col p-6 m-4 lg:my-4 lg:ml-4 lg:mr-0 
-        rounded-3xl transition-transform duration-300 ease-in-out
-        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-[calc(100%+2rem)] lg:translate-x-0'}
+        fixed inset-y-0 left-0 z-[70] w-80 lg:w-72
+        bg-[#050608]/95 backdrop-blur-2xl border-r border-white/10 flex flex-col p-5 lg:p-6 m-0 lg:m-4 lg:my-4 lg:ml-4 lg:mr-0
+        lg:rounded-3xl transition-transform duration-300 ease-in-out
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-              <div className="flex items-center justify-between mb-10">
+              <div className="flex items-center justify-between mb-8 pb-5 border-b border-white/5 lg:border-0">
                 <div className="flex items-center space-x-3 cursor-pointer" onClick={() => { setShowLanding(true); setIsMobileMenuOpen(false); }}>
-                  <div className="bg-gradient-to-br from-violet-600 to-indigo-600 p-2 rounded-xl shadow-lg shadow-violet-600/20">
+                  <div className="bg-gradient-to-br from-violet-600 to-indigo-600 p-2.5 rounded-xl shadow-lg shadow-violet-600/30">
                     <Zap className="w-5 h-5 text-white fill-white" />
                   </div>
-                  <span className="text-xl font-bold tracking-tight text-white uppercase italic">Scopa AI</span>
+                  <span className="text-xl font-black tracking-tight text-white uppercase italic">Scopa AI</span>
                 </div>
-                <button className="lg:hidden p-3 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400 hover:text-white rounded-xl hover:bg-white/5 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                  <X className="w-6 h-6" />
+                <button className="lg:hidden p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-500 hover:text-white rounded-xl hover:bg-white/5 active:bg-white/10 transition-all touch-manipulation" onClick={() => setIsMobileMenuOpen(false)}>
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <nav className="flex-1 space-y-2">
+              <nav className="flex-1 space-y-2.5 overflow-y-auto">
                 <button
-                  className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all ${view === 'home' ? 'bg-violet-600/20 text-white font-medium border border-violet-500/30' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
+                  className={`w-full flex items-center space-x-3 px-5 py-4 rounded-2xl transition-all touch-manipulation active:scale-[0.98] ${view === 'home' ? 'bg-violet-600/20 text-white font-bold border border-violet-500/30 shadow-lg shadow-violet-600/10' : 'hover:bg-white/5 text-slate-400 hover:text-white active:bg-white/10'}`}
                   onClick={() => { setView('home'); setResults(null); setQuery(''); setIsMobileMenuOpen(false); }}
                 >
-                  <Search className={`w-5 h-5 ${view === 'home' ? 'text-violet-400' : ''}`} />
-                  <span>Discover</span>
+                  <Search className={`w-5 h-5 flex-shrink-0 ${view === 'home' ? 'text-violet-400' : ''}`} />
+                  <span className="font-semibold">Discover</span>
                 </button>
 
                 <button
                   onClick={() => { setShowAlerts(true); setIsMobileMenuOpen(false); }}
-                  className="w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all hover:bg-white/5 text-slate-400 hover:text-white"
+                  className="w-full flex items-center space-x-3 px-5 py-4 rounded-2xl transition-all hover:bg-white/5 text-slate-400 hover:text-white active:bg-white/10 touch-manipulation active:scale-[0.98]"
                   data-onboarding="alerts-button"
                 >
-                  <History className="w-5 h-5" />
-                  <span>Alerts</span>
+                  <History className="w-5 h-5 flex-shrink-0" />
+                  <span className="font-semibold">Alerts</span>
                 </button>
 
-                <div className="pt-8 pb-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-widest">
+                <div className="pt-6 pb-3 px-3 text-[10px] font-black text-slate-600 uppercase tracking-widest">
                   Your Plan
                 </div>
-                <div className="glass-card p-4 rounded-2xl mx-1 relative overflow-hidden group">
+                <div className="glass-card p-5 rounded-2xl relative overflow-hidden group border border-white/5 hover:border-white/10 transition-all">
                   <div className="absolute top-0 right-0 w-20 h-20 bg-violet-500/10 rounded-full blur-2xl group-hover:bg-violet-500/20 transition-all"></div>
                   <div className="flex items-center justify-between mb-3 relative z-10">
                     <span className="text-xs font-medium text-slate-300">Credits</span>
@@ -707,40 +705,40 @@ const App: React.FC = () => {
                 </div>
               </nav>
 
-              <div className="border-t border-white/5 pt-6 space-y-2">
-                <div className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-white/5 border border-white/5">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white border border-white/10 shadow-lg shadow-violet-500/20">
-                    {profile?.first_name?.[0] || 'U'}
+              <div className="border-t border-white/10 pt-5 space-y-3 mt-auto">
+                <div className="flex items-center space-x-3 px-4 py-3 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 hover:border-white/20 transition-all">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-sm font-black text-white border-2 border-white/20 shadow-lg shadow-violet-500/30 flex-shrink-0">
+                    {profile?.first_name?.[0]?.toUpperCase() || 'U'}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs font-bold text-white truncate">{profile?.first_name} {profile?.last_name}</div>
-                    <div className="text-[10px] text-slate-400 truncate">{session?.user?.email}</div>
+                    <div className="text-sm font-bold text-white truncate">{profile?.first_name} {profile?.last_name}</div>
+                    <div className="text-[11px] text-slate-400 truncate">{session?.user?.email}</div>
                   </div>
-                  {profile?.is_pro && <Crown className="w-3 h-3 text-amber-400 shrink-0" />}
+                  {profile?.is_pro && <Crown className="w-4 h-4 text-amber-400 flex-shrink-0" />}
                 </div>
 
                 {!profile?.is_pro && (
-                  <button onClick={handleManualUpgrade} className="w-full text-[10px] text-slate-600 hover:text-amber-500 p-1 text-center">
+                  <button onClick={handleManualUpgrade} className="w-full text-[10px] text-slate-600 hover:text-amber-500 p-1.5 text-center transition-colors">
                     (Admin: Upgrade)
                   </button>
                 )}
 
                 <button
                   onClick={handleSignOut}
-                  className="w-full flex items-center space-x-3 px-4 py-2 rounded-xl text-rose-400 hover:bg-rose-500/10 transition-all ml-1"
+                  className="w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-xl text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 active:bg-rose-500/20 transition-all font-semibold touch-manipulation active:scale-[0.98]"
                 >
                   <LogOut className="w-4 h-4" />
                   <span className="text-sm">Sign Out</span>
                 </button>
 
-                <div className="pt-4 flex items-center justify-between px-4 opacity-50 hover:opacity-100 transition-opacity">
+                <div className="pt-2 flex items-center justify-between px-3 opacity-40 hover:opacity-70 transition-opacity">
                   <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Protocol v{(window as any).SCOPA_VERSION || '2.6.1'}</span>
                   <button
                     onClick={handleForceSync}
                     className="text-[9px] font-black text-violet-400 uppercase tracking-widest hover:text-violet-300 transition-colors"
                     title="Force deep cache clear and service worker purge"
                   >
-                    Force Sync
+                    Sync
                   </button>
                 </div>
               </div>
@@ -748,49 +746,49 @@ const App: React.FC = () => {
 
             {/* Main Content */}
             <main className="flex-1 flex flex-col h-full relative overflow-y-auto z-10 w-full">
-              <header className="h-20 flex items-center justify-between px-4 lg:px-10 sticky top-0 z-30 bg-[#0a0b0f]/50 backdrop-blur-md lg:bg-transparent">
-                <div className="flex items-center space-x-4">
+              <header className="h-16 sm:h-20 flex items-center justify-between px-3 sm:px-4 lg:px-10 sticky top-0 z-30 bg-[#0a0b0f]/80 backdrop-blur-xl lg:bg-transparent border-b border-white/5 lg:border-0">
+                <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
                   <button
-                    className="lg:hidden p-3 -ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400 hover:text-white transition-colors rounded-xl hover:bg-white/5"
+                    className="lg:hidden p-2 sm:p-3 -ml-1 sm:-ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400 hover:text-white transition-colors rounded-xl hover:bg-white/5 flex-shrink-0"
                     onClick={() => setIsMobileMenuOpen(true)}
                   >
-                    <Menu className="w-6 h-6" />
+                    <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
                   </button>
-                  <h1 className="text-lg lg:text-xl font-bold text-white tracking-tight">
+                  <h1 className="text-sm sm:text-base lg:text-xl font-black text-white tracking-tight whitespace-nowrap truncate">
                     {isSearching ? 'Neural Protocol' :
                       view === 'home' ? 'Intelligence Hub' : 'Opportunity Analysis'}
                   </h1>
                 </div>
 
-                <div className="flex items-center space-x-4">
-                  <div className="glass-panel px-4 py-2 rounded-full flex items-center space-x-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span className="text-xs font-medium text-slate-300">System Online</span>
+                <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
+                  <div className="glass-panel px-2 sm:px-3 py-1 sm:py-1.5 rounded-full flex items-center space-x-1.5 sm:space-x-2">
+                    <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0"></span>
+                    <span className="text-[10px] sm:text-xs font-bold text-slate-300 whitespace-nowrap">System Online</span>
                   </div>
                   {profile && <NotificationCenter />}
                 </div>
               </header>
 
-              <div className="flex-1 px-4 lg:px-10 pb-24 lg:pb-10">
+              <div className="flex-1 px-3 sm:px-4 lg:px-10 pb-28 sm:pb-24 lg:pb-10 overflow-y-auto">
                 {view === 'home' && !isSearching && (
-                  <div className="max-w-4xl mx-auto py-16">
-                    <div className="text-center mb-12 lg:mb-20 space-y-6">
-                      <div className="inline-flex items-center space-x-3 px-4 py-1.5 rounded-full bg-violet-600/10 border border-violet-500/20 mb-4 animate-in fade-in slide-in-from-bottom-2">
+                  <div className="max-w-4xl mx-auto py-4 sm:py-10 lg:py-16">
+                    <div className="text-center mb-6 sm:mb-12 lg:mb-20 space-y-2 sm:space-y-4 lg:space-y-6">
+                      <div className="inline-flex items-center space-x-2 sm:space-x-3 px-3 sm:px-4 py-1.5 rounded-full bg-violet-600/10 border border-violet-500/20 animate-in fade-in slide-in-from-bottom-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse"></span>
-                        <span className="text-[10px] font-black text-violet-400 uppercase tracking-[0.3em]">Protocol v2.6.1 Active</span>
+                        <span className="text-[9px] sm:text-[10px] font-black text-violet-400 uppercase tracking-[0.2em] sm:tracking-[0.3em]">Protocol v2.6.1 Active</span>
                       </div>
-                      <h2 className="text-5xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] uppercase italic">
+                      <h2 className="text-3xl sm:text-5xl lg:text-8xl font-black text-white tracking-tighter leading-[0.95] uppercase italic px-2">
                         Scopa <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-400 to-violet-500">Intelligence</span>
                       </h2>
-                      <p className="text-slate-500 text-lg lg:text-2xl font-medium tracking-tight max-w-2xl mx-auto">
-                        Scan global markets for untapped blue ocean opportunities using high-fidelity neural analysis.
+                      <p className="text-slate-500 text-xs sm:text-lg lg:text-2xl font-medium tracking-tight max-w-2xl mx-auto px-4 leading-snug">
+                        Scan global markets for untapped opportunities using high-fidelity neural analysis.
                       </p>
                     </div>
 
-                    <div className="relative group max-w-3xl mx-auto">
-                      <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 via-indigo-500 to-violet-600 rounded-[2.5rem] blur opacity-20 group-focus-within:opacity-50 transition duration-1000 animate-pulse-glow"></div>
-                      <form onSubmit={handleSearch} className="relative bg-[#050608]/80 backdrop-blur-xl border border-white/10 rounded-[2.2rem] p-1 shadow-2xl">
-                        <div className="bg-[#050608]/50 rounded-[2rem] p-6 lg:p-8">
+                    <div className="relative group max-w-3xl mx-auto px-1 sm:px-0">
+                      <div className="absolute -inset-0.5 sm:-inset-1 bg-gradient-to-r from-violet-600 via-indigo-500 to-violet-600 rounded-[1.5rem] sm:rounded-[2.5rem] blur opacity-20 group-focus-within:opacity-50 transition duration-1000 animate-pulse-glow"></div>
+                      <form onSubmit={handleSearch} className="relative bg-[#050608]/80 backdrop-blur-xl border border-white/10 rounded-[1.5rem] sm:rounded-[2.2rem] p-0.5 sm:p-1 shadow-2xl">
+                        <div className="bg-[#050608]/50 rounded-[1.5rem] sm:rounded-[2rem] p-3 sm:p-6 lg:p-8">
                           <textarea
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
@@ -801,20 +799,20 @@ const App: React.FC = () => {
                               }
                             }}
                             placeholder={`e.g. "${EXAMPLE_QUERIES[placeholderIndex] || 'AI-powered productivity tools'}"`}
-                            className="w-full bg-transparent border-none focus:ring-0 text-lg lg:text-xl text-white placeholder-slate-600 resize-none min-h-[120px]"
+                            className="w-full bg-transparent border-none focus:ring-0 text-sm sm:text-lg lg:text-xl text-white placeholder-slate-600 resize-none min-h-[60px] sm:min-h-[100px] lg:min-h-[120px]"
                             data-onboarding="search-input"
                           />
-                          <div className="flex items-center justify-between pt-6 mt-2 border-t border-white/5">
-                            <div className="flex flex-wrap gap-2 lg:gap-3">
-                              <button type="button" className="glass-panel px-3 py-1.5 rounded-full text-[10px] lg:text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors flex items-center space-x-1.5">
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-3 pt-3 sm:pt-6 mt-2 border-t border-white/5">
+                            <div className="flex flex-wrap gap-2 items-center">
+                              <button type="button" className="glass-panel px-2.5 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors flex items-center space-x-1.5">
                                 <Globe className="w-3 h-3" />
                                 <span>Global</span>
                               </button>
-                              <button type="button" className="glass-panel px-3 py-1.5 rounded-full text-[10px] lg:text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors flex items-center space-x-1.5">
+                              <button type="button" className="glass-panel px-2.5 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors flex items-center space-x-1.5">
                                 <Target className="w-3 h-3" />
                                 <span>High Intent</span>
                               </button>
-                              <div className="flex items-center space-x-2 text-xs text-slate-500 font-medium ml-auto hidden sm:flex">
+                              <div className="flex items-center space-x-2 text-xs text-slate-500 font-medium ml-auto hidden lg:flex">
                                 <kbd className="px-2 py-1 text-xs font-mono bg-slate-800/50 border border-slate-700/50 rounded">Enter</kbd>
                                 <span>to scan</span>
                               </div>
@@ -822,22 +820,21 @@ const App: React.FC = () => {
                             <button
                               type="submit"
                               disabled={!query.trim()}
-                              className="bg-violet-600 text-white hover:bg-violet-500 disabled:bg-slate-700 disabled:text-slate-500 font-black px-8 lg:px-12 py-3 lg:py-4 rounded-2xl transition-all shadow-xl shadow-violet-600/20 flex items-center space-x-3 uppercase tracking-tighter min-h-[44px]"
+                              className="w-full sm:w-auto bg-violet-600 text-white hover:bg-violet-500 active:bg-violet-700 disabled:bg-slate-700 disabled:text-slate-500 font-black px-5 sm:px-8 lg:px-12 py-2.5 sm:py-3 lg:py-4 rounded-xl sm:rounded-2xl transition-all shadow-xl shadow-violet-600/20 flex items-center justify-center space-x-2 uppercase tracking-tighter min-h-[44px] touch-manipulation"
                             >
-                              <Zap className="w-5 h-5 fill-white" />
-                              <span className="hidden sm:inline">Start Free Discovery</span>
-                              <span className="sm:hidden">Discover</span>
+                              <Zap className="w-4 h-4 sm:w-5 sm:h-5 fill-white flex-shrink-0" />
+                              <span className="text-xs sm:text-sm lg:text-base">Start Discovery</span>
                             </button>
                           </div>
                         </div>
                       </form>
 
                       {/* Quick Start Templates */}
-                      <div className="mt-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
-                        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 text-center">
+                      <div className="mt-4 sm:mt-6 lg:mt-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+                        <div className="text-[9px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 sm:mb-3 text-center">
                           Quick Start Templates
                         </div>
-                        <div className="flex flex-wrap justify-center gap-3">
+                        <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 lg:gap-3">
                           {[
                             { label: 'SaaS Tools', icon: Rocket, query: 'SaaS productivity tools for remote teams' },
                             { label: 'E-commerce', icon: Building2, query: 'E-commerce marketplace opportunities' },
@@ -848,18 +845,26 @@ const App: React.FC = () => {
                               key={template.label}
                               type="button"
                               onClick={() => {
-                                setQuery(template.query);
+                                // Set query and trigger search with a small delay to ensure state updates
+                                const templateQuery = template.query;
+                                setQuery(templateQuery);
+                                // Force a re-render and then trigger search
                                 setTimeout(() => {
-                                  const form = document.querySelector('form');
-                                  if (form) {
-                                    form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                                  const searchForm = document.querySelector('form');
+                                  if (searchForm) {
+                                    const syntheticEvent = {
+                                      preventDefault: () => {},
+                                      target: searchForm,
+                                      currentTarget: searchForm
+                                    } as React.FormEvent;
+                                    handleSearch(syntheticEvent);
                                   }
-                                }, 100);
+                                }, 50);
                               }}
-                              className="group px-5 py-3 bg-white/5 hover:bg-violet-600 border border-white/10 hover:border-violet-500 rounded-2xl text-sm font-bold transition-all flex items-center space-x-2 hover:scale-105 hover:shadow-lg hover:shadow-violet-600/20"
+                              className="group px-2.5 sm:px-4 lg:px-5 py-2 sm:py-2.5 lg:py-3 bg-white/5 hover:bg-violet-600 active:bg-violet-700 border border-white/10 hover:border-violet-500 rounded-lg sm:rounded-xl lg:rounded-2xl text-[10px] sm:text-xs lg:text-sm font-bold transition-all flex items-center space-x-1 sm:space-x-1.5 lg:space-x-2 hover:scale-105 hover:shadow-lg hover:shadow-violet-600/20 touch-manipulation"
                             >
-                              <template.icon className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
-                              <span className="text-slate-300 group-hover:text-white transition-colors">{template.label}</span>
+                              <template.icon className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-slate-400 group-hover:text-white transition-colors flex-shrink-0" />
+                              <span className="text-slate-300 group-hover:text-white transition-colors whitespace-nowrap">{template.label}</span>
                             </button>
                           ))}
                         </div>

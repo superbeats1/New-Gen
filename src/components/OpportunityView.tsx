@@ -81,7 +81,16 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
 
       <div
         className="p-8 lg:p-12 cursor-pointer flex items-start justify-between relative z-10"
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsExpanded(!isExpanded);
+        }}
+        onTouchEnd={(e) => {
+          e.stopPropagation();
+          // Prevent double-triggering on devices that support both touch and click
+          e.preventDefault();
+          setIsExpanded(!isExpanded);
+        }}
       >
         <div className="flex-1">
           <div className="flex items-center space-x-4 mb-6">
@@ -359,15 +368,21 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
                         <p className="text-slate-300 italic mb-4 relative z-10">"{ev.quote}"</p>
                         <div className="flex items-center justify-between">
                           <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{ev.context}</span>
-                          <a
-                            href={ev.sourceUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[10px] font-black uppercase tracking-widest text-violet-400 hover:text-violet-300 transition-colors flex items-center"
-                          >
-                            <span>Source</span>
-                            <ArrowRight className="w-3 h-3 ml-1" />
-                          </a>
+                          {ev.sourceUrl && ev.sourceUrl.trim() ? (
+                            <a
+                              href={ev.sourceUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[10px] font-black uppercase tracking-widest text-violet-400 hover:text-violet-300 transition-colors flex items-center"
+                            >
+                              <span>Source</span>
+                              <ArrowRight className="w-3 h-3 ml-1" />
+                            </a>
+                          ) : (
+                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center">
+                              <span>Source N/A</span>
+                            </span>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -773,9 +788,15 @@ const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
                     <div className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse"></div>
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{finding.source}</span>
                   </div>
-                  <a href={finding.url} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-xl text-slate-500 hover:text-white transition-all">
-                    <ArrowRight className="w-4 h-4" />
-                  </a>
+                  {finding.url && finding.url.trim() ? (
+                    <a href={finding.url} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-xl text-slate-500 hover:text-white transition-all">
+                      <ArrowRight className="w-4 h-4" />
+                    </a>
+                  ) : (
+                    <div className="p-2 bg-slate-700/50 rounded-xl text-slate-600">
+                      <ArrowRight className="w-4 h-4" />
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

@@ -83,6 +83,19 @@ export const SwipeableOpportunityCards: React.FC<Props> = ({ opportunities, rend
 
   return (
     <div className="relative">
+      {/* Swipe Hint (shows prominently above cards) */}
+      {opportunities.length > 1 && (
+        <div className="lg:hidden mb-8 text-center animate-in fade-in slide-in-from-top-2 duration-500 delay-300">
+          <div className="inline-flex items-center space-x-3 px-6 py-3 rounded-full bg-violet-600/20 border border-violet-500/30 shadow-lg shadow-violet-500/10">
+            <ChevronLeft className="w-4 h-4 text-violet-300 animate-pulse" />
+            <span className="text-sm font-black text-violet-200 uppercase tracking-widest">
+              Swipe to explore more opportunities
+            </span>
+            <ChevronRight className="w-4 h-4 text-violet-300 animate-pulse" />
+          </div>
+        </div>
+      )}
+
       {/* Progress Indicators */}
       <div className="flex items-center justify-between mb-6 px-2">
         <div className="flex items-center space-x-2">
@@ -175,19 +188,6 @@ export const SwipeableOpportunityCards: React.FC<Props> = ({ opportunities, rend
           <ChevronRight className="w-5 h-5 text-white" />
         </button>
       </div>
-
-      {/* Swipe Hint (shows on first card) */}
-      {currentIndex === 0 && opportunities.length > 1 && (
-        <div className="lg:hidden mt-4 text-center animate-in fade-in slide-in-from-bottom-2 duration-500 delay-500">
-          <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-violet-600/10 border border-violet-500/20">
-            <ChevronLeft className="w-3 h-3 text-violet-400 animate-pulse" />
-            <span className="text-[10px] font-bold text-violet-400 uppercase tracking-widest">
-              Swipe to explore
-            </span>
-            <ChevronRight className="w-3 h-3 text-violet-400 animate-pulse" />
-          </div>
-        </div>
-      )}
     </div>
   );
 };
