@@ -63,13 +63,13 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
       ></div>
 
       {/* Navigation */}
-      <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${scrolled ? 'py-4 backdrop-blur-xl bg-black/20 border-b border-white/5' : 'py-8'}`}>
-        <div className="max-w-7xl mx-auto px-8 flex items-center justify-between">
-          <div className="flex items-center space-x-3 cursor-pointer group" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <div className="bg-gradient-to-br from-violet-600 to-indigo-600 p-2.5 rounded-2xl shadow-lg shadow-violet-600/20 group-hover:scale-110 transition-transform">
-              <Zap className="w-6 h-6 text-white fill-white" />
+      <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${scrolled ? 'py-3 sm:py-4 backdrop-blur-xl bg-black/20 border-b border-white/5' : 'py-4 sm:py-8'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 flex items-center justify-between">
+          <div className="flex items-center space-x-2 sm:space-x-3 cursor-pointer group" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <div className="bg-gradient-to-br from-violet-600 to-indigo-600 p-2 sm:p-2.5 rounded-xl sm:rounded-2xl shadow-lg shadow-violet-600/20 group-hover:scale-110 transition-transform">
+              <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white" />
             </div>
-            <span className="text-2xl font-black tracking-tighter text-white uppercase italic">Scopa AI</span>
+            <span className="text-lg sm:text-2xl font-black tracking-tighter text-white uppercase italic">Scopa AI</span>
           </div>
 
           <div className="hidden md:flex items-center space-x-8 text-sm font-bold uppercase tracking-widest">
@@ -94,67 +94,77 @@ const LandingPage: React.FC<Props> = ({ onStart, session, onOpenAuth, profile, o
               </button>
             )}
           </div>
+
+          {/* Mobile CTA Button */}
+          <div className="md:hidden">
+            <button
+              onClick={session ? onStart : onOpenAuth}
+              className="bg-violet-600 hover:bg-violet-500 active:bg-violet-700 text-white px-4 py-2 rounded-xl transition-all shadow-lg shadow-violet-900/20 font-bold uppercase text-[10px] tracking-wider touch-manipulation"
+            >
+              {session ? 'Dashboard' : 'Sign In'}
+            </button>
+          </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-48 pb-32 px-8">
+      <section className="relative pt-24 sm:pt-48 pb-16 sm:pb-32 px-4 sm:px-8">
         <div className="max-w-7xl mx-auto flex flex-col items-center text-center">
-          <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+          <div className="inline-flex items-center space-x-1.5 sm:space-x-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[8px] sm:text-[10px] font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] mb-6 sm:mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+            <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
             <span>Neural Discovery Protocol Active</span>
           </div>
 
-          <h1 className="text-6xl md:text-8xl lg:text-[10rem] font-black text-white leading-[0.85] tracking-tighter mb-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100">
+          <h1 className="text-[2.5rem] leading-[0.9] sm:text-6xl md:text-8xl lg:text-[10rem] font-black text-white sm:leading-[0.85] tracking-tighter mb-4 sm:mb-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100 px-2">
             Identify<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-400 to-fuchsia-500">Opportunities.</span>
           </h1>
 
-          <p className="max-w-2xl text-slate-400 text-xl md:text-2xl font-medium leading-relaxed mb-8 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
+          <p className="max-w-2xl text-slate-400 text-sm sm:text-xl md:text-2xl font-medium leading-relaxed mb-6 sm:mb-8 px-4 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
             Scopa AI uses dual-agent intelligence to scan millions of signals across Reddit, X, and forums to reveal business gaps in real-time.
           </p>
 
-          {/* Social Proof */}
-          <div className="flex items-center justify-center space-x-6 mb-12 animate-in fade-in slide-in-from-bottom-14 duration-1000 delay-250">
+          {/* Social Proof - Compact Mobile Layout */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 mb-8 sm:mb-12 animate-in fade-in slide-in-from-bottom-14 duration-1000 delay-250 w-full px-4">
             <div className="flex items-center space-x-3">
-              <div className="flex -space-x-2">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-violet-400 border-2 border-[#030407] flex items-center justify-center text-white text-xs font-bold">A</div>
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-400 border-2 border-[#030407] flex items-center justify-center text-white text-xs font-bold">M</div>
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-400 border-2 border-[#030407] flex items-center justify-center text-white text-xs font-bold">S</div>
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-fuchsia-600 to-fuchsia-400 border-2 border-[#030407] flex items-center justify-center text-white text-xs font-bold">+</div>
+              <div className="flex -space-x-1.5 sm:-space-x-2">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-violet-600 to-violet-400 border-2 border-[#030407] flex items-center justify-center text-white text-[10px] sm:text-xs font-bold shadow-lg">A</div>
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-400 border-2 border-[#030407] flex items-center justify-center text-white text-[10px] sm:text-xs font-bold shadow-lg">M</div>
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-400 border-2 border-[#030407] flex items-center justify-center text-white text-[10px] sm:text-xs font-bold shadow-lg">S</div>
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-fuchsia-600 to-fuchsia-400 border-2 border-[#030407] flex items-center justify-center text-white text-[10px] sm:text-xs font-bold shadow-lg">+</div>
               </div>
               <div className="text-left">
-                <div className="text-sm sm:text-base text-white font-bold">
+                <div className="text-xs sm:text-sm md:text-base text-white font-bold">
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400">2,400+</span> opportunities
                 </div>
-                <div className="text-xs text-slate-500 font-medium">discovered this month</div>
+                <div className="text-[10px] sm:text-xs text-slate-500 font-medium">discovered this month</div>
               </div>
             </div>
-            <div className="h-8 w-px bg-white/10"></div>
-            <div className="flex items-center space-x-2">
-              <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+            <div className="hidden sm:block h-8 w-px bg-white/10"></div>
+            <div className="flex items-center space-x-1.5 sm:space-x-2">
+              <Star className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 fill-amber-400" />
               <div className="text-left">
-                <div className="text-sm sm:text-base text-white font-bold">4.9/5</div>
-                <div className="text-xs text-slate-500 font-medium">avg. rating</div>
+                <div className="text-xs sm:text-sm md:text-base text-white font-bold">4.9/5</div>
+                <div className="text-[10px] sm:text-xs text-slate-500 font-medium">avg. rating</div>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-6 animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-300">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-6 animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-300 w-full max-w-md sm:max-w-none px-4">
             <button
               onClick={onStart}
-              className="group relative bg-violet-600 hover:bg-violet-500 text-white font-black py-6 px-12 rounded-3xl transition-all shadow-2xl shadow-violet-600/30 flex items-center space-x-4 text-xl uppercase tracking-tighter overflow-hidden"
+              className="group relative bg-violet-600 hover:bg-violet-500 active:bg-violet-700 text-white font-black py-4 sm:py-6 px-8 sm:px-12 rounded-2xl sm:rounded-3xl transition-all shadow-2xl shadow-violet-600/30 flex items-center justify-center space-x-2 sm:space-x-4 text-sm sm:text-xl uppercase tracking-tighter overflow-hidden touch-manipulation"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
               <span>{session ? 'Enter Platform' : 'Start Free Discovery'}</span>
-              <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+              <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-2 transition-transform" />
             </button>
             <button
               onClick={() => document.getElementById('workflow')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-              className="group px-8 py-6 rounded-3xl border border-white/10 hover:bg-white/5 transition-all text-xl font-bold uppercase tracking-tighter flex items-center space-x-2"
+              className="group px-6 sm:px-8 py-4 sm:py-6 rounded-2xl sm:rounded-3xl border border-white/10 hover:bg-white/5 active:bg-white/10 transition-all text-sm sm:text-xl font-bold uppercase tracking-tighter flex items-center justify-center space-x-2 touch-manipulation"
             >
               <span>See How It Works</span>
-              <ChevronDown className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
+              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-y-1 transition-transform" />
             </button>
           </div>
         </div>
