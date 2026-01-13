@@ -243,8 +243,8 @@ export class RealDataCollector {
           }
         }
 
-        // Rate limit between subreddit calls (2 seconds to avoid Reddit 403)
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Rate limit between subreddit calls (500ms to avoid Reddit 403)
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
     } catch (error) {
       console.error('Reddit scanning failed:', error);

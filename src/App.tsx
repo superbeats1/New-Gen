@@ -200,9 +200,9 @@ const SearchingModule: React.FC<{ stepIndex: number; onStop: () => void }> = ({ 
               ></div>
             </div>
 
-            <div className="flex items-center justify-center space-x-3 text-slate-400 font-mono text-xs h-6 overflow-hidden">
+            <div className="w-full max-w-xs mx-auto grid grid-cols-[auto_1fr] gap-3 items-center text-slate-400 font-mono text-xs h-6 overflow-hidden">
               <Terminal className="w-4 h-4 text-violet-500 shrink-0" />
-              <span className="truncate animate-pulse">{SEARCH_STEPS[stepIndex]}</span>
+              <span className="truncate animate-pulse text-left">{SEARCH_STEPS[stepIndex]}</span>
             </div>
           </div>
 
