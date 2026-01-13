@@ -290,42 +290,12 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
         {/* Dark overlay */}
         <div className="absolute inset-0 bg-black/90 backdrop-blur-sm animate-in fade-in duration-300" />
 
-        {/* Spotlight on highlighted element - NOW WORKS ON MOBILE! */}
-        {highlightedElement && (
-          <>
-            <div
-              className="absolute"
-              style={getSpotlightStyle()}
-            />
-            {/* Add pulsing ring animation on mobile for extra visibility */}
-            {isMobile && (
-              <>
-                <div
-                  className="absolute animate-pulse"
-                  style={{
-                    ...getSpotlightStyle(),
-                    boxShadow: '0 0 0 3px rgba(139, 92, 246, 0.4)',
-                    animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                  }}
-                />
-                {/* Floating label pointing to element */}
-                <div
-                  className="absolute z-[202] animate-bounce"
-                  style={{
-                    top: `${highlightedElement.getBoundingClientRect().top - 50}px`,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    pointerEvents: 'none'
-                  }}
-                >
-                  <div className="bg-violet-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center space-x-1">
-                    <span>👇</span>
-                    <span>Look here!</span>
-                  </div>
-                </div>
-              </>
-            )}
-          </>
+        {/* Spotlight on highlighted element - Desktop only (mobile elements covered by modal) */}
+        {highlightedElement && !isMobile && (
+          <div
+            className="absolute"
+            style={getSpotlightStyle()}
+          />
         )}
 
         {/* Onboarding Modal */}
