@@ -769,7 +769,7 @@ const App: React.FC = () => {
                 </div>
               </header>
 
-              <div className="flex-1 px-3 sm:px-4 lg:px-10 pb-32 sm:pb-32 lg:pb-20 overflow-y-auto">
+              <div className="flex-1 px-3 sm:px-4 lg:px-10 pb-32 sm:pb-32 lg:pb-20 overflow-y-auto w-full flex flex-col items-center">
                 {view === 'home' && !isSearching && (
                   <div className="max-w-4xl w-full mx-auto py-4 sm:py-10 lg:py-16">
                     <div className="text-center mb-6 sm:mb-12 lg:mb-20 space-y-2 sm:space-y-4 lg:space-y-6">

@@ -1,11 +1,12 @@
 import type { GoogleGenAI } from "@google/genai";
 import { WorkflowMode, AnalysisResult } from "./types";
-import type { RealDataCollector } from "./services/realDataService";
+import { RealDataCollector } from "./services/realDataService";
 
 // Check multiple possible environment variable names - but don't access import.meta.env at module level
 let apiKey: string | undefined;
 let genAIInstance: GoogleGenAI | null = null;
-let realDataCollector: RealDataCollector | null = null;
+// Instantiate immediately since we are using static import (this is lightweight)
+const realDataCollector = new RealDataCollector();
 
 const getApiKey = () => {
   if (!apiKey) {
@@ -30,14 +31,7 @@ const getGenAI = async () => {
   return genAIInstance;
 };
 
-const getRealDataCollector = async () => {
-  if (!realDataCollector) {
-    // Lazy load RealDataCollector
-    const { RealDataCollector } = await import("./services/realDataService");
-    realDataCollector = new RealDataCollector();
-  }
-  return realDataCollector;
-};
+// Removed getRealDataCollector as it is no longer needed with static import
 
 export const analyzeQuery = async (query: string): Promise<AnalysisResult> => {
   try {
@@ -49,7 +43,7 @@ export const analyzeQuery = async (query: string): Promise<AnalysisResult> => {
 
     // Step 2: Get real data from active sources
     console.log(`📡 Collecting real-time market data...`);
-    const collector = await getRealDataCollector();
+    const collector = realDataCollector;
     const realData = await collector.findRealLeads(query, detectedMode);
 
     // Step 3: Generate high-fidelity analysis using real data
@@ -358,20 +352,20 @@ IMPORTANT: If there's NO clear competitor or insufficient data, SET competitorAn
       // Validate and clean opportunities data
       const validatedOpportunities = Array.isArray(parsed.opportunities)
         ? parsed.opportunities.map((opp: any) => ({
-            ...opp,
-            supportingEvidence: Array.isArray(opp.supportingEvidence)
-              ? opp.supportingEvidence
-                  .filter((ev: any) => ev && typeof ev === 'object' && ev.quote && ev.context)
-                  .map((ev: any) => ({
-                    quote: ev.quote || '',
-                    context: ev.context || '',
-                    sourceUrl: ev.sourceUrl && typeof ev.sourceUrl === 'string' && ev.sourceUrl.trim()
-                      ? ev.sourceUrl.trim()
-                      : undefined
-                  }))
-                  .filter((ev: any) => ev.sourceUrl) // Only keep evidence with valid URLs
-              : []
-          }))
+          ...opp,
+          supportingEvidence: Array.isArray(opp.supportingEvidence)
+            ? opp.supportingEvidence
+              .filter((ev: any) => ev && typeof ev === 'object' && ev.quote && ev.context)
+              .map((ev: any) => ({
+                quote: ev.quote || '',
+                context: ev.context || '',
+                sourceUrl: ev.sourceUrl && typeof ev.sourceUrl === 'string' && ev.sourceUrl.trim()
+                  ? ev.sourceUrl.trim()
+                  : undefined
+              }))
+              .filter((ev: any) => ev.sourceUrl) // Only keep evidence with valid URLs
+            : []
+        }))
         : [];
 
       return {
