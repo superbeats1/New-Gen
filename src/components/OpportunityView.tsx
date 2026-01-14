@@ -673,21 +673,21 @@ const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-        <div className="p-4 sm:p-8 bg-[#050608]/40 backdrop-blur-2xl rounded-2xl sm:rounded-[2.5rem] border border-white/10 group hover:border-violet-500/30 transition-all relative overflow-hidden min-w-0">
-          <div className="absolute top-0 right-0 w-24 sm:w-32 h-24 sm:h-32 bg-violet-600/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-          <span className="text-slate-500 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.1em] sm:tracking-[0.2em] mb-2 sm:mb-4 block truncate">Intelligence Index</span>
-          <div className="text-2xl sm:text-6xl font-black text-white mb-2 sm:mb-4 italic tracking-tighter">48.2</div>
-          <div className="text-[7px] sm:text-[10px] text-emerald-400 font-black uppercase tracking-wider sm:tracking-widest flex items-center bg-emerald-400/10 w-fit max-w-full px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-emerald-500/20">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 overflow-hidden">
+        <div className="p-4 sm:p-8 bg-[#0a0b10]/80 backdrop-blur-xl rounded-2xl sm:rounded-[2.5rem] border border-white/10 group hover:border-violet-500/30 transition-all relative min-w-0">
+          <div className="absolute top-0 right-0 w-24 sm:w-32 h-24 sm:h-32 bg-violet-600/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+          <span className="text-slate-500 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.1em] sm:tracking-[0.2em] mb-2 sm:mb-4 block truncate relative z-10">Intelligence Index</span>
+          <div className="text-2xl sm:text-6xl font-black text-white mb-2 sm:mb-4 italic tracking-tighter relative z-10">48.2</div>
+          <div className="text-[7px] sm:text-[10px] text-emerald-400 font-black uppercase tracking-wider sm:tracking-widest flex items-center bg-emerald-400/10 w-fit max-w-full px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-emerald-500/20 relative z-10">
             <TrendingUp className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1 sm:mr-2 flex-shrink-0" /> <span className="truncate">Efficient</span>
           </div>
         </div>
 
-        <div className="p-4 sm:p-8 bg-[#050608]/40 backdrop-blur-2xl rounded-2xl sm:rounded-[2.5rem] border border-white/10 group hover:border-violet-500/30 transition-all flex flex-col items-center justify-center min-w-0 overflow-hidden">
+        <div className="p-4 sm:p-8 bg-[#0a0b10]/80 backdrop-blur-xl rounded-2xl sm:rounded-[2.5rem] border border-white/10 group hover:border-violet-500/30 transition-all flex flex-col items-center justify-center min-w-0">
           <SentimentGauge value={results.opportunities?.[0]?.marketSentiment || 72} label="Market Intensity" />
         </div>
 
-        <div className="p-4 sm:p-8 bg-[#050608]/40 backdrop-blur-2xl rounded-2xl sm:rounded-[2.5rem] border border-white/10 group hover:border-violet-500/30 transition-all min-w-0 overflow-hidden">
+        <div className="p-4 sm:p-8 bg-[#0a0b10]/80 backdrop-blur-xl rounded-2xl sm:rounded-[2.5rem] border border-white/10 group hover:border-violet-500/30 transition-all min-w-0">
           <span className="text-slate-500 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.1em] sm:tracking-[0.2em] mb-2 sm:mb-4 block truncate">Growth Velocity</span>
           <div className="text-2xl sm:text-5xl font-black text-white mb-2 sm:mb-4 italic tracking-tighter">
             {results.opportunities?.[0]?.growthVelocity || 84}%
@@ -700,11 +700,11 @@ const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
           </div>
         </div>
 
-        <div className="p-4 sm:p-8 bg-[#050608]/40 backdrop-blur-2xl rounded-2xl sm:rounded-[2.5rem] border border-white/10 group hover:border-violet-500/30 transition-all relative overflow-hidden min-w-0">
-          <div className="absolute bottom-0 right-0 w-24 sm:w-32 h-24 sm:h-32 bg-indigo-600/10 rounded-full blur-3xl translate-y-1/2 translate-x-1/2"></div>
-          <span className="text-slate-500 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.1em] sm:tracking-[0.2em] mb-2 sm:mb-4 block">Protocol State</span>
-          <div className="text-lg sm:text-4xl font-black text-white mb-2 sm:mb-4 italic tracking-tighter uppercase truncate">Optimized</div>
-          <div className="text-[7px] sm:text-[10px] text-violet-400 font-black uppercase tracking-wider sm:tracking-widest bg-violet-400/10 w-fit max-w-full px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-violet-500/20">
+        <div className="p-4 sm:p-8 bg-[#0a0b10]/80 backdrop-blur-xl rounded-2xl sm:rounded-[2.5rem] border border-white/10 group hover:border-violet-500/30 transition-all relative min-w-0">
+          <div className="absolute bottom-0 right-0 w-24 sm:w-32 h-24 sm:h-32 bg-indigo-600/10 rounded-full blur-3xl translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+          <span className="text-slate-500 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.1em] sm:tracking-[0.2em] mb-2 sm:mb-4 block relative z-10">Protocol State</span>
+          <div className="text-lg sm:text-4xl font-black text-white mb-2 sm:mb-4 italic tracking-tighter uppercase truncate relative z-10">Optimized</div>
+          <div className="text-[7px] sm:text-[10px] text-violet-400 font-black uppercase tracking-wider sm:tracking-widest bg-violet-400/10 w-fit max-w-full px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-violet-500/20 relative z-10">
             <span className="truncate block">{results.opportunities?.[0]?.marketMaturity || 'Emerging'} Stage</span>
           </div>
         </div>
