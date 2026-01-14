@@ -103,10 +103,10 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
           {/* SPEED TO $1K MRR - UNIQUE COMPETITIVE ADVANTAGE */}
           {opportunity.speedToMRR && (
             <div className={`mb-6 px-6 py-4 rounded-2xl border-2 backdrop-blur-md inline-flex items-center space-x-4 ${opportunity.speedToMRR.velocity === 'Fast'
-                ? 'bg-emerald-600/10 border-emerald-500/40'
-                : opportunity.speedToMRR.velocity === 'Medium'
-                  ? 'bg-amber-600/10 border-amber-500/40'
-                  : 'bg-slate-600/10 border-slate-500/40'
+              ? 'bg-emerald-600/10 border-emerald-500/40'
+              : opportunity.speedToMRR.velocity === 'Medium'
+                ? 'bg-amber-600/10 border-amber-500/40'
+                : 'bg-slate-600/10 border-slate-500/40'
               }`}>
               <div className="flex items-center space-x-2">
                 {opportunity.speedToMRR.velocity === 'Fast' && (
@@ -126,10 +126,10 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
                 )}
                 <div>
                   <div className={`text-[10px] font-black uppercase tracking-widest ${opportunity.speedToMRR.velocity === 'Fast'
-                      ? 'text-emerald-400'
-                      : opportunity.speedToMRR.velocity === 'Medium'
-                        ? 'text-amber-400'
-                        : 'text-slate-400'
+                    ? 'text-emerald-400'
+                    : opportunity.speedToMRR.velocity === 'Medium'
+                      ? 'text-amber-400'
+                      : 'text-slate-400'
                     }`}>
                     {opportunity.speedToMRR.velocity} Track
                   </div>
@@ -356,30 +356,39 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
                     <span>Supporting Evidence</span>
                   </h4>
                   <div className="space-y-4">
-                    {opportunity.supportingEvidence.map((ev, i) => (
-                      <div key={i} className="group/quote relative p-6 bg-white/[0.02] rounded-[2rem] border border-white/5 hover:border-violet-500/30 transition-all">
-                        <Quote className="absolute top-4 right-6 w-8 h-8 text-white/5 group-hover/quote:text-violet-500/10 transition-colors" />
-                        <p className="text-slate-300 italic mb-4 relative z-10">"{ev.quote}"</p>
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{ev.context}</span>
-                          {ev.sourceUrl && ev.sourceUrl.trim() ? (
+                    {opportunity.supportingEvidence.map((ev, i) => {
+                      // Helper to ensure we always have a working link
+                      const getSafeLink = () => {
+                        if (ev.sourceUrl && (ev.sourceUrl.startsWith('http://') || ev.sourceUrl.startsWith('https://'))) {
+                          return ev.sourceUrl;
+                        }
+                        // If no valid link, fallback to a smart search
+                        const searchQuery = `${ev.quote} ${ev.context || ''}`;
+                        return `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+                      };
+
+                      const linkUrl = getSafeLink();
+
+                      return (
+                        <div key={i} className="group/quote relative p-6 bg-white/[0.02] rounded-[2rem] border border-white/5 hover:border-violet-500/30 transition-all">
+                          <Quote className="absolute top-4 right-6 w-8 h-8 text-white/5 group-hover/quote:text-violet-500/10 transition-colors" />
+                          <p className="text-slate-300 italic mb-4 relative z-10">"{ev.quote}"</p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{ev.context}</span>
                             <a
-                              href={ev.sourceUrl}
+                              href={linkUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-[10px] font-black uppercase tracking-widest text-violet-400 hover:text-violet-300 transition-colors flex items-center"
+                              className="text-[10px] font-black uppercase tracking-widest text-violet-400 hover:text-violet-300 transition-colors flex items-center cursor-pointer"
+                              onClick={(e) => e.stopPropagation()}
                             >
                               <span>Source</span>
                               <ArrowRight className="w-3 h-3 ml-1" />
                             </a>
-                          ) : (
-                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center">
-                              <span>Source N/A</span>
-                            </span>
-                          )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -766,36 +775,44 @@ const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {results.rawFindings.map((finding) => (
-              <div key={finding.id} className="glass-panel p-6 rounded-3xl border border-white/5 hover:border-violet-500/20 transition-all group/find">
-                <div className="flex items-center justify-between mb-4">
-                  <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${finding.sentiment === 'Positive' ? 'bg-emerald-500/10 text-emerald-400' :
-                    finding.sentiment === 'Negative' ? 'bg-rose-500/10 text-rose-400' :
-                      'bg-slate-500/10 text-slate-400'
-                    }`}>
-                    {finding.sentiment}
-                  </span>
-                  <span className="text-[10px] font-bold text-slate-500 tracking-tighter">{finding.date}</span>
-                </div>
-                <h4 className="text-white font-bold mb-3 line-clamp-2 leading-tight group-hover/find:text-violet-200 transition-colors">{finding.title}</h4>
-                <p className="text-slate-400 text-xs line-clamp-3 leading-relaxed mb-6 italic">"{finding.text}"</p>
-                <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse"></div>
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{finding.source}</span>
+            {results.rawFindings.map((finding) => {
+              // Helper to ensure we always have a working link
+              const getSafeLink = () => {
+                if (finding.url && (finding.url.startsWith('http://') || finding.url.startsWith('https://'))) {
+                  return finding.url;
+                }
+                // If no valid link, fallback to search based on title or text
+                const searchQuery = `${finding.title} ${finding.text.substring(0, 50)}`;
+                return `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+              };
+
+              const linkUrl = getSafeLink();
+
+              return (
+                <div key={finding.id} className="glass-panel p-6 rounded-3xl border border-white/5 hover:border-violet-500/20 transition-all group/find">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${finding.sentiment === 'Positive' ? 'bg-emerald-500/10 text-emerald-400' :
+                      finding.sentiment === 'Negative' ? 'bg-rose-500/10 text-rose-400' :
+                        'bg-slate-500/10 text-slate-400'
+                      }`}>
+                      {finding.sentiment}
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-500 tracking-tighter">{finding.date}</span>
                   </div>
-                  {finding.url && finding.url.trim() ? (
-                    <a href={finding.url} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-xl text-slate-500 hover:text-white transition-all">
+                  <h4 className="text-white font-bold mb-3 line-clamp-2 leading-tight group-hover/find:text-violet-200 transition-colors">{finding.title}</h4>
+                  <p className="text-slate-400 text-xs line-clamp-3 leading-relaxed mb-6 italic">"{finding.text}"</p>
+                  <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse"></div>
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{finding.source}</span>
+                    </div>
+                    <a href={linkUrl} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-xl text-slate-500 hover:text-white hover:bg-violet-600 transition-all cursor-pointer">
                       <ArrowRight className="w-4 h-4" />
                     </a>
-                  ) : (
-                    <div className="p-2 bg-slate-700/50 rounded-xl text-slate-600">
-                      <ArrowRight className="w-4 h-4" />
-                    </div>
-                  )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
