@@ -899,14 +899,17 @@ const App: React.FC = () => {
                               const randomQuery = template.queries[Math.floor(Math.random() * template.queries.length)];
                               setQuery(randomQuery);
 
-                              // Force a re-render and then trigger search
+                              // Focus the search box so user can edit immediately
+                              // We use a small timeout to let React set the state first
                               setTimeout(() => {
-                                // Just calling handleSearch directly with the state set is often not enough due to batching,
-                                // but we rely on the state being set. 
-                                // To be safer, we can pass the query directly to a refactored handleSearch, 
-                                // but for now, the timeout pattern works for this UI interaction.
-                                handleSearch();
-                              }, 50);
+                                const textarea = document.querySelector('textarea[data-onboarding="search-input"]') as HTMLTextAreaElement;
+                                if (textarea) {
+                                  textarea.focus();
+                                  // Optional: Move cursor to end of text
+                                  const len = textarea.value.length;
+                                  textarea.setSelectionRange(len, len);
+                                }
+                              }, 10);
                             }}
                             className="group px-3 sm:px-5 py-2 sm:py-3 bg-white/5 hover:bg-violet-600 active:bg-violet-700 border border-white/10 hover:border-violet-500 rounded-xl text-[10px] sm:text-xs font-bold transition-all flex items-center space-x-2 hover:shadow-lg hover:shadow-violet-600/20 touch-manipulation transform active:scale-95"
                           >
