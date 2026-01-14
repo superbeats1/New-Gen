@@ -730,19 +730,45 @@ const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
 
         {results.opportunities && results.opportunities.length > 0 ? (
           <>
+            {/* DEBUG: Visible marker to confirm render path */}
+            <div className="mb-4 p-3 bg-emerald-500/20 border border-emerald-500/50 rounded-xl text-emerald-400 text-sm font-bold">
+              DEBUG: Rendering {results.opportunities.length} opportunities
+            </div>
+
             {/* Mobile: Swipeable Cards */}
-            <div className="lg:hidden animate-in slide-in-from-bottom-4 duration-700">
-              <SwipeableOpportunityCards
-                opportunities={results.opportunities}
-                renderCard={(opp, idx) => <OpportunityCard key={opp.id} opportunity={opp} index={idx} />}
-              />
+            <div className="lg:hidden">
+              {(() => {
+                try {
+                  return (
+                    <SwipeableOpportunityCards
+                      opportunities={results.opportunities}
+                      renderCard={(opp, idx) => {
+                        try {
+                          return <OpportunityCard key={opp.id} opportunity={opp} index={idx} />;
+                        } catch (cardError) {
+                          console.error('❌ OpportunityCard render error:', cardError, opp);
+                          return <div key={opp.id} className="p-4 bg-red-500/20 rounded-xl text-red-400">Card {idx} failed to render</div>;
+                        }
+                      }}
+                    />
+                  );
+                } catch (swipeError) {
+                  console.error('❌ SwipeableOpportunityCards error:', swipeError);
+                  return <div className="p-4 bg-red-500/20 rounded-xl text-red-400">Swipeable cards failed</div>;
+                }
+              })()}
             </div>
 
             {/* Desktop: Vertical List */}
-            <div className="hidden lg:block space-y-6 animate-in slide-in-from-bottom-4 duration-700">
-              {results.opportunities.map((opp, idx) => (
-                <OpportunityCard key={opp.id} opportunity={opp} index={idx} />
-              ))}
+            <div className="hidden lg:block space-y-6">
+              {results.opportunities.map((opp, idx) => {
+                try {
+                  return <OpportunityCard key={opp.id} opportunity={opp} index={idx} />;
+                } catch (cardError) {
+                  console.error('❌ Desktop OpportunityCard render error:', cardError, opp);
+                  return <div key={opp.id} className="p-4 bg-red-500/20 rounded-xl text-red-400">Desktop Card {idx} failed to render</div>;
+                }
+              })}
             </div>
           </>
         ) : (
