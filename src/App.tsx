@@ -479,17 +479,12 @@ const App: React.FC = () => {
 
       const [result] = await Promise.all([resultPromise, animationTimer]);
 
-      console.log(`🔍 App.tsx received result:`, result);
-      console.log(`🔍 App.tsx result.opportunities:`, result.opportunities);
-      console.log(`🔍 App.tsx result.opportunities?.length:`, result.opportunities?.length);
-
       setDiagStats({
         realDataCount: result.totalSourcesAnalyzed || 0,
         lastLog: `Analysis complete. ${result.opportunities?.length || 0} opportunities identified.`
       });
 
       await deductCredit();
-      console.log(`🔍 About to setResults with opportunities count:`, result.opportunities?.length);
       setResults(result);
       setView('results');
     } catch (error: any) {
