@@ -80,15 +80,11 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
       <div className="absolute -inset-0.5 bg-gradient-to-br from-violet-600/20 via-transparent to-indigo-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
 
       <div
-        className="p-8 lg:p-12 cursor-pointer flex items-start justify-between relative z-10"
+        className="p-5 lg:p-12 cursor-pointer flex items-start justify-between relative z-10"
         onClick={(e) => {
-          e.stopPropagation();
-          setIsExpanded(!isExpanded);
-        }}
-        onTouchEnd={(e) => {
-          e.stopPropagation();
-          // Prevent double-triggering on devices that support both touch and click
-          e.preventDefault();
+          // If this was part of a swipe interaction, the parent handles it. 
+          // But here we just want to toggle expand on click.
+          // We remove stopPropagation for touch to let swipe work.
           setIsExpanded(!isExpanded);
         }}
       >
@@ -106,13 +102,12 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
 
           {/* SPEED TO $1K MRR - UNIQUE COMPETITIVE ADVANTAGE */}
           {opportunity.speedToMRR && (
-            <div className={`mb-6 px-6 py-4 rounded-2xl border-2 backdrop-blur-md inline-flex items-center space-x-4 ${
-              opportunity.speedToMRR.velocity === 'Fast'
+            <div className={`mb-6 px-6 py-4 rounded-2xl border-2 backdrop-blur-md inline-flex items-center space-x-4 ${opportunity.speedToMRR.velocity === 'Fast'
                 ? 'bg-emerald-600/10 border-emerald-500/40'
                 : opportunity.speedToMRR.velocity === 'Medium'
-                ? 'bg-amber-600/10 border-amber-500/40'
-                : 'bg-slate-600/10 border-slate-500/40'
-            }`}>
+                  ? 'bg-amber-600/10 border-amber-500/40'
+                  : 'bg-slate-600/10 border-slate-500/40'
+              }`}>
               <div className="flex items-center space-x-2">
                 {opportunity.speedToMRR.velocity === 'Fast' && (
                   <svg className="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
@@ -130,13 +125,12 @@ const OpportunityCard: React.FC<{ opportunity: Opportunity; index: number }> = (
                   </svg>
                 )}
                 <div>
-                  <div className={`text-[10px] font-black uppercase tracking-widest ${
-                    opportunity.speedToMRR.velocity === 'Fast'
+                  <div className={`text-[10px] font-black uppercase tracking-widest ${opportunity.speedToMRR.velocity === 'Fast'
                       ? 'text-emerald-400'
                       : opportunity.speedToMRR.velocity === 'Medium'
-                      ? 'text-amber-400'
-                      : 'text-slate-400'
-                  }`}>
+                        ? 'text-amber-400'
+                        : 'text-slate-400'
+                    }`}>
                     {opportunity.speedToMRR.velocity} Track
                   </div>
                   <div className="text-xl font-black text-white tracking-tight">
@@ -579,19 +573,19 @@ const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
             </div>
           </div>
         </div>
-        <div className="flex items-center space-x-3 w-full lg:w-auto">
-          <div ref={exportMenuRef} className="relative flex-1 lg:flex-none">
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+          <div ref={exportMenuRef} className="relative w-full sm:w-auto flex-1 lg:flex-none">
             <button
               onClick={() => setShowExportMenu(!showExportMenu)}
-              className="w-full flex items-center justify-center space-x-3 bg-white/5 hover:bg-white/10 px-8 py-5 rounded-[1.5rem] text-slate-400 transition-all text-[10px] font-black uppercase tracking-widest border border-white/5 group"
+              className="w-full flex items-center justify-center space-x-3 bg-white/5 hover:bg-white/10 px-6 py-4 lg:px-8 lg:py-5 rounded-[1rem] lg:rounded-[1.5rem] text-slate-400 transition-all text-[10px] font-black uppercase tracking-widest border border-white/5 group"
             >
               <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
               <span>Export Intelligence</span>
               <ChevronDown className={`w-3 h-3 transition-transform ${showExportMenu ? 'rotate-180' : ''}`} />
             </button>
-
+            {/* Export menu content omitted for brevity as it is inside the conditional */}
             {showExportMenu && (
-              <div className="absolute top-full right-0 mt-2 w-64 bg-[#0A0A0C] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 animate-in slide-in-from-top-2 duration-200">
+              <div className="absolute top-full right-0 mt-2 w-full sm:w-64 bg-[#0A0A0C] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 animate-in slide-in-from-top-2 duration-200">
                 <div className="p-2 space-y-1">
                   <button
                     onClick={() => handleExport('csv')}
@@ -637,7 +631,7 @@ const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
           </div>
           <button
             onClick={onNewSearch}
-            className="flex-1 lg:flex-none flex items-center justify-center space-x-3 bg-violet-600 hover:bg-violet-500 px-10 py-5 rounded-[1.5rem] text-white transition-all text-[10px] font-black uppercase tracking-widest shadow-2xl shadow-violet-600/30 group"
+            className="w-full sm:w-auto flex-1 lg:flex-none flex items-center justify-center space-x-3 bg-violet-600 hover:bg-violet-500 px-6 py-4 lg:px-10 lg:py-5 rounded-[1rem] lg:rounded-[1.5rem] text-white transition-all text-[10px] font-black uppercase tracking-widest shadow-2xl shadow-violet-600/30 group"
           >
             <Target className="w-4 h-4 group-hover:scale-110 transition-transform" />
             <span>New Neuro-Scan</span>
@@ -673,26 +667,28 @@ const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="p-8 bg-[#050608]/40 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 group hover:border-violet-500/30 transition-all relative overflow-hidden">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+        <div className="p-5 md:p-8 bg-[#050608]/40 backdrop-blur-2xl rounded-[1.5rem] md:rounded-[2.5rem] border border-white/10 group hover:border-violet-500/30 transition-all relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-violet-600/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-          <span className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4 block">Intelligence Index</span>
-          <div className="text-6xl font-black text-white mb-4 italic tracking-tighter">48.2</div>
-          <div className="text-[10px] text-emerald-400 font-black uppercase tracking-widest flex items-center bg-emerald-400/10 w-fit px-3 py-1.5 rounded-full border border-emerald-500/20">
-            <TrendingUp className="w-3 h-3 mr-2" /> High Efficiency
+          <span className="text-slate-500 text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] mb-2 md:mb-4 block">Intelligence Index</span>
+          <div className="text-3xl md:text-6xl font-black text-white mb-2 md:mb-4 italic tracking-tighter">48.2</div>
+          <div className="text-[8px] md:text-[10px] text-emerald-400 font-black uppercase tracking-widest flex items-center bg-emerald-400/10 w-fit px-2 md:px-3 py-1 md:py-1.5 rounded-full border border-emerald-500/20">
+            <TrendingUp className="w-3 h-3 mr-1 md:mr-2" /> <span className="hidden md:inline">High Efficiency</span><span className="md:hidden">High Eff.</span>
           </div>
         </div>
 
-        <div className="p-8 bg-[#050608]/40 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 group hover:border-violet-500/30 transition-all flex flex-col items-center justify-center">
-          <SentimentGauge value={results.opportunities?.[0]?.marketSentiment || 72} label="Market Intensity" />
+        <div className="p-5 md:p-8 bg-[#050608]/40 backdrop-blur-2xl rounded-[1.5rem] md:rounded-[2.5rem] border border-white/10 group hover:border-violet-500/30 transition-all flex flex-col items-center justify-center">
+          <div className="scale-75 md:scale-100 origin-center -my-2 md:my-0">
+            <SentimentGauge value={results.opportunities?.[0]?.marketSentiment || 72} label="Market Intensity" />
+          </div>
         </div>
 
-        <div className="p-8 bg-[#050608]/40 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 group hover:border-violet-500/30 transition-all">
-          <span className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4 block">Growth Velocity</span>
-          <div className="text-5xl font-black text-white mb-4 italic tracking-tighter">
+        <div className="p-5 md:p-8 bg-[#050608]/40 backdrop-blur-2xl rounded-[1.5rem] md:rounded-[2.5rem] border border-white/10 group hover:border-violet-500/30 transition-all">
+          <span className="text-slate-500 text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] mb-2 md:mb-4 block">Growth Velocity</span>
+          <div className="text-3xl md:text-5xl font-black text-white mb-2 md:mb-4 italic tracking-tighter">
             {results.opportunities?.[0]?.growthVelocity || 84}%
           </div>
-          <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+          <div className="h-1.5 md:h-2 w-full bg-slate-800 rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-violet-600 to-indigo-600 shadow-[0_0_15px_rgba(139,92,246,0.5)] transition-all duration-1000"
               style={{ width: `${results.opportunities?.[0]?.growthVelocity || 84}%` }}
@@ -700,11 +696,11 @@ const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
           </div>
         </div>
 
-        <div className="p-8 bg-[#050608]/40 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 group hover:border-violet-500/30 transition-all relative overflow-hidden">
+        <div className="p-5 md:p-8 bg-[#050608]/40 backdrop-blur-2xl rounded-[1.5rem] md:rounded-[2.5rem] border border-white/10 group hover:border-violet-500/30 transition-all relative overflow-hidden">
           <div className="absolute bottom-0 right-0 w-32 h-32 bg-indigo-600/10 rounded-full blur-3xl translate-y-1/2 translate-x-1/2"></div>
-          <span className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4 block">Protocol State</span>
-          <div className="text-4xl font-black text-white mb-4 italic tracking-tighter uppercase italic">Optimized</div>
-          <div className="text-[10px] text-violet-400 font-black uppercase tracking-widest bg-violet-400/10 w-fit px-3 py-1.5 rounded-full border border-violet-500/20">
+          <span className="text-slate-500 text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] mb-2 md:mb-4 block">Protocol State</span>
+          <div className="text-2xl md:text-4xl font-black text-white mb-2 md:mb-4 italic tracking-tighter uppercase italic">Optimized</div>
+          <div className="text-[8px] md:text-[10px] text-violet-400 font-black uppercase tracking-widest bg-violet-400/10 w-fit px-2 md:px-3 py-1 md:py-1.5 rounded-full border border-violet-500/20">
             {results.opportunities?.[0]?.marketMaturity || 'Emerging'} Stage
           </div>
         </div>

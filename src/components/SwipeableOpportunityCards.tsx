@@ -81,38 +81,60 @@ export const SwipeableOpportunityCards: React.FC<Props> = ({ opportunities, rend
     setCurrentIndex(index);
   };
 
+  // Hide hint after interaction
+  const [hasInteracted, setHasInteracted] = useState(false);
+
+  useEffect(() => {
+    if (currentIndex > 0) setHasInteracted(true);
+  }, [currentIndex]);
+
+  const handleInteraction = () => {
+    if (!hasInteracted) setHasInteracted(true);
+  };
+
+  const internalHandleTouchStart = (e: React.TouchEvent) => {
+    handleInteraction();
+    handleTouchStart(e);
+  };
+
   return (
-    <div className="relative">
-      {/* Swipe Hint (shows prominently above cards) */}
-      {opportunities.length > 1 && (
-        <div className="lg:hidden mb-8 text-center animate-in fade-in slide-in-from-top-2 duration-500 delay-300">
-          <div className="inline-flex items-center space-x-3 px-6 py-3 rounded-full bg-violet-600/20 border border-violet-500/30 shadow-lg shadow-violet-500/10">
-            <ChevronLeft className="w-4 h-4 text-violet-300 animate-pulse" />
-            <span className="text-sm font-black text-violet-200 uppercase tracking-widest">
-              Swipe to explore more opportunities
-            </span>
-            <ChevronRight className="w-4 h-4 text-violet-300 animate-pulse" />
+    <div className="relative group">
+      {/* Swipe Hint (shows prominently above cards, fades out after interaction) */}
+      {opportunities.length > 1 && !hasInteracted && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none animate-in fade-in zoom-in duration-500">
+          <div className="flex flex-col items-center justify-center bg-black/60 backdrop-blur-md border border-white/10 px-6 py-4 rounded-3xl shadow-2xl">
+            <div className="flex items-center space-x-4 mb-2">
+              <ChevronLeft className="w-5 h-5 text-violet-400 animate-pulse" />
+              <div className="w-12 h-12 rounded-full bg-violet-500/20 flex items-center justify-center relative">
+                <div className="absolute inset-0 rounded-full border border-violet-500/50 animate-ping"></div>
+                <div className="w-2 h-2 rounded-full bg-violet-400"></div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-violet-400 animate-pulse" />
+            </div>
+            <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Swipe to Explore</span>
           </div>
         </div>
       )}
 
       {/* Progress Indicators */}
-      <div className="flex items-center justify-between mb-6 px-2">
+      <div className="flex items-center justify-between mb-4 px-2">
         <div className="flex items-center space-x-2">
-          <span className="text-xs font-black text-slate-500 uppercase tracking-widest">
-            Signal {currentIndex + 1} of {opportunities.length}
+          <span className="text-[10px] font-black text-violet-400 uppercase tracking-widest bg-violet-500/10 px-3 py-1 rounded-full border border-violet-500/20">
+            Signal {currentIndex + 1} / {opportunities.length}
           </span>
         </div>
         <div className="flex items-center space-x-1.5">
           {opportunities.map((_, index) => (
             <button
               key={index}
-              onClick={() => goToCard(index)}
-              className={`h-1.5 rounded-full transition-all ${
-                index === currentIndex
-                  ? 'w-8 bg-violet-500'
-                  : 'w-1.5 bg-slate-700 hover:bg-slate-600'
-              }`}
+              onClick={() => {
+                handleInteraction();
+                goToCard(index);
+              }}
+              className={`h-1.5 rounded-full transition-all duration-300 ${index === currentIndex
+                  ? 'w-8 bg-violet-500 shadow-[0_0_10px_rgba(139,92,246,0.5)]'
+                  : 'w-1.5 bg-white/10 hover:bg-white/20'
+                }`}
               aria-label={`Go to opportunity ${index + 1}`}
             />
           ))}
@@ -123,7 +145,7 @@ export const SwipeableOpportunityCards: React.FC<Props> = ({ opportunities, rend
       <div
         ref={containerRef}
         className="relative overflow-hidden touch-pan-y"
-        onTouchStart={handleTouchStart}
+        onTouchStart={internalHandleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
@@ -133,49 +155,75 @@ export const SwipeableOpportunityCards: React.FC<Props> = ({ opportunities, rend
             transform: isDragging
               ? `translateX(calc(-${currentIndex * 100}% + ${dragOffset}px))`
               : `translateX(-${currentIndex * 100}%)`,
-            transitionDuration: isDragging ? '0ms' : '300ms',
-            transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+            transitionDuration: isDragging ? '0ms' : '500ms',
+            transitionTimingFunction: 'cubic-bezier(0.2, 0.8, 0.2, 1)', // Smooth spring-like ease
           }}
         >
           {opportunities.map((opportunity, index) => (
             <div
               key={opportunity.id}
-              className="w-full flex-shrink-0"
+              className="w-full flex-shrink-0 px-1" // Added slight px to separate cards visually during swipe if peeking (though full width mainly)
               style={{ minWidth: '100%' }}
             >
-              {renderCard(opportunity, index)}
+              <div className={`transition-all duration-500 ${index === currentIndex ? 'scale-100 opacity-100 blur-0' : 'scale-[0.98] opacity-50 blur-sm'}`}>
+                {renderCard(opportunity, index)}
+              </div>
             </div>
           ))}
         </div>
 
         {/* Drag Indicator */}
         {isDragging && Math.abs(dragOffset) > 20 && (
-          <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+          <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-30">
             <div
-              className={`w-16 h-16 rounded-full backdrop-blur-xl flex items-center justify-center border-2 transition-all ${
-                dragOffset > 0
-                  ? 'bg-violet-600/20 border-violet-500/50'
-                  : 'bg-indigo-600/20 border-indigo-500/50'
-              }`}
+              className={`w-20 h-20 rounded-full backdrop-blur-xl flex items-center justify-center border-2 transition-all shadow-2xl ${dragOffset > 0
+                  ? 'bg-violet-600/20 border-violet-500/50 scale-110'
+                  : 'bg-indigo-600/20 border-indigo-500/50 scale-110'
+                }`}
             >
               {dragOffset > 0 ? (
-                <ChevronLeft className="w-8 h-8 text-white" />
+                <ChevronLeft className="w-10 h-10 text-white" />
               ) : (
-                <ChevronRight className="w-8 h-8 text-white" />
+                <ChevronRight className="w-10 h-10 text-white" />
               )}
             </div>
           </div>
         )}
       </div>
 
+      {/* Mobile Navigation Buttons */}
+      {opportunities.length > 1 && (
+        <div className="lg:hidden flex items-center justify-center space-x-4 mt-6">
+          <button
+            onClick={() => { handleInteraction(); goToPrevious(); }}
+            disabled={currentIndex === 0}
+            className="w-12 h-12 rounded-full bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-white/10 active:scale-95 flex items-center justify-center hover:bg-white/10 hover:border-violet-500/30"
+          >
+            <ChevronLeft className="w-5 h-5 text-white" />
+          </button>
+
+          <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+            Scan {currentIndex + 1} / {opportunities.length}
+          </span>
+
+          <button
+            onClick={() => { handleInteraction(); goToNext(); }}
+            disabled={currentIndex === opportunities.length - 1}
+            className="w-12 h-12 rounded-full bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-white/10 active:scale-95 flex items-center justify-center hover:bg-white/10 hover:border-violet-500/30"
+          >
+            <ChevronRight className="w-5 h-5 text-white" />
+          </button>
+        </div>
+      )}
+
       {/* Desktop Navigation Buttons (hidden on mobile) */}
       <div className="hidden lg:flex items-center justify-center space-x-4 mt-6">
         <button
           onClick={goToPrevious}
           disabled={currentIndex === 0}
-          className="p-3 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-white/10 hover:border-violet-500/30"
+          className="p-3 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-white/10 hover:border-violet-500/30 group"
         >
-          <ChevronLeft className="w-5 h-5 text-white" />
+          <ChevronLeft className="w-5 h-5 text-white group-hover:-translate-x-0.5 transition-transform" />
         </button>
         <span className="text-sm font-bold text-slate-400">
           {currentIndex + 1} / {opportunities.length}
@@ -183,9 +231,9 @@ export const SwipeableOpportunityCards: React.FC<Props> = ({ opportunities, rend
         <button
           onClick={goToNext}
           disabled={currentIndex === opportunities.length - 1}
-          className="p-3 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-white/10 hover:border-violet-500/30"
+          className="p-3 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-white/10 hover:border-violet-500/30 group"
         >
-          <ChevronRight className="w-5 h-5 text-white" />
+          <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-0.5 transition-transform" />
         </button>
       </div>
     </div>
