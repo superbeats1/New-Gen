@@ -729,48 +729,36 @@ const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
         </div>
 
         {results.opportunities && results.opportunities.length > 0 ? (
-          <>
-            {/* DEBUG: Visible marker to confirm render path */}
-            <div className="mb-4 p-3 bg-emerald-500/20 border border-emerald-500/50 rounded-xl text-emerald-400 text-sm font-bold">
-              DEBUG: Rendering {results.opportunities.length} opportunities
+          <div className="space-y-6">
+            {/* SIMPLE DEBUG TEST - Just plain divs */}
+            <div style={{ padding: '20px', backgroundColor: '#22c55e', color: 'white', borderRadius: '12px', fontWeight: 'bold' }}>
+              SUCCESS! Rendering {results.opportunities.length} opportunities
             </div>
 
-            {/* Mobile: Swipeable Cards */}
-            <div className="lg:hidden">
-              {(() => {
-                try {
-                  return (
-                    <SwipeableOpportunityCards
-                      opportunities={results.opportunities}
-                      renderCard={(opp, idx) => {
-                        try {
-                          return <OpportunityCard key={opp.id} opportunity={opp} index={idx} />;
-                        } catch (cardError) {
-                          console.error('❌ OpportunityCard render error:', cardError, opp);
-                          return <div key={opp.id} className="p-4 bg-red-500/20 rounded-xl text-red-400">Card {idx} failed to render</div>;
-                        }
-                      }}
-                    />
-                  );
-                } catch (swipeError) {
-                  console.error('❌ SwipeableOpportunityCards error:', swipeError);
-                  return <div className="p-4 bg-red-500/20 rounded-xl text-red-400">Swipeable cards failed</div>;
-                }
-              })()}
-            </div>
-
-            {/* Desktop: Vertical List */}
-            <div className="hidden lg:block space-y-6">
-              {results.opportunities.map((opp, idx) => {
-                try {
-                  return <OpportunityCard key={opp.id} opportunity={opp} index={idx} />;
-                } catch (cardError) {
-                  console.error('❌ Desktop OpportunityCard render error:', cardError, opp);
-                  return <div key={opp.id} className="p-4 bg-red-500/20 rounded-xl text-red-400">Desktop Card {idx} failed to render</div>;
-                }
-              })}
-            </div>
-          </>
+            {/* Simple list without any animation or complex components */}
+            {results.opportunities.map((opp, idx) => (
+              <div
+                key={opp.id || idx}
+                style={{
+                  padding: '24px',
+                  backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                  border: '1px solid rgba(139, 92, 246, 0.3)',
+                  borderRadius: '16px',
+                  color: 'white'
+                }}
+              >
+                <div style={{ fontSize: '12px', color: '#a78bfa', marginBottom: '8px' }}>
+                  Opportunity {idx + 1}
+                </div>
+                <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px' }}>
+                  {opp.problemStatement || 'No problem statement'}
+                </div>
+                <div style={{ fontSize: '14px', color: '#94a3b8' }}>
+                  Score: {opp.overallScore}/10 | Confidence: {opp.confidenceLevel}/10
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
           <div className="glass-panel p-12 rounded-3xl border border-white/10 text-center">
             <AlertTriangle className="w-16 h-16 text-amber-500/50 mx-auto mb-4" />

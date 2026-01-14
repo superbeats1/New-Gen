@@ -901,7 +901,7 @@ const App: React.FC = () => {
                 )}
 
                 {view === 'results' && results && !isSearching && (
-                  <div className="w-full max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-hidden">
+                  <div className="w-full max-w-7xl mx-auto">
                     <OpportunityView
                       results={results}
                       onNewSearch={() => { setView('home'); setResults(null); setQuery(''); }}
