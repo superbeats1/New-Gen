@@ -1,122 +1,45 @@
-# Stripe Webhook Setup Guide
+# 🔴 CRITICAL FIX: Stripe Pro Upgrade Setup
 
-## 🎯 Goal
-Automatically upgrade users to Pro status in Supabase when they complete payment through Stripe.
+## Problem
+Users who pay for Pro via Stripe are not being upgraded in Supabase database. The `is_pro` field remains `false`.
 
-## 📋 Prerequisites
-- Supabase project with CLI installed
-- Stripe account with webhook access
-- Environment variables ready
+## Root Cause
+The Stripe webhook exists but is not deployed or configured in Stripe dashboard, so payment events never reach your backend to update the database.
 
-## 🚀 Step 1: Deploy Supabase Edge Function
+---
 
-### 1.1 Install Supabase CLI (if not already installed)
+## Solution: 5-Step Setup
+
+### Step 1: Deploy Webhook to Supabase
 ```bash
-npm install -g supabase
-```
+cd "/Users/superbeatsm2/Documents/New Gen (project)/New-Gen"
 
-### 1.2 Login to Supabase
-```bash
-supabase login
-```
-
-### 1.3 Link to your project
-```bash
-supabase link --project-ref YOUR_PROJECT_ID
-```
-
-### 1.4 Deploy the webhook function
-```bash
+# Deploy the webhook function
 supabase functions deploy stripe-webhook
+
+# Verify deployment
+supabase functions list
 ```
 
-### 1.5 Set environment variables
+### Step 2: Configure in Stripe Dashboard
+1. Go to: https://dashboard.stripe.com/test/webhooks
+2. Click "Add endpoint"  
+3. Enter webhook URL: `https://[your-project].supabase.co/functions/v1/stripe-webhook`
+4. Select events: `checkout.session.completed`, `invoice.payment_succeeded`
+5. Copy the signing secret (starts with `whsec_...`)
+
+### Step 3: Add Secret to Supabase
 ```bash
-# Set your Stripe webhook secret (get this from Stripe Dashboard)
-supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here
-
-# Set your Supabase URL and Service Role Key
-supabase secrets set SUPABASE_URL=https://your-project.supabase.co
-supabase secrets set SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
+supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxx
 ```
 
-## ⚡ Step 2: Configure Stripe Webhook
+### Step 4: Test
+1. Click "Upgrade to Pro" in app
+2. Use test card: 4242 4242 4242 4242
+3. Complete payment
+4. Check database: is_pro should = true
 
-### 2.1 Get your webhook URL
-After deploying, your webhook URL will be:
-```
-https://your-project.supabase.co/functions/v1/stripe-webhook
-```
+---
 
-### 2.2 In Stripe Dashboard
-1. Go to **Developers** → **Webhooks**
-2. Click **"Add endpoint"**
-3. **Endpoint URL**: `https://your-project.supabase.co/functions/v1/stripe-webhook`
-4. **Listen to**: Select these events:
-   - `checkout.session.completed`
-   - `invoice.payment_succeeded`
-   - `customer.subscription.deleted` (optional - for cancellations)
-
-### 2.3 Get webhook secret
-1. Click on your newly created webhook
-2. Copy the **Signing secret** (starts with `whsec_`)
-3. Update your Supabase secrets:
-```bash
-supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_your_actual_secret_here
-```
-
-## 🔧 Step 3: Test the Integration
-
-### 3.1 Test payment flow
-1. Use a test card: `4242 4242 4242 4242`
-2. Complete payment through your app
-3. Check Supabase logs:
-```bash
-supabase functions logs stripe-webhook
-```
-
-### 3.2 Verify user upgrade
-1. Check your profiles table in Supabase
-2. User should have `is_pro = true` after payment
-
-## 📊 Step 4: Monitor & Debug
-
-### View function logs
-```bash
-supabase functions logs stripe-webhook --follow
-```
-
-### Check webhook deliveries in Stripe
-- Go to Stripe Dashboard → Webhooks → Your endpoint
-- View recent deliveries and any failures
-
-## 🛡️ Security Notes
-
-- ✅ Webhook signature verification is included
-- ✅ CORS headers configured
-- ✅ Error handling and logging
-- ✅ Service role key for admin operations
-
-## 🎯 What Happens After Setup
-
-1. **User clicks "Upgrade to Pro"** → Opens Stripe checkout
-2. **User completes payment** → Stripe sends webhook to Supabase
-3. **Webhook processes payment** → Finds user by email
-4. **User upgraded** → `is_pro = true` in profiles table
-5. **User returns to app** → Sees Pro status and unlimited credits
-
-## 🚨 Troubleshooting
-
-**Webhook not firing?**
-- Check webhook URL is correct
-- Verify events are selected in Stripe
-- Check Supabase function logs
-
-**User not upgrading?**
-- Verify email matches between Stripe and Supabase
-- Check function environment variables
-- Review webhook payload in Stripe dashboard
-
-**Need help?**
-- Check Supabase function logs: `supabase functions logs stripe-webhook`
-- Test webhook manually in Stripe dashboard
+## Quick Manual Fix (Testing Only)
+Click "(Admin: Upgrade)" button in the sidebar to manually set Pro status.

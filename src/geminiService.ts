@@ -66,6 +66,8 @@ export const analyzeQuery = async (query: string): Promise<AnalysisResult> => {
 
     const opportunitiesCount = analysisResponse.opportunities?.length || 0;
     console.log(`✅ Analysis complete: ${detectedMode} mode with ${opportunitiesCount} results`);
+    console.log(`📦 Result object opportunities:`, result.opportunities);
+    console.log(`📦 Result object opportunities length:`, result.opportunities?.length);
     return result;
 
   } catch (error: any) {
@@ -491,6 +493,10 @@ IMPORTANT: If there's NO clear competitor or insufficient data, SET competitorAn
 
     try {
       const parsed = JSON.parse(text);
+      console.log(`📊 Parsed JSON successfully`);
+      console.log(`📊 parsed.opportunities:`, parsed.opportunities);
+      console.log(`📊 parsed.opportunities is Array:`, Array.isArray(parsed.opportunities));
+      console.log(`📊 parsed.opportunities length:`, parsed.opportunities?.length);
 
       // Validate and clean opportunities data
       const validatedOpportunities = Array.isArray(parsed.opportunities)
@@ -510,6 +516,9 @@ IMPORTANT: If there's NO clear competitor or insufficient data, SET competitorAn
             : []
         }))
         : [];
+
+      console.log(`📊 validatedOpportunities:`, validatedOpportunities);
+      console.log(`📊 validatedOpportunities length:`, validatedOpportunities.length);
 
       return {
         totalSourcesAnalyzed: parsed.totalSourcesAnalyzed || realData.length,

@@ -506,6 +506,12 @@ const OpportunityView: React.FC<Props> = ({ results, onNewSearch }) => {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const exportMenuRef = useRef<HTMLDivElement>(null);
 
+  // Debug logging to trace data flow
+  console.log(`🎯 OpportunityView received results:`, results);
+  console.log(`🎯 OpportunityView results.opportunities:`, results.opportunities);
+  console.log(`🎯 OpportunityView results.opportunities?.length:`, results.opportunities?.length);
+  console.log(`🎯 OpportunityView will render opportunities:`, results.opportunities && results.opportunities.length > 0);
+
   // Close export menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
