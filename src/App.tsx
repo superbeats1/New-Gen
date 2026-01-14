@@ -988,75 +988,109 @@ const App: React.FC = () => {
         {/* Mobile Profile Modal - inline to prevent re-mounting */}
         {showMobileProfile && (
           <div className="lg:hidden fixed inset-0 z-[100] flex items-end justify-center bg-black/80 backdrop-blur-md animate-in fade-in duration-300" onClick={() => setShowMobileProfile(false)}>
-            <div className="w-full bg-[#0A0A0C]/95 backdrop-blur-2xl border-t border-white/10 rounded-t-3xl p-6 pb-safe animate-in slide-in-from-bottom-4 duration-300" onClick={(e) => e.stopPropagation()}>
+            <div className="w-full bg-[#050608]/95 backdrop-blur-3xl border-t border-white/10 rounded-t-[2.5rem] p-6 pb-8 md:pb-10 shadow-2xl animate-in slide-in-from-bottom-4 duration-300" onClick={(e) => e.stopPropagation()}>
+
+              {/* Handle Bar */}
+              <div className="w-full flex justify-center mb-6">
+                <div className="w-12 h-1.5 bg-white/10 rounded-full"></div>
+              </div>
+
               {/* Header */}
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-black uppercase tracking-tight text-white">Account</h3>
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-xl font-black uppercase tracking-tight text-white italic">Account</h3>
                 <button
                   onClick={() => setShowMobileProfile(false)}
-                  className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-500 hover:text-white rounded-xl hover:bg-white/5 transition-colors"
+                  className="p-3 bg-white/5 hover:bg-white/10 rounded-full text-slate-400 hover:text-white transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Profile Info */}
+              {/* Profile Card */}
               {profile && (
-                <div className="glass-panel p-4 rounded-2xl mb-6">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-white font-bold text-lg">
-                      {profile.first_name?.[0]}{profile.last_name?.[0]}
+                <div className="relative group mb-8">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-violet-600 via-indigo-600 to-violet-600 rounded-[2rem] opacity-75 blur-sm group-hover:opacity-100 transition duration-1000"></div>
+                  <div className="relative bg-[#0A0A0C] rounded-[2rem] p-6 border border-white/5 flex items-center space-x-5">
+                    <div className="relative">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-xl font-black text-white border-2 border-[#0A0A0C] shadow-lg shadow-violet-500/20">
+                        {profile.first_name?.[0]}{profile.last_name?.[0]}
+                      </div>
+                      {profile.is_pro && (
+                        <div className="absolute -bottom-1 -right-1 bg-[#0A0A0C] rounded-full p-1">
+                          <div className="bg-amber-400 rounded-full p-1">
+                            <Crown className="w-3 h-3 text-black fill-black" />
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex-1">
-                      <div className="text-white font-bold">{profile.first_name} {profile.last_name}</div>
-                      <div className="text-slate-500 text-sm">{session?.user?.email}</div>
-                    </div>
-                  </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-lg font-bold text-white mb-1 truncate">{profile.first_name} {profile.last_name}</div>
+                      <div className="text-slate-500 text-xs font-medium mb-3 truncate">{session?.user?.email}</div>
 
-                  {/* Credits/Pro Status */}
-                  <div className="flex items-center justify-between pt-3 border-t border-white/5">
-                    <span className="text-xs font-medium text-slate-400">Status</span>
-                    {profile.is_pro ? (
-                      <span className="flex items-center text-xs font-bold text-amber-300 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
-                        <Crown className="w-3 h-3 mr-1" />
-                        PRO
-                      </span>
-                    ) : (
-                      <span className="text-xs font-bold text-white">{profile.credits} credits left</span>
-                    )}
+                      <div className="flex items-center">
+                        {profile.is_pro ? (
+                          <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-400/10 to-orange-400/10 border border-amber-400/20">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                            <span className="text-[10px] font-black text-amber-300 uppercase tracking-widest">Pro Status</span>
+                          </div>
+                        ) : (
+                          <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-slate-800 border border-white/5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div>
+                            <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">{profile.credits} Credits Left</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
 
               {/* Actions */}
-              <div className="space-y-2 mb-6">
+              <div className="space-y-3 mb-8">
                 {!profile?.is_pro && (
                   <button
                     onClick={() => { setShowMobileProfile(false); handleUpgradeClick(); }}
-                    className="w-full flex items-center space-x-3 px-4 py-4 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold transition-all shadow-lg shadow-violet-600/20 min-h-[56px]"
+                    className="w-full group flex items-center justify-between px-6 py-5 rounded-[1.5rem] bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-xl shadow-violet-600/20 active:scale-[0.98] transition-all"
                   >
-                    <Sparkles className="w-5 h-5" />
-                    <span>Upgrade to Pro</span>
+                    <div className="flex items-center space-x-4">
+                      <div className="p-2 bg-white/10 rounded-xl">
+                        <Sparkles className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="text-left">
+                        <div className="font-bold text-sm">Upgrade to Pro</div>
+                        <div className="text-[10px] text-white/70 font-medium">Unlock full potential</div>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-white/50 group-hover:translate-x-1 transition-transform" />
                   </button>
                 )}
 
                 <button
                   onClick={() => { setShowMobileProfile(false); setShowLanding(true); }}
-                  className="w-full flex items-center space-x-3 px-4 py-4 rounded-2xl hover:bg-white/5 text-slate-400 hover:text-white transition-all min-h-[56px]"
+                  className="w-full group flex items-center justify-between px-6 py-5 rounded-[1.5rem] bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] active:scale-[0.98] transition-all"
                 >
-                  <Rocket className="w-5 h-5" />
-                  <span>View Landing Page</span>
+                  <div className="flex items-center space-x-4">
+                    <div className="p-2 bg-slate-800/50 rounded-xl text-slate-400 group-hover:text-white transition-colors">
+                      <Rocket className="w-5 h-5" />
+                    </div>
+                    <span className="font-bold text-sm text-slate-300 group-hover:text-white">View Landing Page</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-white transition-colors" />
                 </button>
               </div>
 
               {/* Sign Out */}
               <button
                 onClick={() => { setShowMobileProfile(false); handleSignOut(); }}
-                className="w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-xl text-rose-400 hover:bg-rose-500/10 transition-all border border-rose-500/20 min-h-[56px]"
+                className="w-full flex items-center justify-center space-x-3 px-6 py-5 rounded-[1.5rem] bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/10 hover:border-rose-500/20 active:scale-[0.98] transition-all group"
               >
-                <LogOut className="w-4 h-4" />
-                <span className="font-bold">Sign Out</span>
+                <LogOut className="w-5 h-5 text-rose-500 group-hover:scale-110 transition-transform" />
+                <span className="font-black text-rose-500 text-xs uppercase tracking-widest">Sign Out Securely</span>
               </button>
+
+              <div className="mt-6 text-center">
+                <span className="text-[9px] font-bold text-slate-600 uppercase tracking-[0.2em]">Scopa Intelligence v2.6.1</span>
+              </div>
             </div>
           </div>
         )}
