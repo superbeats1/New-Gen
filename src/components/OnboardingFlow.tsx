@@ -173,10 +173,11 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
       return {
         position: 'fixed' as const,
         top: '50%',
-        left: '16px',
-        right: '16px',
-        transform: 'translateY(-50%)',
-        maxWidth: 'none'
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 'calc(100% - 32px)',
+        maxWidth: '400px',
+        margin: '0 auto'
       };
     }
 
@@ -288,7 +289,7 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
       {/* Backdrop with spotlight effect */}
       <div className="fixed inset-0 z-[200]">
         {/* Dark overlay */}
-        <div className="absolute inset-0 bg-black/90 backdrop-blur-sm animate-in fade-in duration-300" />
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-md animate-in fade-in duration-500" />
 
         {/* Spotlight on highlighted element - Desktop only (mobile elements covered by modal) */}
         {highlightedElement && !isMobile && (
@@ -303,95 +304,79 @@ export const OnboardingFlow: React.FC<Props> = ({ isOpen, onComplete, onSkip }) 
           className="z-[202] w-full max-w-lg"
           style={getModalPosition()}
         >
-          <div className="glass-panel rounded-2xl sm:rounded-3xl p-5 sm:p-6 md:p-8 border border-white/10 shadow-2xl animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-300 relative overflow-visible flex flex-col" style={{ maxHeight: window.innerWidth < 768 ? '80vh' : '90vh' }}>
-            {/* Decorative gradient */}
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-violet-600/20 blur-[100px] rounded-full" />
-            <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-indigo-600/20 blur-[100px] rounded-full" />
+          <div className="relative group">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-violet-600 via-indigo-600 to-violet-600 rounded-[2rem] opacity-75 blur-sm group-hover:opacity-100 transition duration-1000"></div>
+            <div className="relative bg-[#0A0A0C] rounded-[2rem] p-6 sm:p-8 border border-white/10 shadow-2xl animate-in fade-in zoom-in-95 duration-300 flex flex-col overflow-hidden" style={{ maxHeight: window.innerWidth < 768 ? '80vh' : 'auto' }}>
 
-            {/* Skip button */}
-            <button
-              onClick={onSkip}
-              className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-500 hover:text-white transition-colors rounded-xl hover:bg-white/5 z-20 touch-manipulation flex-shrink-0"
-            >
-              <X className="w-5 h-5" />
-            </button>
+              {/* Skip button */}
+              <button
+                onClick={onSkip}
+                className="absolute top-4 right-4 p-2 text-slate-500 hover:text-white transition-colors rounded-full hover:bg-white/10 z-20 touch-manipulation"
+              >
+                <X className="w-5 h-5" />
+              </button>
 
-            {/* Scrollable Content */}
-            <div className="relative z-10 flex-1 min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-violet-500/20 scrollbar-track-transparent flex-shrink-1">
-              {/* Icon */}
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-violet-600/20 to-indigo-600/20 border border-violet-500/30 flex items-center justify-center mb-3 sm:mb-4 flex-shrink-0">
-                <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-violet-400" />
-              </div>
+              {/* Scrollable Content */}
+              <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide py-2">
+                {/* Header Section */}
+                <div className={`flex flex-col mb-4 ${step.position === 'center' ? 'items-center text-center' : 'items-start'}`}>
+                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center mb-5 shadow-lg shadow-violet-600/30 ${step.position === 'center' ? 'mx-auto' : ''}`}>
+                    <Icon className="w-7 h-7 text-white" />
+                  </div>
 
-              {/* Title */}
-              <h2 className="text-base sm:text-lg md:text-xl font-black text-white mb-2 tracking-tight pr-8">
-                {step.title}
-              </h2>
+                  <h2 className="text-xl sm:text-2xl font-black text-white mb-3 tracking-tight">
+                    {step.title}
+                  </h2>
 
-              {/* Description */}
-              <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-4">
-                {step.description}
-              </p>
-
-              {/* Progress dots */}
-              <div className="flex items-center justify-center space-x-2 py-2">
-                {ONBOARDING_STEPS.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentStep(index)}
-                    className={`h-1.5 rounded-full transition-all touch-manipulation ${
-                      index === currentStep
-                        ? 'w-6 bg-violet-500'
-                        : index < currentStep
-                        ? 'w-1.5 bg-emerald-500'
-                        : 'w-1.5 bg-slate-700'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Fixed Navigation Footer */}
-            <div className="relative z-10 pt-4 border-t border-white/5 mt-3 flex-shrink-0">
-              {/* Navigation */}
-              <div className="flex items-center justify-between gap-2 mb-2">
-                <button
-                  onClick={handlePrevious}
-                  disabled={isFirstStep}
-                  className="flex items-center justify-center space-x-1 px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed min-h-[44px] min-w-[60px] touch-manipulation active:scale-95"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  <span className="font-semibold text-xs">Back</span>
-                </button>
-
-                <div className="text-[10px] font-bold text-slate-600 uppercase tracking-wider flex-shrink-0">
-                  {currentStep + 1} / {ONBOARDING_STEPS.length}
+                  <p className="text-slate-400 text-sm sm:text-base leading-relaxed max-w-md">
+                    {step.description}
+                  </p>
                 </div>
 
-                <button
-                  onClick={handleNext}
-                  className="flex items-center justify-center space-x-1.5 px-4 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 active:bg-violet-700 text-white font-bold transition-all shadow-lg shadow-violet-600/20 min-h-[44px] min-w-[80px] touch-manipulation flex-shrink-0 active:scale-95"
-                >
-                  <span className="text-xs font-bold">{isLastStep ? 'Start' : 'Next'}</span>
-                  {isLastStep ? (
-                    <Check className="w-4 h-4" />
-                  ) : (
-                    <ArrowRight className="w-4 h-4" />
-                  )}
-                </button>
+                {/* Progress Indicators */}
+                <div className="flex items-center justify-center space-x-2 py-4">
+                  {ONBOARDING_STEPS.map((_, index) => (
+                    <div
+                      key={index}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${index === currentStep
+                          ? 'w-8 bg-violet-500'
+                          : 'w-1.5 bg-slate-700'
+                        }`}
+                    />
+                  ))}
+                </div>
               </div>
 
-              {/* Skip text */}
-              {!isLastStep && (
-                <div className="text-center">
+              {/* Footer Actions */}
+              <div className="mt-4 pt-4 border-t border-white/10 flex flex-col space-y-3">
+                <div className="flex items-center gap-3">
+                  {!isFirstStep && (
+                    <button
+                      onClick={handlePrevious}
+                      className="px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-semibold transition-all min-w-[44px]"
+                    >
+                      <ArrowLeft className="w-5 h-5" />
+                    </button>
+                  )}
+
+                  <button
+                    onClick={handleNext}
+                    className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold transition-all shadow-lg shadow-violet-600/25 active:scale-[0.98]"
+                  >
+                    <span>{isLastStep ? 'Get Started' : 'Next Step'}</span>
+                    {isLastStep ? <Sparkles className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
+                  </button>
+                </div>
+
+                {!isLastStep && (
                   <button
                     onClick={onSkip}
-                    className="text-[10px] text-slate-500 hover:text-slate-400 transition-colors font-medium touch-manipulation py-1 min-h-[32px]"
+                    className="text-xs text-slate-500 hover:text-white transition-colors font-medium py-2"
                   >
                     Skip tutorial
                   </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
