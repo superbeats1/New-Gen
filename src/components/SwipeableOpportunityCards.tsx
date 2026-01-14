@@ -85,33 +85,33 @@ export const SwipeableOpportunityCards: React.FC<Props> = ({ opportunities, rend
     <div className="relative">
       {/* Swipe Hint (shows prominently above cards) */}
       {opportunities.length > 1 && (
-        <div className="lg:hidden mb-8 text-center animate-in fade-in slide-in-from-top-2 duration-500 delay-300">
-          <div className="inline-flex items-center space-x-3 px-6 py-3 rounded-full bg-violet-600/20 border border-violet-500/30 shadow-lg shadow-violet-500/10">
-            <ChevronLeft className="w-4 h-4 text-violet-300 animate-pulse" />
-            <span className="text-sm font-black text-violet-200 uppercase tracking-widest">
-              Swipe to explore more opportunities
+        <div className="lg:hidden mb-4 sm:mb-8 text-center animate-in fade-in slide-in-from-top-2 duration-500 delay-300 px-2">
+          <div className="inline-flex items-center space-x-2 sm:space-x-3 px-3 sm:px-6 py-2 sm:py-3 rounded-full bg-violet-600/20 border border-violet-500/30 shadow-lg shadow-violet-500/10">
+            <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4 text-violet-300 animate-pulse flex-shrink-0" />
+            <span className="text-[10px] sm:text-sm font-black text-violet-200 uppercase tracking-wider sm:tracking-widest">
+              Swipe for more
             </span>
-            <ChevronRight className="w-4 h-4 text-violet-300 animate-pulse" />
+            <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-violet-300 animate-pulse flex-shrink-0" />
           </div>
         </div>
       )}
 
       {/* Progress Indicators */}
-      <div className="flex items-center justify-between mb-6 px-2">
+      <div className="flex items-center justify-between mb-4 sm:mb-6 px-1 sm:px-2">
         <div className="flex items-center space-x-2">
-          <span className="text-xs font-black text-slate-500 uppercase tracking-widest">
+          <span className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-wider sm:tracking-widest">
             Signal {currentIndex + 1} of {opportunities.length}
           </span>
         </div>
-        <div className="flex items-center space-x-1.5">
+        <div className="flex items-center space-x-1 sm:space-x-1.5">
           {opportunities.map((_, index) => (
             <button
               key={index}
               onClick={() => goToCard(index)}
-              className={`h-1.5 rounded-full transition-all ${
+              className={`h-1 sm:h-1.5 rounded-full transition-all ${
                 index === currentIndex
-                  ? 'w-8 bg-violet-500'
-                  : 'w-1.5 bg-slate-700 hover:bg-slate-600'
+                  ? 'w-5 sm:w-8 bg-violet-500'
+                  : 'w-1 sm:w-1.5 bg-slate-700 hover:bg-slate-600'
               }`}
               aria-label={`Go to opportunity ${index + 1}`}
             />
