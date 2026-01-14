@@ -97,6 +97,105 @@ function getGeminiText(result: any): string {
 }
 
 // Helper to extract JSON from text that might contain markdown or conversational filler
+function repairTruncatedJson(json: string): string {
+  if (!json) return json;
+
+  // Count open brackets and braces
+  let openBraces = 0;
+  let openBrackets = 0;
+  let inString = false;
+  let escapeNext = false;
+
+  for (let i = 0; i < json.length; i++) {
+    const char = json[i];
+
+    if (escapeNext) {
+      escapeNext = false;
+      continue;
+    }
+
+    if (char === '\\') {
+      escapeNext = true;
+      continue;
+    }
+
+    if (char === '"') {
+      inString = !inString;
+      continue;
+    }
+
+    if (!inString) {
+      if (char === '{') openBraces++;
+      else if (char === '}') openBraces--;
+      else if (char === '[') openBrackets++;
+      else if (char === ']') openBrackets--;
+    }
+  }
+
+  // If balanced, return as-is
+  if (openBraces === 0 && openBrackets === 0) {
+    return json;
+  }
+
+  console.log(`🔧 Repairing truncated JSON: ${openBraces} unclosed braces, ${openBrackets} unclosed brackets`);
+
+  // Try to find the last complete object in an array
+  // Look for the last complete "}" that could end an array item
+  let repaired = json;
+
+  // If we're in the middle of a string, close it
+  if (inString) {
+    repaired += '"';
+  }
+
+  // Find the last valid stopping point (after a complete value)
+  // Look for patterns like: "},\n    {" which indicates an incomplete next item
+  const incompleteItemPattern = /,\s*\{[^}]*$/;
+  if (incompleteItemPattern.test(repaired)) {
+    // Remove the incomplete item
+    repaired = repaired.replace(incompleteItemPattern, '');
+    console.log('🔧 Removed incomplete array item');
+  }
+
+  // Also check for incomplete property
+  const incompletePropertyPattern = /,\s*"[^"]*":\s*(?:\{[^}]*|\[[^\]]*|"[^"]*)?$/;
+  if (incompletePropertyPattern.test(repaired)) {
+    repaired = repaired.replace(incompletePropertyPattern, '');
+    console.log('🔧 Removed incomplete property');
+  }
+
+  // Recount after cleanup
+  openBraces = 0;
+  openBrackets = 0;
+  inString = false;
+  escapeNext = false;
+
+  for (let i = 0; i < repaired.length; i++) {
+    const char = repaired[i];
+    if (escapeNext) { escapeNext = false; continue; }
+    if (char === '\\') { escapeNext = true; continue; }
+    if (char === '"') { inString = !inString; continue; }
+    if (!inString) {
+      if (char === '{') openBraces++;
+      else if (char === '}') openBraces--;
+      else if (char === '[') openBrackets++;
+      else if (char === ']') openBrackets--;
+    }
+  }
+
+  // Close any remaining open structures
+  while (openBrackets > 0) {
+    repaired += ']';
+    openBrackets--;
+  }
+  while (openBraces > 0) {
+    repaired += '}';
+    openBraces--;
+  }
+
+  return repaired;
+}
+
 function extractJsonFromText(text: string): string {
   if (!text || typeof text !== 'string') return '';
 
@@ -123,7 +222,25 @@ function extractJsonFromText(text: string): string {
     }
 
     if (start !== -1 && end !== -1 && end > start) {
-      return text.substring(start, end + 1);
+      let extracted = text.substring(start, end + 1);
+
+      // Try to parse as-is first
+      try {
+        JSON.parse(extracted);
+        return extracted;
+      } catch (e) {
+        // If parsing fails, try to repair truncated JSON
+        console.log('🔧 JSON parse failed, attempting repair...');
+        const repaired = repairTruncatedJson(extracted);
+        try {
+          JSON.parse(repaired);
+          console.log('✅ JSON repair successful');
+          return repaired;
+        } catch (e2) {
+          console.warn('⚠️ JSON repair failed, returning original');
+          return extracted;
+        }
+      }
     }
   } catch (e) {
     console.warn("Manual JSON extraction failed, falling back to regex", e);
