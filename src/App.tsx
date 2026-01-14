@@ -514,7 +514,7 @@ const App: React.FC = () => {
     setIsUpgrading(true);
     try {
       setShowUpgradeModal(false);
-      await createCheckoutSession();
+      await createCheckoutSession(session?.user?.email);
     } catch (error) {
       console.error('Upgrade error:', error);
       alert('Failed to start upgrade process. Please try again.');
@@ -604,7 +604,7 @@ const App: React.FC = () => {
           }
         }}
       />
-      <div className="flex h-screen overflow-hidden bg-[#030407] text-slate-200 selection:bg-violet-500/30 relative">
+      <div className="flex h-screen w-screen max-w-full overflow-x-hidden overflow-y-hidden bg-[#030407] text-slate-200 selection:bg-violet-500/30 relative">
         <IntelligentBackground />
         <DiagnosticHub results={results} isSearching={isSearching} stats={diagStats} />
 
@@ -731,7 +731,7 @@ const App: React.FC = () => {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col h-full relative overflow-y-auto z-10 w-full lg:pl-[304px]">
+            <main className="flex-1 flex flex-col h-full relative overflow-x-hidden overflow-y-auto z-10 w-full lg:pl-[304px]">
               <header className="h-16 sm:h-20 flex items-center justify-between px-3 sm:px-4 lg:px-10 sticky top-0 z-30 bg-[#0a0b0f]/80 backdrop-blur-xl lg:bg-transparent border-b border-white/5 lg:border-0">
                 <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
                   <button
@@ -755,7 +755,7 @@ const App: React.FC = () => {
                 </div>
               </header>
 
-              <div className="flex-1 px-3 sm:px-4 lg:px-10 pb-32 sm:pb-32 lg:pb-20 overflow-y-auto w-full flex flex-col items-center">
+              <div className="flex-1 px-3 sm:px-4 lg:px-10 pb-32 sm:pb-32 lg:pb-20 overflow-x-hidden overflow-y-auto w-full flex flex-col items-center">
                 {view === 'home' && !isSearching && (
                   <div className="max-w-4xl w-full mx-auto py-4 sm:py-10 lg:py-16">
                     <div className="text-center mb-6 sm:mb-12 lg:mb-20 space-y-2 sm:space-y-4 lg:space-y-6">
@@ -896,7 +896,7 @@ const App: React.FC = () => {
                 )}
 
                 {view === 'results' && results && !isSearching && (
-                  <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="w-full max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-hidden">
                     <OpportunityView
                       results={results}
                       onNewSearch={() => { setView('home'); setResults(null); setQuery(''); }}

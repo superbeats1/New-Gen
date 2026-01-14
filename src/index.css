@@ -10,14 +10,23 @@
   --signal-accent: #8b5cf6; /* Violet 500 */
 }
 
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
 body {
   font-family: 'Outfit', sans-serif;
   background-color: var(--signal-bg);
   color: #e2e8f0;
-  overflow-x: hidden;
-  background-image: 
+  background-image:
     radial-gradient(circle at 15% 50%, rgba(109, 40, 217, 0.08), transparent 25%),
     radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%);
+}
+
+#root {
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 /* Glassmorphism Utilities */
