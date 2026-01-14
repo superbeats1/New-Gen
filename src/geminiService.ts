@@ -502,6 +502,10 @@ IMPORTANT: If there's NO clear competitor or insufficient data, SET competitorAn
       const validatedOpportunities = Array.isArray(parsed.opportunities)
         ? parsed.opportunities.map((opp: any) => ({
           ...opp,
+          // Ensure evidence array exists (required by type, used as fallback in UI)
+          evidence: Array.isArray(opp.evidence) ? opp.evidence : [],
+          // Ensure nextSteps array exists (required by type)
+          nextSteps: Array.isArray(opp.nextSteps) ? opp.nextSteps : [],
           supportingEvidence: Array.isArray(opp.supportingEvidence)
             ? opp.supportingEvidence
               .filter((ev: any) => ev && typeof ev === 'object' && ev.quote && ev.context)
